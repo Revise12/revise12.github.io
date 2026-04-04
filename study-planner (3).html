@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revise — Smart Study Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e0f;--surface:#161618;--surface2:#1e1e21;--border:#2a2a2e;
+  --accent:#c8f564;--accent2:#64c8f5;--accent3:#f5a664;
+  --text:#f0efe8;--muted:#7a7a82;--danger:#f56464;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+.app{max-width:940px;margin:0 auto;padding:32px 20px 100px;}
+
+/* ── HEADER ── */
+header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:38px;gap:16px;flex-wrap:wrap;}
+.logo{font-family:'Instrument Serif',serif;font-size:2.9rem;line-height:1;letter-spacing:-2px;}
+.logo span{color:var(--accent);}
+.tagline{font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;font-weight:500;}
+
+/* ── AUTH BUTTON / BADGE ── */
+.auth-area{display:flex;align-items:center;gap:10px;}
+.auth-btn{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 15px;cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;}
+.auth-btn:hover{border-color:var(--accent);}
+.auth-btn img{width:18px;height:18px;border-radius:50%;}
+.auth-btn-label{font-size:0.76rem;font-weight:600;color:var(--text);}
+.auth-btn-sub{font-size:0.64rem;color:var(--muted);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background 0.3s;}
+.sync-dot.syncing{background:var(--accent3);animation:pulse 1s infinite;}
+.sync-dot.synced{background:var(--accent);}
+.sync-dot.err{background:var(--danger);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ── SETUP SCREEN ── */
+#setupScreen{display:none;max-width:560px;margin:60px auto 0;}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;text-align:center;}
+.setup-title{font-family:'Instrument Serif',serif;font-size:2rem;letter-spacing:-1px;margin-bottom:10px;}
+.setup-sub{font-size:0.85rem;color:var(--muted);line-height:1.6;margin-bottom:28px;}
+.setup-steps{text-align:left;margin-bottom:28px;display:grid;gap:14px;}
+.step{display:flex;gap:12px;align-items:flex-start;}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#0e0e0f;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:0.84rem;line-height:1.5;color:var(--muted);}
+.step-text strong{color:var(--text);}
+.step-text a{color:var(--accent);text-decoration:none;}
+.step-text a:hover{text-decoration:underline;}
+.config-area{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;text-align:left;}
+.config-label{font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;display:block;}
+textarea.config-input{width:100%;min-height:130px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--accent);font-family:'DM Mono',monospace;font-size:0.78rem;line-height:1.5;resize:vertical;outline:none;}
+textarea.config-input:focus{border-color:var(--accent);}
+.config-err{font-size:0.78rem;color:var(--danger);margin-top:8px;display:none;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;background:var(--surface);padding:4px;border-radius:var(--r);border:1px solid var(--border);margin-bottom:26px;}
+.tab{flex:1;padding:10px 6px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.2s;}
+.tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 8px rgba(0,0,0,0.4);}
+.tab:hover:not(.active){color:var(--text);}
+.page{display:none;}.page.active{display:block;}
+.stitle{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:13px;font-weight:600;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;}
+.fg{display:flex;flex-direction:column;gap:7px;}
+.fg label{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+input[type="text"],input[type="date"],input[type="number"],textarea:not(.config-input){background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;width:100%;}
+textarea:not(.config-input){resize:vertical;min-height:70px;line-height:1.5;}
+input:focus,textarea:not(.config-input):focus{border-color:var(--accent);}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
+.btn{padding:9px 17px;border:none;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:0.76rem;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;}
+.btn-p{background:var(--accent);color:#0e0e0f;}
+.btn-p:hover{background:#d4f870;transform:translateY(-1px);}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-g:hover{color:var(--text);border-color:var(--muted);}
+.btn-d{background:transparent;color:var(--danger);border:1px solid var(--border);padding:4px 10px;font-size:0.66rem;}
+.btn-d:hover{border-color:var(--danger);background:rgba(245,100,100,0.08);}
+.btn-sm{padding:6px 12px;font-size:0.68rem;}
+.btn-google{background:#fff;color:#3c3c3c;display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:9px;font-size:0.82rem;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+.btn-google:hover{background:#f5f5f5;transform:translateY(-1px);}
+.btn-google svg{flex-shrink:0;}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;}
+.sw:hover{transform:scale(1.15);}
+.sw.on{border-color:var(--text);transform:scale(1.1);}
+
+/* ── SUBJECT CARDS ── */
+.sg{display:grid;gap:9px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
+.sc-h{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none;}
+.sc-dot{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.95rem;}
+.sc-info{flex:1;min-width:0;}
+.sc-name{font-size:0.92rem;font-weight:700;margin-bottom:3px;}
+.sc-meta{font-size:0.71rem;color:var(--muted);display:flex;gap:11px;flex-wrap:wrap;}
+.dbadge{font-family:'DM Mono',monospace;font-size:0.68rem;padding:3px 8px;border-radius:20px;font-weight:500;flex-shrink:0;}
+.du{background:rgba(245,100,100,0.15);color:var(--danger);}
+.ds{background:rgba(245,166,100,0.15);color:var(--accent3);}
+.do{background:rgba(200,245,100,0.15);color:var(--accent);}
+.dp{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.chev{color:var(--muted);font-size:0.72rem;transition:transform 0.2s;flex-shrink:0;margin-left:4px;}
+.sc.open .chev{transform:rotate(180deg);}
+.tp{border-top:1px solid var(--border);padding:14px 18px 18px;display:none;}
+.sc.open .tp{display:block;}
+.tlist{display:grid;gap:6px;margin-bottom:12px;}
+.trow{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:9px 12px;flex-wrap:wrap;}
+.trow-name{font-size:0.83rem;font-weight:600;flex:1;min-width:120px;}
+.conf5{display:flex;gap:3px;}
+.c5btn{padding:4px 0;width:36px;border-radius:6px;font-size:0.62rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;opacity:0.32;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;}
+.c5btn:hover{opacity:0.7;}.c5btn.on{opacity:1;}
+.l1{background:rgba(220,50,50,0.15);color:#e05555;border-color:rgba(220,50,50,0.3);}
+.l2{background:rgba(245,130,60,0.15);color:#f5823c;border-color:rgba(245,130,60,0.3);}
+.l3{background:rgba(245,200,60,0.15);color:#e8c040;border-color:rgba(245,200,60,0.3);}
+.l4{background:rgba(140,220,80,0.15);color:#8edc50;border-color:rgba(140,220,80,0.3);}
+.l5{background:rgba(80,220,120,0.15);color:#50dc78;border-color:rgba(80,220,120,0.3);}
+.l1.on{background:rgba(220,50,50,0.28);}
+.l2.on{background:rgba(245,130,60,0.28);}
+.l3.on{background:rgba(245,200,60,0.28);}
+.l4.on{background:rgba(140,220,80,0.28);}
+.l5.on{background:rgba(80,220,120,0.28);}
+.add-tr{display:flex;gap:8px;}.add-tr input{flex:1;}
+
+/* ── SCHEDULE ── */
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
+.dlabel{font-family:'Instrument Serif',serif;font-size:1.3rem;letter-spacing:-0.5px;}
+.dnav{display:flex;gap:6px;}
+.dnav button{background:var(--surface);border:1px solid var(--border);color:var(--text);height:31px;padding:0 10px;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;}
+.dnav button:hover{border-color:var(--accent);color:var(--accent);}
+.wstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px;}
+.wd{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.wd:hover{border-color:var(--muted);}
+.wd.sel{border-color:var(--accent);background:rgba(200,245,100,0.07);}
+.wd.tod .wdn{color:var(--accent);font-weight:700;}
+.wdl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;font-weight:600;}
+.wdn{font-family:'DM Mono',monospace;font-size:0.9rem;}
+.wdd{display:flex;justify-content:center;gap:2px;margin-top:4px;min-height:5px;}
+.wdot{width:5px;height:5px;border-radius:50%;}
+.slist{display:grid;gap:9px;}
+.eday{background:var(--surface);border:1px dashed var(--border);border-radius:var(--r);padding:34px;text-align:center;color:var(--muted);}
+.eday .ej{font-size:1.7rem;margin-bottom:9px;}
+.eday p{font-size:0.82rem;}
+
+/* ── SESSION CARD ── */
+.sess{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
+.sess::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
+.sess.done{opacity:0.5;}
+.sess.done .stit{text-decoration:line-through;}
+.sess-main{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;}
+.sck{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;background:transparent;color:transparent;font-size:0.78rem;margin-top:2px;}
+.sck:hover{border-color:var(--accent);}
+.sess.done .sck{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
+.si{flex:1;min-width:0;}
+.stit{font-size:0.88rem;font-weight:700;margin-bottom:5px;}
+.smeta{font-size:0.71rem;color:var(--muted);display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:6px;}
+.styp{font-family:'DM Mono',monospace;font-size:0.62rem;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.07em;}
+.t-fl{background:rgba(200,245,100,0.1);color:var(--accent);}
+.t-rv{background:rgba(100,200,245,0.1);color:var(--accent2);}
+.t-st{background:rgba(245,166,100,0.1);color:var(--accent3);}
+.sugg-block{background:var(--surface2);border-radius:9px;padding:11px 13px;margin-bottom:2px;}
+.sugg-label{font-size:0.63rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.sugg-label span{background:var(--accent);color:#0e0e0f;border-radius:4px;padding:1px 6px;font-size:0.6rem;}
+.sugg-rows{display:grid;gap:5px;}
+.sugg-row{display:flex;align-items:center;gap:9px;padding:6px 8px;background:var(--surface);border-radius:7px;border:1px solid var(--border);}
+.sugg-name{flex:1;font-size:0.82rem;font-weight:600;}
+.sugg-reason{font-size:0.68rem;color:var(--muted);}
+.cb5l{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;}
+.cb0{background:var(--surface2);color:var(--muted);}
+.cb1{background:rgba(220,50,50,0.2);color:#e05555;}
+.cb2{background:rgba(245,130,60,0.2);color:#f5823c;}
+.cb3{background:rgba(245,200,60,0.2);color:#e8c040;}
+.cb4{background:rgba(140,220,80,0.2);color:#8edc50;}
+.cb5{background:rgba(80,220,120,0.2);color:#50dc78;}
+.sa{display:flex;gap:5px;flex-shrink:0;}
+.sib{background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);cursor:pointer;padding:5px 8px;font-size:0.76rem;transition:all 0.15s;}
+.sib:hover,.sib.on{border-color:var(--accent);color:var(--accent);background:rgba(200,245,100,0.07);}
+.sess-exp{border-top:1px solid var(--border);padding:14px 16px;display:none;}
+.tp-pick{margin-bottom:12px;}
+.tp-pl{font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px;}
+.tchips{display:flex;gap:5px;flex-wrap:wrap;}
+.tchip{padding:4px 10px;border-radius:20px;font-size:0.71rem;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all 0.15s;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;}
+.tchip:hover{border-color:var(--muted);color:var(--text);}
+.tchip.on{border-color:var(--c,var(--accent));color:var(--c,var(--accent));background:rgba(200,245,100,0.06);}
+.nlbl{font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px;}
+
+/* ── PROGRESS ── */
+.pg{display:grid;gap:12px;}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden;}
+.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
+.pch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:11px;}
+.pcn{font-size:0.96rem;font-weight:700;margin-bottom:3px;}
+.pcs{display:flex;gap:15px;flex-wrap:wrap;}
+.sv{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:500;line-height:1;margin-bottom:3px;}
+.sl{font-size:0.61rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
+.pbar-w{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-bottom:12px;}
+.pbar{height:100%;border-radius:4px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+.tbd{margin-top:14px;border-top:1px solid var(--border);padding-top:12px;}
+.tbd-t{font-size:0.63rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px;}
+.tbr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.tbn{font-size:0.81rem;flex:1;}
+.last-studied{font-size:0.67rem;color:var(--muted);}
+.conf-bar{width:80px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
+.conf-bar-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+.struggle-box{background:rgba(245,100,100,0.07);border:1px solid rgba(245,100,100,0.18);border-radius:8px;padding:9px 12px;font-size:0.77rem;color:var(--danger);margin-top:8px;}
+
+/* ── POMODORO MODAL ── */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,0.74);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.ovl.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;animation:mIn 0.22s ease;}
+@keyframes mIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.mt{font-family:'Instrument Serif',serif;font-size:1.4rem;letter-spacing:-0.5px;}
+.mcl{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.mcl:hover{color:var(--text);border-color:var(--muted);}
+.pbox{background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:13px;}
+.prw{position:relative;width:86px;height:86px;margin:0 auto 10px;}
+.prw svg{transform:rotate(-90deg);}
+.rbg{fill:none;stroke:var(--border);stroke-width:6;}
+.rfl{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.5s;}
+.rfl.brk{stroke:var(--accent2);}
+.rinn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ptm{font-family:'DM Mono',monospace;font-size:1.25rem;line-height:1;}
+.pph{font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px;font-weight:600;}
+.pctl{display:flex;gap:7px;justify-content:center;margin:10px 0;}
+.pset{display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap;}
+.pset label{font-size:0.63rem;color:var(--muted);letter-spacing:0.07em;text-transform:uppercase;font-weight:600;}
+.pset input{width:50px;padding:6px 7px;font-size:0.8rem;text-align:center;}
+.pdots{display:flex;gap:4px;justify-content:center;margin-top:9px;}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all 0.3s;}
+.pdot.dn{background:var(--accent);}
+.pdot.cu{background:var(--accent);box-shadow:0 0 5px var(--accent);}
+
+.es{text-align:center;padding:48px 20px;color:var(--muted);}
+.es .be{font-size:2.6rem;margin-bottom:13px;}
+.es p{font-size:0.83rem;line-height:1.6;max-width:300px;margin:0 auto;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:0.81rem;transform:translateY(60px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:10000;max-width:260px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ac{border-color:var(--accent);}
+
+@media(max-width:600px){
+  .fr3c{grid-template-columns:1fr!important;}
+  .logo{font-size:2.2rem;}
+  .pcs{gap:9px;}.sv{font-size:1.1rem;}
+  .tab{font-size:0.67rem;padding:8px 4px;}
+  .conf5{flex-wrap:wrap;}
+  .auth-btn-sub{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     SETUP SCREEN — shown before Firebase config is saved
+═══════════════════════════════════════════════════════ -->
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-title">Connect Firebase</div>
+    <p class="setup-sub">Revise uses Firebase to sync your data across all your devices. Takes about 5 minutes to set up — free forever.</p>
+    <div class="setup-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> and create a new project (disable Google Analytics if asked).</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">In your project, go to <strong>Build → Authentication</strong>, click <strong>Get started</strong>, enable the <strong>Google</strong> sign-in provider.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Go to <strong>Build → Firestore Database</strong>, click <strong>Create database</strong>, choose <strong>Start in test mode</strong>, pick any region.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Go to <strong>Project Settings</strong> (gear icon) → <strong>Your apps</strong> → click the <strong>&lt;/&gt;</strong> web icon → register an app → copy the <code style="color:var(--accent);font-size:0.8em">firebaseConfig</code> object shown.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Paste the entire <code style="color:var(--accent);font-size:0.8em">firebaseConfig = { ... }</code> block (or just the JSON object) below.</div></div>
+    </div>
+    <div class="config-area">
+      <span class="config-label">Paste your firebaseConfig here</span>
+      <textarea class="config-input" id="configInput" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "your-app.firebaseapp.com",
+  "projectId": "your-app",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123..."
+}'></textarea>
+      <div class="config-err" id="configErr"></div>
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="saveConfig()">Save &amp; Connect →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════ -->
+<div class="app" id="mainApp" style="display:none">
+  <header>
+    <div>
+      <div class="tagline">Evidence-based exam prep</div>
+      <div class="logo">Re<span>vise</span></div>
+    </div>
+    <div class="auth-area">
+      <div class="sync-dot" id="syncDot" title="Sync status"></div>
+      <div class="auth-btn" id="authBtn" onclick="handleAuthClick()">
+        <span id="authBtnContent">
+          <span class="auth-btn-label">Sign in with Google</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
+    <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
+    <button class="tab" onclick="showPage('progress',this)">Progress</button>
+  </nav>
+
+  <!-- SUBJECTS -->
+  <div id="page-subjects" class="page active">
+    <div class="stitle">Add a subject</div>
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:11px;align-items:end;margin-bottom:13px" class="fr3c">
+        <div class="fg"><label>Subject Name</label><input type="text" id="sn" placeholder="e.g. Mathematics" maxlength="40"></div>
+        <div class="fg"><label>Exam Date</label><input type="date" id="ed"></div>
+        <button class="btn btn-p" style="align-self:flex-end" onclick="addSubject()">+ Add</button>
+      </div>
+      <div class="fg"><label>Colour</label><div class="swatches" id="swatches"></div></div>
+    </div>
+    <div class="stitle">Your subjects</div>
+    <div class="sg" id="sg">
+      <div class="es"><div class="be">📚</div><p>Add subjects above, then expand to add topics and set your confidence on each one.</p></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="page-schedule" class="page">
+    <div class="sh">
+      <div><div class="stitle">Daily sessions</div><div class="dlabel" id="dlabel">Today</div></div>
+      <div class="dnav">
+        <button onclick="changeDay(-1)">←</button>
+        <button onclick="goToday()">Today</button>
+        <button onclick="changeDay(1)">→</button>
+      </div>
+    </div>
+    <div class="wstrip" id="wstrip"></div>
+    <div class="slist" id="slist"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="page-progress" class="page">
+    <div class="stitle">Progress &amp; topic confidence</div>
+    <div class="pg" id="pg">
+      <div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- POMODORO MODAL -->
+<div class="ovl" id="pomoOvl">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="pomoTitle">Focus Session</div><button class="mcl" onclick="closePomo()">✕</button></div>
+    <div class="pbox">
+      <div style="text-align:center">
+        <div class="prw">
+          <svg width="86" height="86" viewBox="0 0 86 86">
+            <circle class="rbg" cx="43" cy="43" r="36"/>
+            <circle class="rfl" id="rfl" cx="43" cy="43" r="36"/>
+          </svg>
+          <div class="rinn"><div class="ptm" id="ptm">25:00</div><div class="pph" id="pph">Focus</div></div>
+        </div>
+        <div class="pdots" id="pdots"></div>
+      </div>
+      <div class="pctl"><button class="btn btn-p" id="pstbtn" onclick="togglePomo()">Start</button><button class="btn btn-g" onclick="resetPomo()">Reset</button></div>
+      <div class="pset">
+        <label>Focus (min)</label><input type="number" id="pfoc" value="25" min="1" max="60" onchange="resetPomo()">
+        <label>Break (min)</label><input type="number" id="pbrk" value="5" min="1" max="30" onchange="resetPomo()">
+        <label>Rounds</label><input type="number" id="prnd" value="4" min="1" max="8" onchange="resetPomo()">
+      </div>
+    </div>
+    <label class="nlbl">Session Notes</label>
+    <textarea id="mnt" placeholder="What did you cover? Any struggles?"></textarea>
+    <button class="btn btn-g btn-sm" style="margin-top:8px" onclick="saveModalNotes()">Save Notes</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, onSnapshot, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ════════════════════════════════════════════════════════
+// CONFIG SETUP
+// ════════════════════════════════════════════════════════
+const STORAGE_CONFIG_KEY = 'revise_fb_config';
+
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_CONFIG_KEY)); } catch(e){ return null; }
+}
+
+window.saveConfig = function() {
+  const raw = document.getElementById('configInput').value.trim();
+  const errEl = document.getElementById('configErr');
+  errEl.style.display = 'none';
+  let cfg;
+  try {
+    // Accept either a raw JSON object or the full firebaseConfig = {...} assignment
+    const cleaned = raw
+	  .replace(/\/\/.*$/gm, '') // remove comments
+	  .replace(/^(const|var|let)?\s*firebaseConfig\s*=\s*/, '')
+	  .replace(/;?\s*$/, '');
+		cfg = Function('"use strict"; return (' + cleaned + ')')();
+  } catch(e) {
+    errEl.textContent = '⚠️ Could not parse config — make sure you copied the full firebaseConfig object.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const required = ['apiKey','authDomain','projectId'];
+  const missing = required.filter(k => !cfg[k]);
+  if (missing.length) {
+    errEl.textContent = `⚠️ Missing fields: ${missing.join(', ')}`;
+    errEl.style.display = 'block';
+    return;
+  }
+  localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify(cfg));
+  location.reload();
+};
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+const fbConfig = loadConfig();
+
+if (!fbConfig) {
+  document.getElementById('setupScreen').style.display = 'block';
+} else {
+  document.getElementById('mainApp').style.display = 'block';
+  bootApp(fbConfig);
+}
+
+function bootApp(fbConfig) {
+  const app  = initializeApp(fbConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── LOCAL STATE (used before/after auth) ──────────────
+  const COLORS = ['#c8f564','#64c8f5','#f5a664','#f564a0','#a064f5','#64f5c8','#f5e664','#f56464','#64a0f5','#c864f5'];
+  const EMOJIS = ['📗','📘','📙','📕','📓','📔','📒','📃','🔬','🧪'];
+  const CLABEL = ['','Lost','Shaky','Getting it','Almost there','Nailed it'];
+  const CCLASS = ['cb0','cb1','cb2','cb3','cb4','cb5'];
+  const CCOLOR = ['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
+
+  let S = JSON.parse(localStorage.getItem('rv4') || 'null') || { subjects:[], sessions:{}, ci:0 };
+  let currentUser = null;
+  let firestoreUnsub = null;
+  let saveTimer = null;
+  let ignoreSnapshot = false;
+
+  // ── SYNC STATUS ────────────────────────────────────────
+  function setSyncDot(state) {
+    const d = document.getElementById('syncDot');
+    d.className = 'sync-dot ' + state; // '', 'syncing', 'synced', 'err'
+  }
+
+  // ── FIRESTORE SAVE (debounced 1.2s) ───────────────────
+  function scheduleSave() {
+    if (!currentUser) { localStorage.setItem('rv4', JSON.stringify(S)); return; }
+    setSyncDot('syncing');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        ignoreSnapshot = true;
+        await setDoc(doc(db, 'users', currentUser.uid, 'data', 'state'), S);
+        setSyncDot('synced');
+        setTimeout(() => setSyncDot(''), 2000);
+      } catch(e) {
+        console.error('Save error', e);
+        setSyncDot('err');
+        tk('Sync error — check your connection', false);
+      } finally {
+        setTimeout(() => { ignoreSnapshot = false; }, 500);
+      }
+    }, 1200);
+  }
+
+  function save() {
+    localStorage.setItem('rv4', JSON.stringify(S));
+    scheduleSave();
+  }
+
+  // ── FIRESTORE REALTIME LISTENER ───────────────────────
+  function attachListener(uid) {
+    if (firestoreUnsub) firestoreUnsub();
+    firestoreUnsub = onSnapshot(
+      doc(db, 'users', uid, 'data', 'state'),
+      (snap) => {
+        if (ignoreSnapshot) return;
+        if (snap.exists()) {
+          S = snap.data();
+          localStorage.setItem('rv4', JSON.stringify(S));
+          renderAll();
+          setSyncDot('synced');
+          setTimeout(() => setSyncDot(''), 1500);
+        }
+      },
+      (err) => {
+        console.error('Listener error', err);
+        setSyncDot('err');
+      }
+    );
+  }
+
+  // ── AUTH ───────────────────────────────────────────────
+  window.handleAuthClick = function() {
+    if (currentUser) {
+      if (confirm('Sign out of Google?')) {
+        signOut(auth);
+      }
+    } else {
+      signInWithPopup(auth, new GoogleAuthProvider()).catch(e => {
+        tk('Sign-in failed: ' + e.message);
+      });
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    const btn = document.getElementById('authBtnContent');
+    if (user) {
+      btn.innerHTML = `
+        <img src="${user.photoURL||''}" onerror="this.style.display='none'">
+        <div>
+          <div class="auth-btn-label">${esc(user.displayName||'Signed in')}</div>
+          <div class="auth-btn-sub">Tap to sign out</div>
+        </div>`;
+      attachListener(user.uid);
+      tk('Signed in — syncing ✓', true);
+    } else {
+      btn.innerHTML = `<span class="auth-btn-label">Sign in with Google</span>`;
+      if (firestoreUnsub) { firestoreUnsub(); firestoreUnsub = null; }
+      setSyncDot('');
+    }
+  });
+
+  // ════════════════════════════════════════════════════════
+  // SWATCHES
+  // ════════════════════════════════════════════════════════
+  function renderSwatches() {
+    document.getElementById('swatches').innerHTML = COLORS.map((c,i) =>
+      `<div class="sw${i===S.ci?' on':''}" style="background:${c}" onclick="pickC(${i})"></div>`).join('');
+  }
+  window.pickC = function(i) { S.ci = i; renderSwatches(); };
+
+  // ════════════════════════════════════════════════════════
+  // SUBJECTS
+  // ════════════════════════════════════════════════════════
+  window.addSubject = function() {
+    const n = document.getElementById('sn').value.trim();
+    const d = document.getElementById('ed').value;
+    if (!n) return tk('Enter a subject name');
+    if (!d) return tk('Pick an exam date');
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (new Date(d) <= today) return tk('Exam must be in the future');
+    S.subjects.push({ id:''+Date.now(), name:n, examDate:d, color:COLORS[S.ci], emoji:EMOJIS[S.subjects.length % EMOJIS.length], topics:[] });
+    S.ci = (S.ci + 1) % COLORS.length;
+    save();
+    document.getElementById('sn').value = '';
+    document.getElementById('ed').value = '';
+    renderSwatches(); renderSubjects(); tk('Subject added ✓', true);
+  };
+
+  window.rmSubject = function(id) {
+    if (!confirm('Remove this subject?')) return;
+    S.subjects = S.subjects.filter(s => s.id !== id);
+    Object.keys(S.sessions).filter(k => k.startsWith(id+'_')).forEach(k => delete S.sessions[k]);
+    save(); renderSubjects(); renderProgress();
+  };
+
+  window.toggleCard = function(id) { document.getElementById('sc-'+id)?.classList.toggle('open'); };
+
+  window.addTopic = function(sid) {
+    const inp = document.getElementById('ti-'+sid);
+    const n = inp.value.trim(); if (!n) return;
+    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
+    sub.topics.push({ id:''+Date.now(), name:n, conf:0, lastStudied:null });
+    save(); inp.value = ''; renderSubjects();
+    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+  };
+
+  window.rmTopic = function(sid, tid) {
+    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
+    sub.topics = sub.topics.filter(t => t.id !== tid);
+    save(); renderSubjects();
+    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+  };
+
+  window.setConf = function(sid, tid, level) {
+    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
+    const t = sub.topics.find(t => t.id === tid); if (!t) return;
+    t.conf = (t.conf === level) ? 0 : level;
+    save(); renderSubjects(); renderProgress();
+    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+  };
+
+  function renderSubjects() {
+    const grid = document.getElementById('sg');
+    if (!S.subjects.length) {
+      grid.innerHTML = '<div class="es"><div class="be">📚</div><p>Add subjects above, then expand to add topics and set your confidence on each one.</p></div>';
+      return;
+    }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const sorted = [...S.subjects].sort((a,b) => new Date(a.examDate) - new Date(b.examDate));
+    grid.innerHTML = sorted.map(sub => {
+      const exam = new Date(sub.examDate);
+      const days = Math.ceil((exam - today) / 86400000);
+      const bc = days<=7?'du':days<=14?'ds':days<=30?'do':'dp';
+      const schd = genSched(sub);
+      const done = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
+      const examStr = exam.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+      const ratedTopics = sub.topics.filter(t => t.conf > 0);
+      const avgConf = ratedTopics.length ? Math.round(ratedTopics.reduce((a,t) => a+t.conf, 0) / ratedTopics.length * 10) / 10 : 0;
+
+      const topicsHtml = sub.topics.length
+        ? sub.topics.map(t => `
+          <div class="trow">
+            <div class="trow-name">${esc(t.name)}</div>
+            <div class="conf5">
+              ${[1,2,3,4,5].map(l => `<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CLABEL[l].split(' ')[0]}</button>`).join('')}
+            </div>
+            <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
+          </div>`).join('')
+        : '<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
+
+      return `
+      <div class="sc" id="sc-${sub.id}" style="--c:${sub.color}">
+        <div class="sc-h" onclick="toggleCard('${sub.id}')">
+          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color}">${sub.emoji}</div>
+          <div class="sc-info">
+            <div class="sc-name">${esc(sub.name)}</div>
+            <div class="sc-meta">
+              <span>📅 ${examStr}</span>
+              <span>📋 ${done}/${schd.length} sessions</span>
+              <span>🏷 ${sub.topics.length} topic${sub.topics.length!==1?'s':''}</span>
+              ${avgConf > 0 ? `<span style="color:${CCOLOR[Math.round(avgConf)]}">avg: ${avgConf}/5</span>` : ''}
+            </div>
+          </div>
+          <span class="dbadge ${bc}">${days===1?'1 day':days+' days'}</span>
+          <button class="btn btn-d btn-sm" onclick="event.stopPropagation();rmSubject('${sub.id}')">Remove</button>
+          <span class="chev">▾</span>
+        </div>
+        <div class="tp">
+          <div class="stitle" style="margin-bottom:9px">Topics &amp; confidence <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— 1 (Lost) → 5 (Nailed it)</span></div>
+          <div class="tlist">${topicsHtml}</div>
+          <div class="add-tr">
+            <input type="text" id="ti-${sub.id}" placeholder="Add a topic" maxlength="60"
+              onkeydown="if(event.key==='Enter')addTopic('${sub.id}')">
+            <button class="btn btn-p btn-sm" onclick="addTopic('${sub.id}')">+ Topic</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ════════════════════════════════════════════════════════
+  // SCHEDULE GENERATION
+  // ════════════════════════════════════════════════════════
+  function genSched(sub) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const d = Math.ceil((exam - today) / 86400000); if (d <= 0) return [];
+    let iv;
+    if (d<=3)       iv=[0,1,2];
+    else if (d<=7)  iv=[0,1,3,6];
+    else if (d<=14) iv=[0,1,3,6,10,13];
+    else if (d<=30) iv=[0,1,3,6,10,15,21,28];
+    else if (d<=60) iv=[0,1,3,7,12,18,25,35,45,55];
+    else { iv=[]; let g=1,day=0; while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);} if(iv[iv.length-1]<d-2)iv.push(d-2); }
+    const types = ['first','review','review','test','review','test','review','test','review','test'];
+    return iv.map((off,i) => {
+      const dt = new Date(today); dt.setDate(dt.getDate() + off);
+      if (dt >= today && dt < exam)
+        return { date:dt.toISOString().split('T')[0], subjectId:sub.id, type:types[Math.min(i,types.length-1)], idx:i };
+      return null;
+    }).filter(Boolean);
+  }
+
+  function allSess() { return S.subjects.flatMap(s => genSched(s)); }
+  function sessForDate(ds) { return allSess().filter(s => s.date === ds); }
+  function sk(s) { return `${s.subjectId}_${s.date}_${s.idx}`; }
+
+  // ════════════════════════════════════════════════════════
+  // TOPIC SUGGESTION ENGINE
+  // ════════════════════════════════════════════════════════
+  function suggestTopics(sub, sessType, n=3) {
+    if (!sub.topics.length) return [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const daysLeft = Math.max(1, Math.ceil((exam - today) / 86400000));
+
+    const scored = sub.topics.map(t => {
+      const confVal = t.conf === 0 ? 2.5 : t.conf;
+      const confScore = (5 - confVal);
+      let recencyScore = 0;
+      if (t.lastStudied) {
+        const ls = new Date(t.lastStudied); ls.setHours(0,0,0,0);
+        recencyScore = Math.min(Math.ceil((today - ls) / 86400000), 30) / 30 * 3;
+      } else {
+        recencyScore = 3;
+      }
+      const urgency = daysLeft <= 7 ? 1.5 : daysLeft <= 14 ? 1.2 : 1.0;
+      let typeBoost = 0;
+      if (sessType === 'test' && t.conf >= 3) typeBoost = 0.5;
+      if (sessType === 'first' && t.conf === 0) typeBoost = 1;
+      return { ...t, score: (confScore * urgency) + recencyScore + typeBoost + (Math.random() * 0.3) };
+    });
+    return scored.sort((a,b) => b.score - a.score).slice(0, n);
+  }
+
+  function suggReason(t, sub, sessType) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const daysLeft = Math.ceil((exam - today) / 86400000);
+    if (t.conf === 0) return 'Not yet rated — good time to start';
+    if (t.conf <= 2) return daysLeft <= 7 ? '⚠️ Exam soon & low confidence' : 'Low confidence — needs work';
+    if (t.lastStudied) {
+      const days = Math.ceil((today - new Date(t.lastStudied+'T00:00:00')) / 86400000);
+      if (days >= 7) return `Not studied in ${days} days`;
+      if (days >= 3) return `Last studied ${days} days ago`;
+    }
+    return sessType === 'test' ? 'Good to self-test on this' : 'Due for a spaced review';
+  }
+
+  // ════════════════════════════════════════════════════════
+  // WEEK STRIP & SESSIONS
+  // ════════════════════════════════════════════════════════
+  let selDate = new Date().toISOString().split('T')[0];
+
+  function renderStrip() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const all = allSess();
+    const sel = new Date(selDate + 'T00:00:00');
+    const ws  = new Date(sel); ws.setDate(sel.getDate() - sel.getDay());
+    const lbl = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    document.getElementById('wstrip').innerHTML = Array.from({length:7}, (_,i) => {
+      const d  = new Date(ws); d.setDate(ws.getDate() + i);
+      const ds = d.toISOString().split('T')[0];
+      const dots = all.filter(s => s.date === ds).slice(0,4).map(s2 => {
+        const sub = S.subjects.find(s => s.id === s2.subjectId);
+        return sub ? `<div class="wdot" style="background:${sub.color}"></div>` : '';
+      }).join('');
+      return `<div class="wd${ds===todayStr?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')">
+        <div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div>
+        <div class="wdd">${dots}</div></div>`;
+    }).join('');
+  }
+
+  window.selDay = function(ds) {
+    selDate = ds; renderStrip(); renderSessions();
+    const d = new Date(ds + 'T00:00:00');
+    document.getElementById('dlabel').textContent =
+      d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+  };
+  window.changeDay = function(delta) {
+    const d = new Date(selDate + 'T00:00:00'); d.setDate(d.getDate() + delta);
+    selDay(d.toISOString().split('T')[0]);
+  };
+  window.goToday = function() { selDay(new Date().toISOString().split('T')[0]); };
+
+  function renderSessions() {
+    const list = document.getElementById('slist');
+    const sess = sessForDate(selDate);
+    if (!sess.length) {
+      list.innerHTML = `<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length ? 'Nothing scheduled today — rest up!' : 'Add subjects to generate your schedule.'}</p></div>`;
+      return;
+    }
+    const TL   = {first:'First Look', review:'Spaced Review', test:'Self-Test'};
+    const TIPS = {first:'Read notes. Summarise in your own words.', review:'Cover notes — recall from memory.', test:'Quiz yourself — no notes.'};
+
+    list.innerHTML = sess.map(s2 => {
+      const sub = S.subjects.find(s => s.id === s2.subjectId); if (!sub) return '';
+      const k   = sk(s2); const sd = S.sessions[k] || {}; const done = !!sd.completedAt;
+      const hasNotes = !!(sd.notes && sd.notes.trim());
+      const suggestions = suggestTopics(sub, s2.type, 3);
+
+      const suggHtml = sub.topics.length ? `
+        <div class="sugg-block">
+          <div class="sugg-label">Suggested topics <span>smart pick</span></div>
+          <div class="sugg-rows">
+            ${suggestions.map(t => {
+              const isSel = (sd.topicIds || []).includes(t.id);
+              const confBadge = t.conf > 0
+                ? `<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`
+                : '<span class="cb5l cb0">Unrated</span>';
+              return `<div class="sugg-row">
+                <div>
+                  <div class="sugg-name">${esc(t.name)}</div>
+                  <div class="sugg-reason">${suggReason(t, sub, s2.type)}</div>
+                </div>
+                ${confBadge}
+                <button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel ? '✓ Done' : 'Study'}</button>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : '';
+
+      const chips = sub.topics.length ? `<div class="tp-pick" style="--c:${sub.color}">
+        <span class="tp-pl">All topics (mark covered)</span>
+        <div class="tchips">${sub.topics.map(t => {
+          const isSel = (sd.topicIds || []).includes(t.id);
+          return `<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}</button>`;
+        }).join('')}</div></div>` : '';
+
+      return `
+      <div class="sess${done?' done':''}" id="sc2-${k}" style="--c:${sub.color}">
+        <div class="sess-main">
+          <div class="sck" onclick="toggleDone('${k}')">${done ? '✓' : ''}</div>
+          <div class="si">
+            <div class="stit">${sub.emoji} ${esc(sub.name)}</div>
+            <div class="smeta">
+              <span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span>
+              <span>${TIPS[s2.type]}</span>
+            </div>
+            ${suggHtml}
+          </div>
+          <div class="sa">
+            <button class="sib${hasNotes?' on':''}" onclick="openPomo('${k}','${esc(sub.name)}')">🍅</button>
+            <button class="sib${hasNotes?' on':''}" onclick="toggleExp('${k}')">✏️</button>
+          </div>
+        </div>
+        <div class="sess-exp" id="exp-${k}">
+          ${chips}
+          <label class="nlbl">Session Notes</label>
+          <textarea id="nt-${k}" placeholder="What did you cover? Anything to remember?">${esc(sd.notes || '')}</textarea>
+          <button class="btn btn-g btn-sm" style="margin-top:7px" onclick="saveNotes('${k}')">Save Notes</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.toggleExp = function(k) {
+    const e = document.getElementById('exp-'+k);
+    e.style.display = e.style.display === 'block' ? 'none' : 'block';
+  };
+  window.toggleDone = function(k) {
+    const sd = S.sessions[k] || {};
+    if (sd.completedAt) { delete S.sessions[k]; }
+    else { S.sessions[k] = {...sd, completedAt: new Date().toISOString()}; tk('Session complete ✓', true); }
+    save(); renderSessions(); renderProgress(); renderSubjects();
+  };
+  window.toggleTopic = function(k, tid, sid) {
+    if (!S.sessions[k]) S.sessions[k] = {};
+    const sd = S.sessions[k]; if (!sd.topicIds) sd.topicIds = [];
+    const i = sd.topicIds.indexOf(tid);
+    if (i > -1) { sd.topicIds.splice(i, 1); }
+    else {
+      sd.topicIds.push(tid);
+      const sub = S.subjects.find(s => s.id === sid);
+      if (sub) { const t = sub.topics.find(t => t.id === tid); if (t) t.lastStudied = new Date().toISOString().split('T')[0]; }
+    }
+    save(); renderSessions();
+    setTimeout(() => { const e = document.getElementById('exp-'+k); if(e) e.style.display = 'block'; }, 8);
+  };
+  window.saveNotes = function(k) {
+    const v = document.getElementById('nt-'+k).value;
+    if (!S.sessions[k]) S.sessions[k] = {};
+    S.sessions[k].notes = v; save(); tk('Notes saved ✓', true);
+    renderSessions();
+    setTimeout(() => { const e = document.getElementById('exp-'+k); if(e) e.style.display = 'block'; }, 8);
+  };
+
+  // ════════════════════════════════════════════════════════
+  // POMODORO
+  // ════════════════════════════════════════════════════════
+  let P = {run:false, iv:null, left:0, total:0, phase:'focus', round:1, rounds:4, key:null};
+
+  window.openPomo = function(k, name) {
+    P.key = k; document.getElementById('pomoTitle').textContent = '🍅 ' + name;
+    const sd = S.sessions[k] || {};
+    document.getElementById('mnt').value = sd.notes || '';
+    resetPomo(); document.getElementById('pomoOvl').classList.add('open');
+  };
+  window.closePomo = function() { if (P.run) togglePomo(); document.getElementById('pomoOvl').classList.remove('open'); P.key = null; };
+  const gf = () => Math.max(1, parseInt(document.getElementById('pfoc').value)||25) * 60;
+  const gb = () => Math.max(1, parseInt(document.getElementById('pbrk').value)||5) * 60;
+  const gr = () => Math.max(1, parseInt(document.getElementById('prnd').value)||4);
+  window.resetPomo = function() {
+    if (P.iv) { clearInterval(P.iv); P.iv = null; }
+    P.run=false; P.phase='focus'; P.round=1; P.rounds=gr(); P.total=gf(); P.left=P.total;
+    document.getElementById('pstbtn').textContent = 'Start'; updPomo();
+  };
+  window.togglePomo = function() {
+    if (P.run) { clearInterval(P.iv); P.iv=null; P.run=false; document.getElementById('pstbtn').textContent='Resume'; }
+    else { P.run=true; document.getElementById('pstbtn').textContent='Pause'; P.iv=setInterval(tickPomo,1000); }
+  };
+  function tickPomo() {
+    P.left--;
+    if (P.left <= 0) {
+      if (P.phase === 'focus') {
+        tk(`Round ${P.round} done! Break time 🎉`, true);
+        if (P.round >= P.rounds) { clearInterval(P.iv); P.iv=null; P.run=false; document.getElementById('pstbtn').textContent='Done! 🏆'; return; }
+        P.phase='break'; P.total=gb(); P.left=P.total;
+      } else { P.round++; P.phase='focus'; P.total=gf(); P.left=P.total; tk(`Round ${P.round} starting!`); }
+    }
+    updPomo();
+  }
+  function updPomo() {
+    const m = Math.floor(P.left/60), s = P.left % 60;
+    document.getElementById('ptm').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    document.getElementById('pph').textContent  = P.phase==='focus' ? `Round ${P.round}/${P.rounds}` : 'Break';
+    const circ = 2*Math.PI*36, ring = document.getElementById('rfl');
+    ring.style.strokeDasharray = circ; ring.style.strokeDashoffset = circ * (1 - P.left/P.total);
+    ring.className = 'rfl' + (P.phase==='break' ? ' brk' : '');
+    document.getElementById('pdots').innerHTML = Array.from({length:P.rounds}, (_,i) => {
+      const cl = i < P.round-1 ? 'dn' : i === P.round-1 && P.phase==='focus' ? 'cu' : '';
+      return `<div class="pdot ${cl}"></div>`;
+    }).join('');
+  }
+  window.saveModalNotes = function() {
+    if (!P.key) return;
+    const v = document.getElementById('mnt').value;
+    if (!S.sessions[P.key]) S.sessions[P.key] = {};
+    S.sessions[P.key].notes = v; save(); tk('Notes saved ✓', true);
+  };
+  document.getElementById('pomoOvl').addEventListener('click', e => { if (e.target === document.getElementById('pomoOvl')) closePomo(); });
+
+  // ════════════════════════════════════════════════════════
+  // PROGRESS
+  // ════════════════════════════════════════════════════════
+  function renderProgress() {
+    const grid = document.getElementById('pg');
+    if (!S.subjects.length) {
+      grid.innerHTML = '<div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>';
+      return;
+    }
+    const today  = new Date(); today.setHours(0,0,0,0);
+    const sorted = [...S.subjects].sort((a,b) => new Date(a.examDate) - new Date(b.examDate));
+    grid.innerHTML = sorted.map(sub => {
+      const schd = genSched(sub);
+      const total = schd.length;
+      const done  = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
+      const pct   = total ? Math.round((done/total)*100) : 0;
+      const exam  = new Date(sub.examDate);
+      const daysLeft = Math.max(0, Math.ceil((exam - today) / 86400000));
+      const struggling = sub.topics.filter(t => t.conf > 0 && t.conf <= 2);
+      const unrated    = sub.topics.filter(t => t.conf === 0);
+
+      const dts = schd.filter(s => S.sessions[sk(s)]?.completedAt).map(s => s.date).sort();
+      let streak = 0;
+      if (dts.length) { const u=[...new Set(dts)]; streak=1; for(let i=u.length-1;i>0;i--){if((new Date(u[i])-new Date(u[i-1]))/86400000===1)streak++;else break;} }
+      const next = schd.find(s => !S.sessions[sk(s)]?.completedAt && new Date(s.date+'T00:00:00') >= today);
+      const nextStr = next ? new Date(next.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—';
+
+      const tbHtml = sub.topics.length ? `<div class="tbd">
+        <div class="tbd-t">Topic breakdown</div>
+        ${sub.topics.map(t => {
+          const cl = CCLASS[t.conf]; const lbl = CLABEL[t.conf] || 'Not rated';
+          const barPct = t.conf > 0 ? (t.conf/5*100) : 0;
+          const lastStr = t.lastStudied
+            ? `Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`
+            : 'Never studied';
+          return `<div class="tbr">
+            <div class="tbn">${esc(t.name)}</div>
+            <div class="last-studied">${lastStr}</div>
+            <div class="conf-bar"><div class="conf-bar-fill" style="width:${barPct}%;background:${CCOLOR[t.conf]}"></div></div>
+            <span class="cb5l ${cl}">${lbl}</span>
+          </div>`;
+        }).join('')}
+        ${struggling.length ? `<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t => esc(t.name)).join(', ')}</strong></div>` : ''}
+        ${unrated.length ? `<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t => esc(t.name)).join(', ')}</div>` : ''}
+      </div>` : '';
+
+      return `<div class="pc" style="--c:${sub.color}">
+        <div class="pch">
+          <div>
+            <div class="pcn">${sub.emoji} ${esc(sub.name)}</div>
+            <div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div>
+          </div>
+          <div class="pcs">
+            <div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Done</div></div>
+            <div class="stat"><div class="sv">${done}/${total}</div><div class="sl">Sessions</div></div>
+            <div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div>
+            <div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div>
+          </div>
+        </div>
+        <div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div>
+        <div style="font-size:0.73rem;color:var(--muted)">Next session: <strong style="color:var(--text)">${nextStr}</strong></div>
+        ${tbHtml}
+      </div>`;
+    }).join('');
+  }
+
+  // ════════════════════════════════════════════════════════
+  // UTILS
+  // ════════════════════════════════════════════════════════
+  window.showPage = function(p, el) {
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-'+p).classList.add('active'); el.classList.add('active');
+    if (p === 'schedule') { renderStrip(); selDay(selDate); }
+    if (p === 'progress') renderProgress();
+  };
+
+  function renderAll() { renderSubjects(); renderStrip(); renderSessions(); renderProgress(); }
+
+  document.getElementById('ed').min = new Date().toISOString().split('T')[0];
+  renderSwatches(); renderSubjects();
+  selDay(new Date().toISOString().split('T')[0]);
+  updPomo();
+}
+
+// ── TOAST (global, needed by saveConfig before app boots) ──
+window.tk = function(msg, ac=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (ac ? ' ac' : '');
+  clearTimeout(window._tkT);
+  window._tkT = setTimeout(() => t.className = 'toast', 2600);
+};
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+window.esc = esc;
+</script>
+</body>
+</html>
