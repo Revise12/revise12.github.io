@@ -950,8 +950,7 @@ function bootApp(fbConfig) {
       list.innerHTML = `<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length ? 'Nothing scheduled today — rest up!' : 'Add subjects to generate your schedule.'}</p></div>`;
       return;
     }
-    const TL   = {first:'First Look', review:'Spaced Review', test:'Self-Test'};
-    const TIPS = {first:'Read notes. Summarise in your own words.', review:'Cover notes — recall from memory.', test:'Quiz yourself — no notes.'};
+    const TL = {first:'First Look', review:'Spaced Review', test:'Self-Test'};
 
     list.innerHTML = sess.map(s2 => {
       const sub = S.subjects.find(s => s.id === s2.subjectId); if (!sub) return '';
@@ -995,7 +994,6 @@ function bootApp(fbConfig) {
             <div class="stit">${sub.emoji} ${esc(sub.name)}${s2.carried?'<span class="carried-badge">↩ carried over</span>':''}</div>
             <div class="smeta">
               <span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span>
-              <span>${TIPS[s2.type]}</span>
               <span style="color:var(--muted)">~${S.prefs.sessionLen||45} min</span>
             </div>
             ${suggHtml}
