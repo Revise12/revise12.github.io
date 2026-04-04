@@ -226,6 +226,33 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
   .conf5{flex-wrap:wrap;}
   .auth-btn-sub{display:none;}
 }
+
+/* ── CARRIED OVER ── */
+.carried{border-left-color:var(--accent3)!important;}
+.carried-badge{display:inline-block;margin-left:8px;font-size:0.6rem;background:rgba(245,166,100,0.15);color:var(--accent3);border-radius:4px;padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle;}
+
+/* ── WEEK STRIP EXTRAS ── */
+.wd-off{opacity:0.38;}
+.wd-off .wdn{color:var(--muted);}
+.wdot-c{outline:2px dashed var(--accent3);outline-offset:1px;}
+
+/* ── PREFERENCES PAGE ── */
+.day-tog{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;transition:all 0.15s;}
+.day-tog:hover{border-color:var(--muted);color:var(--text);}
+.day-tog.on{background:rgba(200,245,100,0.12);border-color:var(--accent);color:var(--accent);}
+
+input[type="range"]{height:4px;border-radius:2px;outline:none;cursor:pointer;}
+
+/* ── EMOJI DOT HOVER ── */
+.sc-dot:hover::after{content:'✏️';position:absolute;font-size:0.6rem;bottom:-2px;right:-2px;}
+.sc-dot{position:relative;}
+
+/* ── PREFS RADIO ── */
+#pref-priority label{transition:border-color 0.15s;}
+#pref-priority label:has(input:checked){border-color:var(--accent);background:rgba(200,245,100,0.05);}
+
+/* ── STAT GRID ── */
+.stat{text-align:center;min-width:50px;}
 </style>
 </head>
 <body>
@@ -253,15 +280,17 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
     <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
     <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
     <button class="tab" onclick="showPage('progress',this)">Progress</button>
+    <button class="tab" onclick="showPage('prefs',this)">⚙️ Prefs</button>
   </nav>
 
   <!-- SUBJECTS -->
   <div id="page-subjects" class="page active">
     <div class="stitle">Add a subject</div>
     <div class="card" style="margin-bottom:20px">
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:11px;align-items:end;margin-bottom:13px" class="fr3c">
+      <div style="display:grid;grid-template-columns:1fr 1fr 56px auto;gap:11px;align-items:end;margin-bottom:13px" class="fr3c">
         <div class="fg"><label>Subject Name</label><input type="text" id="sn" placeholder="e.g. Mathematics" maxlength="40"></div>
         <div class="fg"><label>Exam Date</label><input type="date" id="ed"></div>
+        <div class="fg"><label>Emoji</label><input type="text" id="emojiPick" placeholder="📗" maxlength="2" style="text-align:center;font-size:1.3rem;padding:6px;"></div>
         <button class="btn btn-p" style="align-self:flex-end" onclick="addSubject()">+ Add</button>
       </div>
       <div class="fg"><label>Colour</label><div class="swatches" id="swatches"></div></div>
@@ -283,6 +312,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
       </div>
     </div>
     <div class="wstrip" id="wstrip"></div>
+    <div id="upcoming-preview" style="margin-bottom:14px"></div>
     <div class="slist" id="slist"></div>
   </div>
 
@@ -291,6 +321,70 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
     <div class="stitle">Progress &amp; topic confidence</div>
     <div class="pg" id="pg">
       <div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>
+    </div>
+  </div>
+
+  <!-- PREFS -->
+  <div id="page-prefs" class="page">
+    <div class="stitle">Study Preferences</div>
+    <div style="display:grid;gap:16px">
+
+      <div class="card">
+        <div class="stitle" style="margin-bottom:14px">Daily Schedule</div>
+        <div style="display:grid;gap:14px">
+          <div class="fg">
+            <label>Max sessions per day</label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="range" id="pref-maxpd" min="1" max="8" value="3" oninput="updPrefMaxPD(this.value)" style="flex:1;accent-color:var(--accent)">
+              <span id="pref-maxpd-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:20px">3</span>
+            </div>
+            <span style="font-size:0.72rem;color:var(--muted)">How many subjects you want to study per day</span>
+          </div>
+          <div class="fg">
+            <label>Session length (minutes)</label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="range" id="pref-sesslen" min="15" max="120" step="5" value="45" oninput="updPrefSessLen(this.value)" style="flex:1;accent-color:var(--accent)">
+              <span id="pref-sesslen-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:40px">45m</span>
+            </div>
+            <span style="font-size:0.72rem;color:var(--muted)">Used for time estimates and Pomodoro defaults</span>
+          </div>
+          <div class="fg">
+            <label>Pre-exam buffer days</label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="range" id="pref-buffer" min="0" max="7" value="2" oninput="updPrefBuffer(this.value)" style="flex:1;accent-color:var(--accent)">
+              <span id="pref-buffer-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:20px">2</span>
+            </div>
+            <span style="font-size:0.72rem;color:var(--muted)">Days before exam to stop scheduling new sessions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stitle" style="margin-bottom:14px">Study Days</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Which days of the week do you want to study?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="pref-studydays">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stitle" style="margin-bottom:14px">Priority Mode</div>
+        <div style="display:grid;gap:8px" id="pref-priority">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-balanced">
+            <input type="radio" name="priority" value="balanced" style="accent-color:var(--accent)"> 
+            <div><div style="font-size:0.84rem;font-weight:600">Balanced</div><div style="font-size:0.72rem;color:var(--muted)">Spread sessions evenly across all subjects</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-urgent">
+            <input type="radio" name="priority" value="urgent" style="accent-color:var(--accent)">
+            <div><div style="font-size:0.84rem;font-weight:600">Urgency-first</div><div style="font-size:0.72rem;color:var(--muted)">Focus more time on subjects with exams soon</div></div>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-weak">
+            <input type="radio" name="priority" value="weak" style="accent-color:var(--accent)">
+            <div><div style="font-size:0.84rem;font-weight:600">Weakness-first</div><div style="font-size:0.72rem;color:var(--muted)">Prioritise topics and subjects with low confidence</div></div>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-p" style="width:100%;padding:13px" onclick="savePrefs()">Save Preferences →</button>
     </div>
   </div>
 </div>
@@ -369,7 +463,16 @@ function bootApp(fbConfig) {
   const CCLASS = ['cb0','cb1','cb2','cb3','cb4','cb5'];
   const CCOLOR = ['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
 
-  let S = JSON.parse(localStorage.getItem('rv4') || 'null') || { subjects:[], sessions:{}, ci:0 };
+  let S = JSON.parse(localStorage.getItem('rv4') || 'null') || { subjects:[], sessions:{}, ci:0, prefs:{} };
+  if (!S.prefs) S.prefs = {};
+  // Default prefs
+  const PREFS_DEF = { maxPerDay:3, studyDays:[1,2,3,4,5], sessionLen:45, breakDays:[], buffer:2, priorityMode:'balanced' };
+  Object.keys(PREFS_DEF).forEach(k => { if (S.prefs[k] === undefined) S.prefs[k] = PREFS_DEF[k]; });
+
+  // Schedule cache — invalidated on every save
+  let _schedCache = null, _schedCacheKey = '';
+  function invalidateSchedCache() { _schedCache = null; _schedCacheKey = ''; }
+
   let currentUser = null;
   let firestoreUnsub = null;
   let saveTimer = null;
@@ -403,6 +506,7 @@ function bootApp(fbConfig) {
   }
 
   function save() {
+    invalidateSchedCache();
     localStorage.setItem('rv4', JSON.stringify(S));
     scheduleSave();
   }
@@ -416,6 +520,9 @@ function bootApp(fbConfig) {
         if (ignoreSnapshot) return;
         if (snap.exists()) {
           S = snap.data();
+          if (!S.prefs) S.prefs = {};
+          Object.keys(PREFS_DEF).forEach(k => { if (S.prefs[k] === undefined) S.prefs[k] = PREFS_DEF[k]; });
+          invalidateSchedCache();
           localStorage.setItem('rv4', JSON.stringify(S));
           renderAll();
           setSyncDot('synced');
@@ -480,12 +587,20 @@ function bootApp(fbConfig) {
     if (!d) return tk('Pick an exam date');
     const today = new Date(); today.setHours(0,0,0,0);
     if (new Date(d) <= today) return tk('Exam must be in the future');
-    S.subjects.push({ id:''+Date.now(), name:n, examDate:d, color:COLORS[S.ci], emoji:EMOJIS[S.subjects.length % EMOJIS.length], topics:[] });
+    const chosenEmoji = document.getElementById('emojiPick').value.trim() || EMOJIS[S.subjects.length % EMOJIS.length];
+    S.subjects.push({ id:''+Date.now(), name:n, examDate:d, color:COLORS[S.ci], emoji:chosenEmoji, topics:[] });
     S.ci = (S.ci + 1) % COLORS.length;
     save();
     document.getElementById('sn').value = '';
     document.getElementById('ed').value = '';
+    document.getElementById('emojiPick').value = '';
     renderSwatches(); renderSubjects(); tk('Subject added ✓', true);
+  };
+
+  window.setSubjectEmoji = function(id) {
+    const sub = S.subjects.find(s => s.id === id); if (!sub) return;
+    const em = prompt('Enter an emoji for this subject:', sub.emoji);
+    if (em && em.trim()) { sub.emoji = em.trim().slice(0,2); save(); renderSubjects(); setTimeout(()=>document.getElementById('sc-'+id)?.classList.add('open'),8); }
   };
 
   window.rmSubject = function(id) {
@@ -553,7 +668,7 @@ function bootApp(fbConfig) {
       return `
       <div class="sc" id="sc-${sub.id}" style="--c:${sub.color}">
         <div class="sc-h" onclick="toggleCard('${sub.id}')">
-          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color}">${sub.emoji}</div>
+          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color};cursor:pointer" title="Click to change emoji" onclick="event.stopPropagation();setSubjectEmoji('${sub.id}')">${sub.emoji}</div>
           <div class="sc-info">
             <div class="sc-name">${esc(sub.name)}</div>
             <div class="sc-meta">
@@ -581,31 +696,180 @@ function bootApp(fbConfig) {
   }
 
   // ════════════════════════════════════════════════════════
-  // SCHEDULE GENERATION
+  // SCHEDULE GENERATION — smarter spaced-repetition engine
   // ════════════════════════════════════════════════════════
-  function genSched(sub) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const d = Math.ceil((exam - today) / 86400000); if (d <= 0) return [];
-    let iv;
-    if (d<=3)       iv=[0,1,2];
-    else if (d<=7)  iv=[0,1,3,6];
-    else if (d<=14) iv=[0,1,3,6,10,13];
-    else if (d<=30) iv=[0,1,3,6,10,15,21,28];
-    else if (d<=60) iv=[0,1,3,7,12,18,25,35,45,55];
-    else { iv=[]; let g=1,day=0; while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);} if(iv[iv.length-1]<d-2)iv.push(d-2); }
-    const types = ['first','review','review','test','review','test','review','test','review','test'];
-    return iv.map((off,i) => {
-      const dt = new Date(today); dt.setDate(dt.getDate() + off);
-      if (dt >= today && dt < exam)
-        return { date:dt.toISOString().split('T')[0], subjectId:sub.id, type:types[Math.min(i,types.length-1)], idx:i };
-      return null;
-    }).filter(Boolean);
+
+  // Returns the spacing intervals in days for a subject based on days until exam
+  function spacingIntervals(daysTotal) {
+    if (daysTotal <= 0) return [];
+    if (daysTotal === 1) return [0];
+    if (daysTotal <= 3) return [0, daysTotal - 1];
+    if (daysTotal <= 7) return [0, 1, Math.floor(daysTotal*0.5), daysTotal - 1];
+    if (daysTotal <= 14) return [0, 1, 3, 7, daysTotal - 2, daysTotal - 1];
+    if (daysTotal <= 30) return [0, 1, 3, 7, 12, 18, daysTotal - 3, daysTotal - 2, daysTotal - 1];
+    // For longer periods use fibonacci-ish growth capped at 14 days
+    const ivs = [0, 1]; let gap = 2;
+    while (ivs[ivs.length-1] + gap < daysTotal - 3) {
+      ivs.push(ivs[ivs.length-1] + gap);
+      gap = Math.min(Math.ceil(gap * 1.5), 14);
+    }
+    // Always add final review sessions close to exam
+    ivs.push(daysTotal - 3, daysTotal - 2, daysTotal - 1);
+    return [...new Set(ivs)].filter(x => x >= 0 && x < daysTotal).sort((a,b)=>a-b);
   }
 
-  function allSess() { return S.subjects.flatMap(s => genSched(s)); }
-  function sessForDate(ds) { return allSess().filter(s => s.date === ds); }
+  // Generate desired sessions for a single subject (ignoring capacity constraints)
+  function genDesiredSessions(sub, buffer=2) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const daysTotal = Math.ceil((exam - today) / 86400000);
+    const effectiveDays = Math.max(1, daysTotal - buffer);
+    if (daysTotal <= 0) return [];
+
+    const ivs = spacingIntervals(effectiveDays);
+    const types = ['first','review','review','review','test','review','test','review','test','review','test'];
+
+    return ivs.map((off, i) => {
+      const dt = new Date(today); dt.setDate(dt.getDate() + off);
+      const ds = dt.toISOString().split('T')[0];
+      return { date: ds, subjectId: sub.id, type: types[Math.min(i, types.length-1)], idx: i, _off: off };
+    });
+  }
+
+  // Urgency score for a subject: 0–1 (higher = more urgent)
+  function subjectUrgency(sub) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const days  = Math.ceil((exam - today) / 86400000);
+    if (days <= 0) return 0;
+    // Exponential urgency: subjects within 7 days are very high
+    const base = Math.max(0, 1 - (days / 90));
+    const weakTopics = sub.topics.filter(t => t.conf > 0 && t.conf <= 2).length;
+    const unrated    = sub.topics.filter(t => t.conf === 0).length;
+    const confPenalty = (weakTopics * 0.15) + (unrated * 0.05);
+    return Math.min(1, base + confPenalty);
+  }
+
+  // Master schedule: assign sessions to calendar days respecting maxPerDay + studyDays
+  // Also handles carryover of missed incomplete sessions
+  function _buildMasterSchedule() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayStr = today.toISOString().split('T')[0];
+    const maxPD = S.prefs.maxPerDay || 3;
+    const studyDays = S.prefs.studyDays || [1,2,3,4,5];
+    const buffer = S.prefs.buffer ?? 2;
+    const priorityMode = S.prefs.priorityMode || 'balanced';
+
+    // Gather all desired sessions for all subjects, tagged with urgency
+    const desired = S.subjects.flatMap(sub => {
+      const urgency = subjectUrgency(sub);
+      // Compute weak-topic score for weakness-first mode
+      const weakScore = sub.topics.length
+        ? sub.topics.filter(t => t.conf > 0 && t.conf <= 2).length / sub.topics.length
+        : 0;
+      return genDesiredSessions(sub, buffer).map(s => ({ ...s, urgency, weakScore }));
+    });
+
+    // Sort by date, then by priority mode
+    desired.sort((a,b) => {
+      const dateDiff = a.date.localeCompare(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      if (priorityMode === 'urgent') return b.urgency - a.urgency;
+      if (priorityMode === 'weak')   return b.weakScore - a.weakScore;
+      return b.urgency - a.urgency; // balanced: still use urgency as tiebreak
+    });
+
+    // Day capacity map: how many slots are left per day
+    const dayLoad = {};
+    const getLoad = ds => dayLoad[ds] ?? 0;
+    const incLoad = ds => { dayLoad[ds] = (dayLoad[ds] || 0) + 1; };
+
+    const assigned = []; // { ...session, assignedDate }
+
+    // Helper: is a date a valid study day?
+    const isStudyDay = ds => {
+      const d = new Date(ds + 'T00:00:00');
+      return studyDays.includes(d.getDay());
+    };
+
+    // Helper: advance a date string by N valid study days
+    const nextStudyDay = (ds, skipN=1) => {
+      let d = new Date(ds + 'T00:00:00');
+      let skipped = 0;
+      while (true) {
+        d.setDate(d.getDate() + 1);
+        const s = d.toISOString().split('T')[0];
+        if (isStudyDay(s)) { skipped++; if (skipped >= skipN) return s; }
+      }
+    };
+
+    // Process each desired session
+    for (const sess of desired) {
+      let targetDate = sess.date;
+
+      // If this session is in the past and not completed: carry forward to today
+      if (targetDate < todayStr) {
+        const k = sk({ ...sess, date: targetDate });
+        if (S.sessions[k]?.completedAt) {
+          assigned.push({ ...sess, assignedDate: targetDate, carried: false });
+          continue;
+        }
+        targetDate = todayStr;
+      }
+
+      // Skip non-study days — shift to next valid day
+      if (!isStudyDay(targetDate)) {
+        let d = new Date(targetDate + 'T00:00:00');
+        while (!isStudyDay(targetDate)) {
+          d.setDate(d.getDate() + 1);
+          targetDate = d.toISOString().split('T')[0];
+        }
+      }
+
+      // If this day is already at capacity, push forward day by day
+      let attempts = 0;
+      while (getLoad(targetDate) >= maxPD && attempts < 60) {
+        let d = new Date(targetDate + 'T00:00:00');
+        d.setDate(d.getDate() + 1);
+        targetDate = d.toISOString().split('T')[0];
+        if (!isStudyDay(targetDate)) {
+          let d2 = new Date(targetDate + 'T00:00:00');
+          while (!isStudyDay(targetDate)) { d2.setDate(d2.getDate()+1); targetDate = d2.toISOString().split('T')[0]; }
+        }
+        attempts++;
+      }
+
+      incLoad(targetDate);
+      const carried = targetDate !== sess.date && sess.date >= todayStr;
+      assigned.push({ ...sess, assignedDate: targetDate, carried });
+    }
+
+    return assigned;
+  }
+
+  // Return sessions scheduled for a specific date string
+  function sessForDate(ds) {
+    return buildMasterSchedule().filter(s => s.assignedDate === ds);
+  }
+
+  // For progress/stats: all sessions for a subject
+  function genSched(sub) {
+    return buildMasterSchedule().filter(s => s.subjectId === sub.id);
+  }
+
+  function allSess() { return buildMasterSchedule(); }
+  // sk uses original planned date so completion persists across carryovers
   function sk(s) { return `${s.subjectId}_${s.date}_${s.idx}`; }
+
+  // Memoized wrapper around _buildMasterSchedule
+  function buildMasterSchedule() {
+    const key = JSON.stringify({ subs: S.subjects.map(s=>({id:s.id,ed:s.examDate,tc:s.topics.length})), prefs: S.prefs, sessKeys: Object.keys(S.sessions).length });
+    if (_schedCache && _schedCacheKey === key) return _schedCache;
+    _schedCacheKey = key;
+    _schedCache = _buildMasterSchedule();
+    return _schedCache;
+  }
+
 
   // ════════════════════════════════════════════════════════
   // TOPIC SUGGESTION ENGINE
@@ -657,24 +921,26 @@ function bootApp(fbConfig) {
   function renderStrip() {
     const todayStr = new Date().toISOString().split('T')[0];
     const all = allSess();
-    const sel = new Date(selDate + 'T00:00:00');
-    const ws  = new Date(sel); ws.setDate(sel.getDate() - sel.getDay());
+    // Always show 7 days starting from today
+    const startD = new Date(todayStr + 'T00:00:00');
     const lbl = ['Su','Mo','Tu','We','Th','Fr','Sa'];
     document.getElementById('wstrip').innerHTML = Array.from({length:7}, (_,i) => {
-      const d  = new Date(ws); d.setDate(ws.getDate() + i);
+      const d  = new Date(startD); d.setDate(startD.getDate() + i);
       const ds = d.toISOString().split('T')[0];
-      const dots = all.filter(s => s.date === ds).slice(0,4).map(s2 => {
+      const daySess = all.filter(s => s.assignedDate === ds);
+      const dots = daySess.slice(0,4).map(s2 => {
         const sub = S.subjects.find(s => s.id === s2.subjectId);
-        return sub ? `<div class="wdot" style="background:${sub.color}"></div>` : '';
+        return sub ? `<div class="wdot${s2.carried?' wdot-c':''}" style="background:${sub.color}"></div>` : '';
       }).join('');
-      return `<div class="wd${ds===todayStr?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')">
+      const isOffDay = !(S.prefs.studyDays || [1,2,3,4,5]).includes(d.getDay());
+      return `<div class="wd${ds===todayStr?' tod':''}${ds===selDate?' sel':''}${isOffDay?' wd-off':''}" onclick="selDay('${ds}')">
         <div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div>
         <div class="wdd">${dots}</div></div>`;
     }).join('');
   }
 
   window.selDay = function(ds) {
-    selDate = ds; renderStrip(); renderSessions();
+    selDate = ds; renderStrip(); renderSessions(); renderUpcoming();
     const d = new Date(ds + 'T00:00:00');
     document.getElementById('dlabel').textContent =
       d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
@@ -684,6 +950,31 @@ function bootApp(fbConfig) {
     selDay(d.toISOString().split('T')[0]);
   };
   window.goToday = function() { selDay(new Date().toISOString().split('T')[0]); };
+
+  function renderUpcoming() {
+    const el = document.getElementById('upcoming-preview'); if (!el) return;
+    const todayStr = new Date().toISOString().split('T')[0];
+    // Only show upcoming preview when viewing today
+    if (selDate !== todayStr) { el.innerHTML = ''; return; }
+    const all = allSess();
+    const days = [1,2,3].map(offset => {
+      const d = new Date(todayStr + 'T00:00:00'); d.setDate(d.getDate() + offset);
+      const ds = d.toISOString().split('T')[0];
+      const daySess = all.filter(s => s.assignedDate === ds);
+      if (!daySess.length) return null;
+      const label = offset === 1 ? 'Tomorrow' : d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+      const dots = daySess.slice(0,5).map(s2 => {
+        const sub = S.subjects.find(s => s.id === s2.subjectId);
+        return sub ? `<span style="font-size:0.85rem">${sub.emoji}</span>` : '';
+      }).join('');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;cursor:pointer" onclick="selDay('${ds}')">
+        <span style="color:var(--muted);font-weight:600;min-width:72px">${label}</span>
+        <span style="display:flex;gap:3px">${dots}</span>
+        <span style="color:var(--muted);margin-left:auto">${daySess.length} session${daySess.length!==1?'s':''} →</span>
+      </div>`;
+    }).filter(Boolean);
+    el.innerHTML = days.length ? `<div style="display:grid;gap:5px">${days.join('')}</div>` : '';
+  }
 
   function renderSessions() {
     const list = document.getElementById('slist');
@@ -730,19 +1021,20 @@ function bootApp(fbConfig) {
         }).join('')}</div></div>` : '';
 
       return `
-      <div class="sess${done?' done':''}" id="sc2-${k}" style="--c:${sub.color}">
+      <div class="sess${done?' done':''}${s2.carried?' carried':''}" id="sc2-${k}" style="--c:${sub.color}">
         <div class="sess-main">
           <div class="sck" onclick="toggleDone('${k}')">${done ? '✓' : ''}</div>
           <div class="si">
-            <div class="stit">${sub.emoji} ${esc(sub.name)}</div>
+            <div class="stit">${sub.emoji} ${esc(sub.name)}${s2.carried?'<span class="carried-badge">↩ carried over</span>':''}</div>
             <div class="smeta">
               <span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span>
               <span>${TIPS[s2.type]}</span>
+              <span style="color:var(--muted)">~${S.prefs.sessionLen||45} min</span>
             </div>
             ${suggHtml}
           </div>
           <div class="sa">
-            <button class="sib${hasNotes?' on':''}" onclick="openPomo('${k}','${esc(sub.name)}')">🍅</button>
+            <button class="sib" onclick="openPomo('${k}','${esc(sub.name)}')">🍅</button>
             <button class="sib${hasNotes?' on':''}" onclick="toggleExp('${k}')">✏️</button>
           </div>
         </div>
@@ -917,9 +1209,60 @@ function bootApp(fbConfig) {
     document.getElementById('page-'+p).classList.add('active'); el.classList.add('active');
     if (p === 'schedule') { renderStrip(); selDay(selDate); }
     if (p === 'progress') renderProgress();
+    if (p === 'prefs') renderPrefs();
   };
 
-  function renderAll() { renderSubjects(); renderStrip(); renderSessions(); renderProgress(); }
+  // ════════════════════════════════════════════════════════
+  // PREFERENCES
+  // ════════════════════════════════════════════════════════
+  function renderPrefs() {
+    const p = S.prefs;
+    const mxEl = document.getElementById('pref-maxpd');
+    mxEl.value = p.maxPerDay; document.getElementById('pref-maxpd-val').textContent = p.maxPerDay;
+    const slEl = document.getElementById('pref-sesslen');
+    slEl.value = p.sessionLen; document.getElementById('pref-sesslen-val').textContent = p.sessionLen + 'm';
+    const bufEl = document.getElementById('pref-buffer');
+    bufEl.value = p.buffer; document.getElementById('pref-buffer-val').textContent = p.buffer;
+
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    document.getElementById('pref-studydays').innerHTML = days.map((d,i) => {
+      const on = (p.studyDays||[1,2,3,4,5]).includes(i);
+      return `<button class="day-tog${on?' on':''}" data-day="${i}" onclick="toggleStudyDay(${i})">${d}</button>`;
+    }).join('');
+
+    document.querySelectorAll('input[name="priority"]').forEach(r => {
+      r.checked = (r.value === (p.priorityMode||'balanced'));
+    });
+  }
+
+  window.updPrefMaxPD = function(v) { document.getElementById('pref-maxpd-val').textContent = v; };
+  window.updPrefSessLen = function(v) { document.getElementById('pref-sesslen-val').textContent = v+'m'; };
+  window.updPrefBuffer = function(v) { document.getElementById('pref-buffer-val').textContent = v; };
+
+  window.toggleStudyDay = function(i) {
+    const btn = document.querySelector(`.day-tog[data-day="${i}"]`);
+    if (!btn) return;
+    const days = S.prefs.studyDays || [1,2,3,4,5];
+    const idx = days.indexOf(i);
+    if (idx > -1) { if (days.length <= 1) return tk('Need at least 1 study day'); days.splice(idx,1); }
+    else { days.push(i); days.sort(); }
+    S.prefs.studyDays = days;
+    btn.classList.toggle('on', days.includes(i));
+  };
+
+  window.savePrefs = function() {
+    S.prefs.maxPerDay = parseInt(document.getElementById('pref-maxpd').value) || 3;
+    S.prefs.sessionLen = parseInt(document.getElementById('pref-sesslen').value) || 45;
+    S.prefs.buffer = parseInt(document.getElementById('pref-buffer').value) || 2;
+    const pm = document.querySelector('input[name="priority"]:checked');
+    if (pm) S.prefs.priorityMode = pm.value;
+    save(); tk('Preferences saved ✓', true);
+    // Reset pomodoro focus time to match session length
+    const focEl = document.getElementById('pfoc');
+    if (focEl) { focEl.value = Math.min(S.prefs.sessionLen, 60); resetPomo(); }
+  };
+
+  function renderAll() { renderSubjects(); renderStrip(); renderSessions(); renderUpcoming(); renderProgress(); }
 
   document.getElementById('ed').min = new Date().toISOString().split('T')[0];
   renderSwatches(); renderSubjects();
