@@ -585,8 +585,8 @@ function bootApp(fbConfig) {
     const d = document.getElementById('ed').value;
     if (!n) return tk('Enter a subject name');
     if (!d) return tk('Pick an exam date');
-    const today = new Date(); today.setHours(0,0,0,0);
-    if (new Date(d) <= today) return tk('Exam must be in the future');
+    const today = parseDate(todayStr());
+    if (parseDate(d) <= today) return tk('Exam must be in the future');
     const chosenEmoji = document.getElementById('emojiPick').value.trim() || EMOJIS[S.subjects.length % EMOJIS.length];
     S.subjects.push({ id:''+Date.now(), name:n, examDate:d, color:COLORS[S.ci], emoji:chosenEmoji, topics:[] });
     S.ci = (S.ci + 1) % COLORS.length;
@@ -642,11 +642,11 @@ function bootApp(fbConfig) {
       grid.innerHTML = '<div class="es"><div class="be">📚</div><p>Add subjects above, then expand to add topics and set your confidence on each one.</p></div>';
       return;
     }
-    const today = new Date(); today.setHours(0,0,0,0);
-    const sorted = [...S.subjects].sort((a,b) => new Date(a.examDate) - new Date(b.examDate));
+    const today = parseDate(todayStr());
+    const sorted = [...S.subjects].sort((a,b) => parseDate(a.examDate) - parseDate(b.examDate));
     grid.innerHTML = sorted.map(sub => {
-      const exam = new Date(sub.examDate);
-      const days = Math.ceil((exam - today) / 86400000);
+      const exam = parseDate(sub.examDate);
+      const days = Math.round((exam - today) / 86400000);
       const bc = days<=7?'du':days<=14?'ds':days<=30?'do':'dp';
       const schd = genSched(sub);
       const done = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
@@ -696,273 +696,203 @@ function bootApp(fbConfig) {
   }
 
   // ════════════════════════════════════════════════════════
-  // SCHEDULE GENERATION — smarter spaced-repetition engine
+  // SCHEDULING ENGINE — clean rewrite
   // ════════════════════════════════════════════════════════
 
-  // Returns the spacing intervals in days for a subject based on days until exam
-  function spacingIntervals(daysTotal) {
-    if (daysTotal <= 0) return [];
-    if (daysTotal === 1) return [0];
-    if (daysTotal <= 3) return [0, daysTotal - 1];
-    if (daysTotal <= 7) return [0, 1, Math.floor(daysTotal*0.5), daysTotal - 1];
-    if (daysTotal <= 14) return [0, 1, 3, 7, daysTotal - 2, daysTotal - 1];
-    if (daysTotal <= 30) return [0, 1, 3, 7, 12, 18, daysTotal - 3, daysTotal - 2, daysTotal - 1];
-    // For longer periods use fibonacci-ish growth capped at 14 days
-    const ivs = [0, 1]; let gap = 2;
-    while (ivs[ivs.length-1] + gap < daysTotal - 3) {
-      ivs.push(ivs[ivs.length-1] + gap);
-      gap = Math.min(Math.ceil(gap * 1.5), 14);
+  // Parse a YYYY-MM-DD string into a local-midnight Date safely
+  function parseDate(ds) {
+    const [y,m,d] = ds.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  // Format a local Date to YYYY-MM-DD
+  function fmtDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  }
+  // Today as YYYY-MM-DD (local time, no UTC shift)
+  function todayStr() {
+    return fmtDate(new Date());
+  }
+  // Add N calendar days to a date string
+  function addDays(ds, n) {
+    const d = parseDate(ds); d.setDate(d.getDate() + n); return fmtDate(d);
+  }
+  // Day-of-week index (0=Sun..6=Sat) for a date string
+  function dowOf(ds) { return parseDate(ds).getDay(); }
+
+  // Advance ds forward until it lands on a study day
+  function snapToStudyDay(ds, studyDays) {
+    let d = parseDate(ds);
+    let attempts = 0;
+    while (!studyDays.includes(d.getDay()) && attempts < 14) {
+      d.setDate(d.getDate() + 1);
+      attempts++;
     }
-    // Always add final review sessions close to exam
-    ivs.push(daysTotal - 3, daysTotal - 2, daysTotal - 1);
-    return [...new Set(ivs)].filter(x => x >= 0 && x < daysTotal).sort((a,b)=>a-b);
+    return fmtDate(d);
   }
 
-  // Generate desired sessions for a single subject (ignoring capacity constraints)
-  function genDesiredSessions(sub, buffer=2) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const daysTotal = Math.ceil((exam - today) / 86400000);
-    const effectiveDays = Math.max(1, daysTotal - buffer);
-    if (daysTotal <= 0) return [];
-
-    const ivs = spacingIntervals(effectiveDays);
-    const types = ['first','review','review','review','test','review','test','review','test','review','test'];
-
-    return ivs.map((off, i) => {
-      const dt = new Date(today); dt.setDate(dt.getDate() + off);
-      const ds = dt.toISOString().split('T')[0];
-      return { date: ds, subjectId: sub.id, type: types[Math.min(i, types.length-1)], idx: i, _off: off };
-    });
+  // Given total calendar days until exam, return spacing offsets (from today)
+  function spacingOffsets(total) {
+    if (total <= 0) return [];
+    if (total === 1) return [0];
+    if (total <= 3) return [0, total - 1];
+    if (total <= 7) return [0, 1, Math.round(total * 0.5), total - 1];
+    if (total <= 14) return [0, 1, 3, 7, total - 2, total - 1];
+    if (total <= 30) return [0, 1, 3, 7, 12, 18, total - 3, total - 2, total - 1];
+    // Long: fibonacci-ish growth up to 14-day gap, then cram near exam
+    const offs = [0, 1]; let gap = 2;
+    while (true) {
+      const next = offs[offs.length-1] + gap;
+      if (next >= total - 4) break;
+      offs.push(next);
+      gap = Math.min(Math.ceil(gap * 1.6), 14);
+    }
+    offs.push(total - 4, total - 3, total - 2, total - 1);
+    return [...new Set(offs)].filter(x => x >= 0).sort((a,b) => a-b);
   }
 
-  // Urgency score for a subject: 0–1 (higher = more urgent)
-  function subjectUrgency(sub) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const days  = Math.ceil((exam - today) / 86400000);
-    if (days <= 0) return 0;
-    // Exponential urgency: subjects within 7 days are very high
-    const base = Math.max(0, 1 - (days / 90));
-    const weakTopics = sub.topics.filter(t => t.conf > 0 && t.conf <= 2).length;
-    const unrated    = sub.topics.filter(t => t.conf === 0).length;
-    const confPenalty = (weakTopics * 0.15) + (unrated * 0.05);
-    return Math.min(1, base + confPenalty);
-  }
+  // Session type sequence
+  const SESSION_TYPES = ['first','review','review','review','test','review','test','review','test','review','test'];
 
-  // Master schedule: assign sessions to calendar days respecting maxPerDay + studyDays
-  // Also handles carryover of missed incomplete sessions
+  // Build the full schedule. Returns array of session objects, each with assignedDate.
+  // sk() key is based on subjectId + original offset index (stable, not date-dependent).
   function _buildMasterSchedule() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const todayStr = today.toISOString().split('T')[0];
-    const maxPD = S.prefs.maxPerDay || 3;
-    const studyDays = S.prefs.studyDays || [1,2,3,4,5];
-    const buffer = S.prefs.buffer ?? 2;
-    const priorityMode = S.prefs.priorityMode || 'balanced';
+    const today = todayStr();
+    const studyDays = (S.prefs.studyDays && S.prefs.studyDays.length) ? S.prefs.studyDays : [0,1,2,3,4,5,6];
+    const maxPD     = Math.max(1, S.prefs.maxPerDay || 3);
+    const buffer    = S.prefs.buffer ?? 2;
 
-    // Gather all desired sessions for all subjects, tagged with urgency
-    const desired = S.subjects.flatMap(sub => {
-      const urgency = subjectUrgency(sub);
-      // Compute weak-topic score for weakness-first mode
-      const weakScore = sub.topics.length
-        ? sub.topics.filter(t => t.conf > 0 && t.conf <= 2).length / sub.topics.length
-        : 0;
-      return genDesiredSessions(sub, buffer).map(s => ({ ...s, urgency, weakScore }));
-    });
+    // Build desired sessions per subject
+    const allDesired = [];
+    for (const sub of S.subjects) {
+      const examD  = parseDate(sub.examDate);
+      const todayD = parseDate(today);
+      const daysToExam = Math.round((examD - todayD) / 86400000);
+      if (daysToExam <= 0) continue;
 
-    // Sort by date, then by priority mode
-    desired.sort((a,b) => {
-      const dateDiff = a.date.localeCompare(b.date);
-      if (dateDiff !== 0) return dateDiff;
-      if (priorityMode === 'urgent') return b.urgency - a.urgency;
-      if (priorityMode === 'weak')   return b.weakScore - a.weakScore;
-      return b.urgency - a.urgency; // balanced: still use urgency as tiebreak
-    });
+      const effectiveDays = Math.max(1, daysToExam - buffer);
+      const offsets = spacingOffsets(effectiveDays);
 
-    // Day capacity map: how many slots are left per day
-    const dayLoad = {};
-    const getLoad = ds => dayLoad[ds] ?? 0;
-    const incLoad = ds => { dayLoad[ds] = (dayLoad[ds] || 0) + 1; };
-
-    const assigned = []; // { ...session, assignedDate }
-
-    // Helper: is a date a valid study day?
-    const isStudyDay = ds => {
-      const d = new Date(ds + 'T00:00:00');
-      return studyDays.includes(d.getDay());
-    };
-
-    // Helper: advance a date string by N valid study days
-    const nextStudyDay = (ds, skipN=1) => {
-      let d = new Date(ds + 'T00:00:00');
-      let skipped = 0;
-      while (true) {
-        d.setDate(d.getDate() + 1);
-        const s = d.toISOString().split('T')[0];
-        if (isStudyDay(s)) { skipped++; if (skipped >= skipN) return s; }
+      for (let i = 0; i < offsets.length; i++) {
+        const idealDate = addDays(today, offsets[i]);
+        allDesired.push({
+          subjectId: sub.id,
+          idx: i,
+          idealDate,
+          type: SESSION_TYPES[Math.min(i, SESSION_TYPES.length-1)],
+        });
       }
-    };
-
-    // Process each desired session
-    for (const sess of desired) {
-      let targetDate = sess.date;
-
-      // If this session is in the past and not completed: carry forward to today
-      if (targetDate < todayStr) {
-        const k = sk({ ...sess, date: targetDate });
-        if (S.sessions[k]?.completedAt) {
-          assigned.push({ ...sess, assignedDate: targetDate, carried: false });
-          continue;
-        }
-        targetDate = todayStr;
-      }
-
-      // Skip non-study days — shift to next valid day
-      if (!isStudyDay(targetDate)) {
-        let d = new Date(targetDate + 'T00:00:00');
-        while (!isStudyDay(targetDate)) {
-          d.setDate(d.getDate() + 1);
-          targetDate = d.toISOString().split('T')[0];
-        }
-      }
-
-      // If this day is already at capacity, push forward day by day
-      let attempts = 0;
-      while (getLoad(targetDate) >= maxPD && attempts < 60) {
-        let d = new Date(targetDate + 'T00:00:00');
-        d.setDate(d.getDate() + 1);
-        targetDate = d.toISOString().split('T')[0];
-        if (!isStudyDay(targetDate)) {
-          let d2 = new Date(targetDate + 'T00:00:00');
-          while (!isStudyDay(targetDate)) { d2.setDate(d2.getDate()+1); targetDate = d2.toISOString().split('T')[0]; }
-        }
-        attempts++;
-      }
-
-      incLoad(targetDate);
-      const carried = targetDate !== sess.date && sess.date >= todayStr;
-      assigned.push({ ...sess, assignedDate: targetDate, carried });
     }
 
-    return assigned;
+    // Sort by idealDate so earlier sessions get first pick of capacity
+    allDesired.sort((a,b) => a.idealDate.localeCompare(b.idealDate) || a.subjectId.localeCompare(b.subjectId));
+
+    // Assign each session to a calendar day, respecting maxPD and studyDays
+    const dayLoad = {}; // ds -> count
+    const result  = [];
+
+    for (const sess of allDesired) {
+      const sessKey = `${sess.subjectId}_${sess.idx}`; // stable key
+      const alreadyDone = S.sessions[sessKey]?.completedAt;
+
+      // Start from idealDate; if in the past, start from today
+      let assignDate = sess.idealDate < today ? today : sess.idealDate;
+
+      // Snap to a valid study day
+      assignDate = snapToStudyDay(assignDate, studyDays);
+
+      // If over capacity, keep advancing one day at a time (respecting study days)
+      if (!alreadyDone) {
+        let safety = 0;
+        while ((dayLoad[assignDate] || 0) >= maxPD && safety < 90) {
+          assignDate = addDays(assignDate, 1);
+          assignDate = snapToStudyDay(assignDate, studyDays);
+          safety++;
+        }
+      }
+
+      dayLoad[assignDate] = (dayLoad[assignDate] || 0) + 1;
+
+      const carried = !alreadyDone && sess.idealDate < today;
+      result.push({ ...sess, assignedDate: assignDate, carried });
+    }
+
+    return result;
   }
 
-  // Return sessions scheduled for a specific date string
-  function sessForDate(ds) {
-    return buildMasterSchedule().filter(s => s.assignedDate === ds);
-  }
+  // Stable session key — based on subjectId + offset index, NOT date
+  function sk(s) { return `${s.subjectId}_${s.idx}`; }
 
-  // For progress/stats: all sessions for a subject
-  function genSched(sub) {
-    return buildMasterSchedule().filter(s => s.subjectId === sub.id);
-  }
-
-  function allSess() { return buildMasterSchedule(); }
-  // sk uses original planned date so completion persists across carryovers
-  function sk(s) { return `${s.subjectId}_${s.date}_${s.idx}`; }
-
-  // Memoized wrapper around _buildMasterSchedule
+  // Memoised wrapper
   function buildMasterSchedule() {
-    const key = JSON.stringify({ subs: S.subjects.map(s=>({id:s.id,ed:s.examDate,tc:s.topics.length})), prefs: S.prefs, sessKeys: Object.keys(S.sessions).length });
+    const key = JSON.stringify({
+      subs: S.subjects.map(s => ({ id:s.id, ed:s.examDate })),
+      prefs: S.prefs,
+      doneCount: Object.keys(S.sessions).length
+    });
     if (_schedCache && _schedCacheKey === key) return _schedCache;
     _schedCacheKey = key;
     _schedCache = _buildMasterSchedule();
     return _schedCache;
   }
 
-
-  // ════════════════════════════════════════════════════════
-  // TOPIC SUGGESTION ENGINE
-  // ════════════════════════════════════════════════════════
-  function suggestTopics(sub, sessType, n=3) {
-    if (!sub.topics.length) return [];
-    const today = new Date(); today.setHours(0,0,0,0);
-    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const daysLeft = Math.max(1, Math.ceil((exam - today) / 86400000));
-
-    const scored = sub.topics.map(t => {
-      const confVal = t.conf === 0 ? 2.5 : t.conf;
-      const confScore = (5 - confVal);
-      let recencyScore = 0;
-      if (t.lastStudied) {
-        const ls = new Date(t.lastStudied); ls.setHours(0,0,0,0);
-        recencyScore = Math.min(Math.ceil((today - ls) / 86400000), 30) / 30 * 3;
-      } else {
-        recencyScore = 3;
-      }
-      const urgency = daysLeft <= 7 ? 1.5 : daysLeft <= 14 ? 1.2 : 1.0;
-      let typeBoost = 0;
-      if (sessType === 'test' && t.conf >= 3) typeBoost = 0.5;
-      if (sessType === 'first' && t.conf === 0) typeBoost = 1;
-      return { ...t, score: (confScore * urgency) + recencyScore + typeBoost + (Math.random() * 0.3) };
-    });
-    return scored.sort((a,b) => b.score - a.score).slice(0, n);
-  }
-
-  function suggReason(t, sub, sessType) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const exam  = new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const daysLeft = Math.ceil((exam - today) / 86400000);
-    if (t.conf === 0) return 'Not yet rated — good time to start';
-    if (t.conf <= 2) return daysLeft <= 7 ? '⚠️ Exam soon & low confidence' : 'Low confidence — needs work';
-    if (t.lastStudied) {
-      const days = Math.ceil((today - new Date(t.lastStudied+'T00:00:00')) / 86400000);
-      if (days >= 7) return `Not studied in ${days} days`;
-      if (days >= 3) return `Last studied ${days} days ago`;
-    }
-    return sessType === 'test' ? 'Good to self-test on this' : 'Due for a spaced review';
-  }
+  function allSess()       { return buildMasterSchedule(); }
+  function sessForDate(ds) { return buildMasterSchedule().filter(s => s.assignedDate === ds); }
+  function genSched(sub)   { return buildMasterSchedule().filter(s => s.subjectId === sub.id); }
 
   // ════════════════════════════════════════════════════════
   // WEEK STRIP & SESSIONS
   // ════════════════════════════════════════════════════════
-  let selDate = new Date().toISOString().split('T')[0];
+  let selDate = todayStr();
 
   function renderStrip() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    const all = allSess();
-    // Always show 7 days starting from today
-    const startD = new Date(todayStr + 'T00:00:00');
-    const lbl = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const today  = todayStr();
+    const all    = allSess();
+    const DAY_LBL = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const studyDays = (S.prefs.studyDays && S.prefs.studyDays.length) ? S.prefs.studyDays : [0,1,2,3,4,5,6];
     document.getElementById('wstrip').innerHTML = Array.from({length:7}, (_,i) => {
-      const d  = new Date(startD); d.setDate(startD.getDate() + i);
-      const ds = d.toISOString().split('T')[0];
+      const ds  = addDays(today, i);
+      const dow = dowOf(ds);
       const daySess = all.filter(s => s.assignedDate === ds);
       const dots = daySess.slice(0,4).map(s2 => {
         const sub = S.subjects.find(s => s.id === s2.subjectId);
         return sub ? `<div class="wdot${s2.carried?' wdot-c':''}" style="background:${sub.color}"></div>` : '';
       }).join('');
-      const isOffDay = !(S.prefs.studyDays || [1,2,3,4,5]).includes(d.getDay());
-      return `<div class="wd${ds===todayStr?' tod':''}${ds===selDate?' sel':''}${isOffDay?' wd-off':''}" onclick="selDay('${ds}')">
-        <div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div>
-        <div class="wdd">${dots}</div></div>`;
+      const isOff = !studyDays.includes(dow);
+      return `<div class="wd${ds===today?' tod':''}${ds===selDate?' sel':''}${isOff?' wd-off':''}" onclick="selDay('${ds}')">
+        <div class="wdl">${DAY_LBL[dow]}</div>
+        <div class="wdn">${parseDate(ds).getDate()}</div>
+        <div class="wdd">${dots}</div>
+      </div>`;
     }).join('');
   }
 
   window.selDay = function(ds) {
-    selDate = ds; renderStrip(); renderSessions(); renderUpcoming();
-    const d = new Date(ds + 'T00:00:00');
+    selDate = ds;
+    renderStrip();
+    renderSessions();
+    renderUpcoming();
+    const d = parseDate(ds);
     document.getElementById('dlabel').textContent =
       d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
   };
   window.changeDay = function(delta) {
-    const d = new Date(selDate + 'T00:00:00'); d.setDate(d.getDate() + delta);
-    selDay(d.toISOString().split('T')[0]);
+    selDay(addDays(selDate, delta));
   };
-  window.goToday = function() { selDay(new Date().toISOString().split('T')[0]); };
+  window.goToday = function() { selDay(todayStr()); };
 
   function renderUpcoming() {
     const el = document.getElementById('upcoming-preview'); if (!el) return;
-    const todayStr = new Date().toISOString().split('T')[0];
-    // Only show upcoming preview when viewing today
-    if (selDate !== todayStr) { el.innerHTML = ''; return; }
+    const today = todayStr();
+    if (selDate !== today) { el.innerHTML = ''; return; }
     const all = allSess();
-    const days = [1,2,3].map(offset => {
-      const d = new Date(todayStr + 'T00:00:00'); d.setDate(d.getDate() + offset);
-      const ds = d.toISOString().split('T')[0];
+    const rows = [1,2,3].map(offset => {
+      const ds = addDays(today, offset);
       const daySess = all.filter(s => s.assignedDate === ds);
       if (!daySess.length) return null;
-      const label = offset === 1 ? 'Tomorrow' : d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+      const label = offset === 1 ? 'Tomorrow' : parseDate(ds).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
       const dots = daySess.slice(0,5).map(s2 => {
         const sub = S.subjects.find(s => s.id === s2.subjectId);
         return sub ? `<span style="font-size:0.85rem">${sub.emoji}</span>` : '';
@@ -973,7 +903,44 @@ function bootApp(fbConfig) {
         <span style="color:var(--muted);margin-left:auto">${daySess.length} session${daySess.length!==1?'s':''} →</span>
       </div>`;
     }).filter(Boolean);
-    el.innerHTML = days.length ? `<div style="display:grid;gap:5px">${days.join('')}</div>` : '';
+    el.innerHTML = rows.length ? `<div style="display:grid;gap:5px">${rows.join('')}</div>` : '';
+  }
+
+  // ════════════════════════════════════════════════════════
+  // TOPIC SUGGESTION ENGINE
+  // ════════════════════════════════════════════════════════
+  function suggestTopics(sub, sessType, n=3) {
+    if (!sub.topics.length) return [];
+    const today = parseDate(todayStr());
+    const exam  = parseDate(sub.examDate);
+    const daysLeft = Math.max(1, Math.round((exam - today) / 86400000));
+    const scored = sub.topics.map(t => {
+      const confVal = t.conf === 0 ? 2.5 : t.conf;
+      const confScore = (5 - confVal);
+      let recencyScore = t.lastStudied
+        ? Math.min(Math.round((today - parseDate(t.lastStudied)) / 86400000), 30) / 30 * 3
+        : 3;
+      const urgency = daysLeft <= 7 ? 1.5 : daysLeft <= 14 ? 1.2 : 1.0;
+      let typeBoost = 0;
+      if (sessType === 'test'  && t.conf >= 3) typeBoost = 0.5;
+      if (sessType === 'first' && t.conf === 0) typeBoost = 1;
+      return { ...t, score: (confScore * urgency) + recencyScore + typeBoost + (Math.random() * 0.3) };
+    });
+    return scored.sort((a,b) => b.score - a.score).slice(0, n);
+  }
+
+  function suggReason(t, sub, sessType) {
+    const today = parseDate(todayStr());
+    const exam  = parseDate(sub.examDate);
+    const daysLeft = Math.round((exam - today) / 86400000);
+    if (t.conf === 0) return 'Not yet rated — good time to start';
+    if (t.conf <= 2)  return daysLeft <= 7 ? '⚠️ Exam soon & low confidence' : 'Low confidence — needs work';
+    if (t.lastStudied) {
+      const days = Math.round((today - parseDate(t.lastStudied)) / 86400000);
+      if (days >= 7) return `Not studied in ${days} days`;
+      if (days >= 3) return `Last studied ${days} days ago`;
+    }
+    return sessType === 'test' ? 'Good to self-test on this' : 'Due for a spaced review';
   }
 
   function renderSessions() {
@@ -1066,7 +1033,7 @@ function bootApp(fbConfig) {
     else {
       sd.topicIds.push(tid);
       const sub = S.subjects.find(s => s.id === sid);
-      if (sub) { const t = sub.topics.find(t => t.id === tid); if (t) t.lastStudied = new Date().toISOString().split('T')[0]; }
+      if (sub) { const t = sub.topics.find(t => t.id === tid); if (t) t.lastStudied = todayStr(); }
     }
     save(); renderSessions();
     setTimeout(() => { const e = document.getElementById('exp-'+k); if(e) e.style.display = 'block'; }, 8);
@@ -1143,23 +1110,23 @@ function bootApp(fbConfig) {
       grid.innerHTML = '<div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>';
       return;
     }
-    const today  = new Date(); today.setHours(0,0,0,0);
-    const sorted = [...S.subjects].sort((a,b) => new Date(a.examDate) - new Date(b.examDate));
+    const today  = parseDate(todayStr());
+    const sorted = [...S.subjects].sort((a,b) => parseDate(a.examDate) - parseDate(b.examDate));
     grid.innerHTML = sorted.map(sub => {
       const schd = genSched(sub);
       const total = schd.length;
       const done  = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
       const pct   = total ? Math.round((done/total)*100) : 0;
-      const exam  = new Date(sub.examDate);
-      const daysLeft = Math.max(0, Math.ceil((exam - today) / 86400000));
+      const exam  = parseDate(sub.examDate);
+      const daysLeft = Math.max(0, Math.round((exam - today) / 86400000));
       const struggling = sub.topics.filter(t => t.conf > 0 && t.conf <= 2);
       const unrated    = sub.topics.filter(t => t.conf === 0);
 
-      const dts = schd.filter(s => S.sessions[sk(s)]?.completedAt).map(s => s.date).sort();
+      const dts = schd.filter(s => S.sessions[sk(s)]?.completedAt).map(s => s.assignedDate).sort();
       let streak = 0;
-      if (dts.length) { const u=[...new Set(dts)]; streak=1; for(let i=u.length-1;i>0;i--){if((new Date(u[i])-new Date(u[i-1]))/86400000===1)streak++;else break;} }
-      const next = schd.find(s => !S.sessions[sk(s)]?.completedAt && new Date(s.date+'T00:00:00') >= today);
-      const nextStr = next ? new Date(next.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—';
+      if (dts.length) { const u=[...new Set(dts)]; streak=1; for(let i=u.length-1;i>0;i--){if((parseDate(u[i])-parseDate(u[i-1]))/86400000===1)streak++;else break;} }
+      const next = schd.find(s => !S.sessions[sk(s)]?.completedAt && parseDate(s.assignedDate) >= today);
+      const nextStr = next ? parseDate(next.assignedDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—';
 
       const tbHtml = sub.topics.length ? `<div class="tbd">
         <div class="tbd-t">Topic breakdown</div>
@@ -1167,7 +1134,7 @@ function bootApp(fbConfig) {
           const cl = CCLASS[t.conf]; const lbl = CLABEL[t.conf] || 'Not rated';
           const barPct = t.conf > 0 ? (t.conf/5*100) : 0;
           const lastStr = t.lastStudied
-            ? `Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`
+            ? `Last: ${parseDate(t.lastStudied).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`
             : 'Never studied';
           return `<div class="tbr">
             <div class="tbn">${esc(t.name)}</div>
@@ -1264,9 +1231,9 @@ function bootApp(fbConfig) {
 
   function renderAll() { renderSubjects(); renderStrip(); renderSessions(); renderUpcoming(); renderProgress(); }
 
-  document.getElementById('ed').min = new Date().toISOString().split('T')[0];
+  document.getElementById('ed').min = todayStr();
   renderSwatches(); renderSubjects();
-  selDay(new Date().toISOString().split('T')[0]);
+  selDay(todayStr());
   updPomo();
 }
 
