@@ -14,29 +14,94 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
-.app{max-width:940px;margin:0 auto;padding:32px 20px 100px;}
 
-/* ── HEADER ── */
+/* ── ONBOARDING SHELL ── */
+#onboarding{display:none;min-height:100vh;display:none;align-items:center;justify-content:center;padding:24px;}
+#onboarding.visible{display:flex;}
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:600px;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.ob-step{display:none;}.ob-step.active{display:block;}
+.ob-logo{font-family:'Instrument Serif',serif;font-size:2.6rem;letter-spacing:-2px;margin-bottom:6px;}
+.ob-logo span{color:var(--accent);}
+.ob-heading{font-family:'Instrument Serif',serif;font-size:1.9rem;letter-spacing:-1px;margin-bottom:8px;line-height:1.2;}
+.ob-sub{font-size:0.84rem;color:var(--muted);line-height:1.6;margin-bottom:26px;}
+.ob-progress{display:flex;gap:5px;margin-bottom:28px;}
+.ob-pip{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;}
+.ob-pip.done{background:var(--accent);}
+.ob-pip.active{background:var(--accent);opacity:0.5;}
+
+/* Step 1: level + board */
+.big-choice{display:grid;gap:10px;}
+.big-btn{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;text-align:left;transition:all 0.18s;font-family:'Syne',sans-serif;}
+.big-btn:hover,.big-btn.sel{border-color:var(--accent);background:rgba(200,245,100,0.07);}
+.big-btn .bb-title{font-size:1rem;font-weight:700;margin-bottom:3px;}
+.big-btn .bb-sub{font-size:0.78rem;color:var(--muted);}
+
+/* Step 2: subject picker */
+.subject-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;max-height:340px;overflow-y:auto;margin-bottom:20px;padding-right:4px;}
+.subject-picker-grid::-webkit-scrollbar{width:4px;}
+.subject-picker-grid::-webkit-scrollbar-track{background:var(--surface2);}
+.subject-picker-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sp-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;}
+.sp-item:hover{border-color:var(--muted);}
+.sp-item.sel{border-color:var(--accent);background:rgba(200,245,100,0.07);}
+.sp-item .sp-emoji{font-size:1.2rem;flex-shrink:0;}
+.sp-item .sp-name{font-size:0.82rem;font-weight:600;line-height:1.3;}
+.sp-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-left:auto;transition:all 0.15s;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:transparent;}
+.sp-item.sel .sp-check{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
+
+/* Step 3: exam dates */
+.exam-date-list{display:grid;gap:10px;margin-bottom:20px;max-height:360px;overflow-y:auto;}
+.edrow{background:var(--surface2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.edrow-left{flex:1;}
+.edrow-name{font-size:0.9rem;font-weight:700;margin-bottom:4px;}
+.edrow-emoji{font-size:1rem;margin-right:4px;}
+.edrow input[type="date"]{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.84rem;outline:none;width:160px;}
+.edrow input[type="date"]:focus{border-color:var(--accent);}
+.edrow input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
+
+/* Firebase setup */
+.setup-steps{display:grid;gap:12px;margin-bottom:22px;}
+.step{display:flex;gap:11px;align-items:flex-start;}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#0e0e0f;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-text{font-size:0.82rem;line-height:1.55;color:var(--muted);}
+.step-text strong{color:var(--text);}
+.step-text a{color:var(--accent);text-decoration:none;}
+.step-text a:hover{text-decoration:underline;}
+.config-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;}
+.config-lbl{font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px;display:block;}
+textarea.cfg{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;color:var(--accent);font-family:'DM Mono',monospace;font-size:0.76rem;line-height:1.5;resize:vertical;outline:none;}
+textarea.cfg:focus{border-color:var(--accent);}
+.cfg-err{font-size:0.76rem;color:var(--danger);margin-top:7px;display:none;}
+
+.ob-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+.btn{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:0.76rem;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;}
+.btn-p{background:var(--accent);color:#0e0e0f;}
+.btn-p:hover{background:#d4f870;transform:translateY(-1px);}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-g:hover{color:var(--text);border-color:var(--muted);}
+.btn-d{background:transparent;color:var(--danger);border:1px solid var(--border);padding:4px 10px;font-size:0.66rem;}
+.btn-d:hover{border-color:var(--danger);background:rgba(245,100,100,0.08);}
+.btn-sm{padding:6px 12px;font-size:0.68rem;}
+
+/* ── MAIN APP ── */
+.app{max-width:940px;margin:0 auto;padding:32px 20px 100px;}
 header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:38px;gap:16px;flex-wrap:wrap;}
 .logo{font-family:'Instrument Serif',serif;font-size:2.9rem;line-height:1;letter-spacing:-2px;}
 .logo span{color:var(--accent);}
 .tagline{font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;font-weight:500;}
-
-/* ── AUTH BUTTON / BADGE ── */
 .auth-area{display:flex;align-items:center;gap:10px;}
 .auth-btn{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 15px;cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;}
 .auth-btn:hover{border-color:var(--accent);}
 .auth-btn img{width:18px;height:18px;border-radius:50%;}
-.auth-btn-label{font-size:0.76rem;font-weight:600;color:var(--text);}
-.auth-btn-sub{font-size:0.64rem;color:var(--muted);}
+.auth-label{font-size:0.76rem;font-weight:600;color:var(--text);}
+.auth-sub{font-size:0.64rem;color:var(--muted);}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background 0.3s;}
 .sync-dot.syncing{background:var(--accent3);animation:pulse 1s infinite;}
 .sync-dot.synced{background:var(--accent);}
 .sync-dot.err{background:var(--danger);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-
-/* ── TABS ── */
 .tabs{display:flex;gap:4px;background:var(--surface);padding:4px;border-radius:var(--r);border:1px solid var(--border);margin-bottom:26px;}
 .tab{flex:1;padding:10px 6px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.2s;}
 .tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 8px rgba(0,0,0,0.4);}
@@ -46,27 +111,15 @@ header{display:flex;align-items:flex-end;justify-content:space-between;margin-bo
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;}
 .fg{display:flex;flex-direction:column;gap:7px;}
 .fg label{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;}
-input[type="text"],input[type="date"],input[type="number"],textarea:not(.config-input){background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;width:100%;}
-textarea:not(.config-input){resize:vertical;min-height:70px;line-height:1.5;}
-input:focus,textarea:not(.config-input):focus{border-color:var(--accent);}
+input[type="text"],input[type="date"],input[type="number"],textarea:not(.cfg){background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;width:100%;}
+textarea:not(.cfg){resize:vertical;min-height:70px;line-height:1.5;}
+input:focus,textarea:not(.cfg):focus{border-color:var(--accent);}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
-.btn{padding:9px 17px;border:none;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:0.76rem;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;}
-.btn-p{background:var(--accent);color:#0e0e0f;}
-.btn-p:hover{background:#d4f870;transform:translateY(-1px);}
-.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.btn-g:hover{color:var(--text);border-color:var(--muted);}
-.btn-d{background:transparent;color:var(--danger);border:1px solid var(--border);padding:4px 10px;font-size:0.66rem;}
-.btn-d:hover{border-color:var(--danger);background:rgba(245,100,100,0.08);}
-.btn-sm{padding:6px 12px;font-size:0.68rem;}
-.btn-google{background:#fff;color:#3c3c3c;display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:9px;font-size:0.82rem;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-.btn-google:hover{background:#f5f5f5;transform:translateY(-1px);}
-.btn-google svg{flex-shrink:0;}
 .swatches{display:flex;gap:7px;flex-wrap:wrap;}
 .sw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;}
 .sw:hover{transform:scale(1.15);}
 .sw.on{border-color:var(--text);transform:scale(1.1);}
 
-/* ── SUBJECT CARDS ── */
 .sg{display:grid;gap:9px;}
 .sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
 .sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
@@ -88,21 +141,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .trow{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:9px 12px;flex-wrap:wrap;}
 .trow-name{font-size:0.83rem;font-weight:600;flex:1;min-width:120px;}
 .conf5{display:flex;gap:3px;}
-.c5btn{padding:4px 0;width:36px;border-radius:6px;font-size:0.62rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;opacity:0.32;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;}
+.c5btn{padding:4px 0;width:34px;border-radius:6px;font-size:0.6rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;opacity:0.32;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;}
 .c5btn:hover{opacity:0.7;}.c5btn.on{opacity:1;}
 .l1{background:rgba(220,50,50,0.15);color:#e05555;border-color:rgba(220,50,50,0.3);}
 .l2{background:rgba(245,130,60,0.15);color:#f5823c;border-color:rgba(245,130,60,0.3);}
 .l3{background:rgba(245,200,60,0.15);color:#e8c040;border-color:rgba(245,200,60,0.3);}
 .l4{background:rgba(140,220,80,0.15);color:#8edc50;border-color:rgba(140,220,80,0.3);}
 .l5{background:rgba(80,220,120,0.15);color:#50dc78;border-color:rgba(80,220,120,0.3);}
-.l1.on{background:rgba(220,50,50,0.28);}
-.l2.on{background:rgba(245,130,60,0.28);}
-.l3.on{background:rgba(245,200,60,0.28);}
-.l4.on{background:rgba(140,220,80,0.28);}
+.l1.on{background:rgba(220,50,50,0.28);}.l2.on{background:rgba(245,130,60,0.28);}
+.l3.on{background:rgba(245,200,60,0.28);}.l4.on{background:rgba(140,220,80,0.28);}
 .l5.on{background:rgba(80,220,120,0.28);}
 .add-tr{display:flex;gap:8px;}.add-tr input{flex:1;}
 
-/* ── SCHEDULE ── */
 .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
 .dlabel{font-family:'Instrument Serif',serif;font-size:1.3rem;letter-spacing:-0.5px;}
 .dnav{display:flex;gap:6px;}
@@ -122,11 +172,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .eday .ej{font-size:1.7rem;margin-bottom:9px;}
 .eday p{font-size:0.82rem;}
 
-/* ── SESSION CARD ── */
 .sess{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
 .sess::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
-.sess.done{opacity:0.5;}
-.sess.done .stit{text-decoration:line-through;}
+.sess.done{opacity:0.5;}.sess.done .stit{text-decoration:line-through;}
 .sess-main{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;}
 .sck{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;background:transparent;color:transparent;font-size:0.78rem;margin-top:2px;}
 .sck:hover{border-color:var(--accent);}
@@ -147,10 +195,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .sugg-reason{font-size:0.68rem;color:var(--muted);}
 .cb5l{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;}
 .cb0{background:var(--surface2);color:var(--muted);}
-.cb1{background:rgba(220,50,50,0.2);color:#e05555;}
-.cb2{background:rgba(245,130,60,0.2);color:#f5823c;}
-.cb3{background:rgba(245,200,60,0.2);color:#e8c040;}
-.cb4{background:rgba(140,220,80,0.2);color:#8edc50;}
+.cb1{background:rgba(220,50,50,0.2);color:#e05555;}.cb2{background:rgba(245,130,60,0.2);color:#f5823c;}
+.cb3{background:rgba(245,200,60,0.2);color:#e8c040;}.cb4{background:rgba(140,220,80,0.2);color:#8edc50;}
 .cb5{background:rgba(80,220,120,0.2);color:#50dc78;}
 .sa{display:flex;gap:5px;flex-shrink:0;}
 .sib{background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);cursor:pointer;padding:5px 8px;font-size:0.76rem;transition:all 0.15s;}
@@ -164,7 +210,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .tchip.on{border-color:var(--c,var(--accent));color:var(--c,var(--accent));background:rgba(200,245,100,0.06);}
 .nlbl{font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px;}
 
-/* ── PROGRESS ── */
 .pg{display:grid;gap:12px;}
 .pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden;}
 .pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
@@ -179,12 +224,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .tbd-t{font-size:0.63rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px;}
 .tbr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .tbn{font-size:0.81rem;flex:1;}
-.last-studied{font-size:0.67rem;color:var(--muted);}
+.lstu{font-size:0.67rem;color:var(--muted);}
 .conf-bar{width:80px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
 .conf-bar-fill{height:100%;border-radius:3px;transition:width 0.4s;}
 .struggle-box{background:rgba(245,100,100,0.07);border:1px solid rgba(245,100,100,0.18);border-radius:8px;padding:9px 12px;font-size:0.77rem;color:var(--danger);margin-top:8px;}
 
-/* ── POMODORO MODAL ── */
 .ovl{position:fixed;inset:0;background:rgba(0,0,0,0.74);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .ovl.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;animation:mIn 0.22s ease;}
@@ -208,183 +252,153 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .pset input{width:50px;padding:6px 7px;font-size:0.8rem;text-align:center;}
 .pdots{display:flex;gap:4px;justify-content:center;margin-top:9px;}
 .pdot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all 0.3s;}
-.pdot.dn{background:var(--accent);}
-.pdot.cu{background:var(--accent);box-shadow:0 0 5px var(--accent);}
+.pdot.dn{background:var(--accent);}.pdot.cu{background:var(--accent);box-shadow:0 0 5px var(--accent);}
 
 .es{text-align:center;padding:48px 20px;color:var(--muted);}
 .es .be{font-size:2.6rem;margin-bottom:13px;}
 .es p{font-size:0.83rem;line-height:1.6;max-width:300px;margin:0 auto;}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:0.81rem;transform:translateY(60px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:10000;max-width:260px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.ac{border-color:var(--accent);}
+.toast.show{transform:translateY(0);opacity:1;}.toast.ac{border-color:var(--accent);}
 
 @media(max-width:600px){
-  .fr3c{grid-template-columns:1fr!important;}
+  .ob-card{padding:24px 20px;}
+  .subject-picker-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+  .edrow{flex-wrap:wrap;}.edrow input[type="date"]{width:100%;}
   .logo{font-size:2.2rem;}
-  .pcs{gap:9px;}.sv{font-size:1.1rem;}
   .tab{font-size:0.67rem;padding:8px 4px;}
   .conf5{flex-wrap:wrap;}
-  .auth-btn-sub{display:none;}
+  .auth-sub{display:none;}
 }
-
-/* ── CARRIED OVER ── */
-.carried{border-left-color:var(--accent3)!important;}
-.carried-badge{display:inline-block;margin-left:8px;font-size:0.6rem;background:rgba(245,166,100,0.15);color:var(--accent3);border-radius:4px;padding:1px 6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle;}
-
-/* ── WEEK STRIP EXTRAS ── */
-.wd-off{opacity:0.38;}
-.wd-off .wdn{color:var(--muted);}
-.wdot-c{outline:2px dashed var(--accent3);outline-offset:1px;}
-
-/* ── PREFERENCES PAGE ── */
-.day-tog{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;transition:all 0.15s;}
-.day-tog:hover{border-color:var(--muted);color:var(--text);}
-.day-tog.on{background:rgba(200,245,100,0.12);border-color:var(--accent);color:var(--accent);}
-
-input[type="range"]{height:4px;border-radius:2px;outline:none;cursor:pointer;}
-
-/* ── EMOJI DOT HOVER ── */
-.sc-dot:hover::after{content:'✏️';position:absolute;font-size:0.6rem;bottom:-2px;right:-2px;}
-.sc-dot{position:relative;}
-
-/* ── PREFS RADIO ── */
-#pref-priority label{transition:border-color 0.15s;}
-#pref-priority label:has(input:checked){border-color:var(--accent);background:rgba(200,245,100,0.05);}
-
-/* ── STAT GRID ── */
-.stat{text-align:center;min-width:50px;}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
+<!-- ══════════════════════════════════════
+     ONBOARDING
+══════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="ob-card">
+    <div class="ob-progress" id="obProgress"></div>
+
+    <!-- STEP 0: Welcome -->
+    <div class="ob-step active" id="ob0">
+      <div class="ob-logo">Re<span>vise</span></div>
+      <div class="ob-heading">Let's get you set up.</div>
+      <p class="ob-sub">We'll build your personalised revision plan in 3 quick steps — picking your qualification level, subjects, and exam dates. Takes about 2 minutes.</p>
+      <div class="ob-actions">
+        <button class="btn btn-p" onclick="obNext()">Get started →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Level -->
+    <div class="ob-step" id="ob1">
+      <div class="ob-heading">What level are you studying?</div>
+      <p class="ob-sub">Choose your qualification and exam board.</p>
+      <div class="big-choice" style="margin-bottom:24px">
+        <div class="big-btn" id="lvlGCSE" onclick="pickLevel('GCSE')">
+          <div class="bb-title">GCSE</div>
+          <div class="bb-sub">CCEA · Northern Ireland</div>
+        </div>
+        <div class="big-btn" id="lvlALevel" onclick="pickLevel('A-Level')">
+          <div class="bb-title">A-Level</div>
+          <div class="bb-sub">CCEA · Northern Ireland</div>
+        </div>
+      </div>
+      <div class="ob-actions">
+        <button class="btn btn-g" onclick="obBack()">← Back</button>
+        <button class="btn btn-p" onclick="obNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Subjects -->
+    <div class="ob-step" id="ob2">
+      <div class="ob-heading">Which subjects are you taking?</div>
+      <p class="ob-sub">Select all that apply. We'll pre-load the official CCEA topics for each one.</p>
+      <div class="subject-picker-grid" id="subjectPicker"></div>
+      <div class="ob-actions">
+        <button class="btn btn-g" onclick="obBack()">← Back</button>
+        <button class="btn btn-p" onclick="obNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Exam Dates -->
+    <div class="ob-step" id="ob3">
+      <div class="ob-heading">When are your exams?</div>
+      <p class="ob-sub">Enter the date for each subject. You can always change these later.</p>
+      <div class="exam-date-list" id="examDateList"></div>
+      <div class="ob-actions">
+        <button class="btn btn-g" onclick="obBack()">← Back</button>
+        <button class="btn btn-p" onclick="obNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Launch -->
+    <div class="ob-step" id="ob4">
+      <div class="ob-heading">You're all set! 🎉</div>
+      <p class="ob-sub">Your personalised revision plan is ready. Your progress syncs automatically to your Google account across all devices.</p>
+      <div class="ob-actions">
+        <button class="btn btn-g" onclick="obBack()">← Back</button>
+        <button class="btn btn-p" onclick="finishOnboarding()">Launch Revise →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      MAIN APP
-═══════════════════════════════════════════════════════ -->
-<div class="app" id="mainApp" style="display:none">
-  <header>
-    <div>
-      <div class="tagline">Evidence-based exam prep</div>
-      <div class="logo">Re<span>vise</span></div>
-    </div>
-    <div class="auth-area">
-      <div class="sync-dot" id="syncDot" title="Sync status"></div>
-      <div class="auth-btn" id="authBtn" onclick="handleAuthClick()">
-        <span id="authBtnContent">
-          <span class="auth-btn-label">Sign in with Google</span>
-        </span>
+══════════════════════════════════════ -->
+<div id="mainApp" style="display:none">
+  <div class="app">
+    <header>
+      <div>
+        <div class="tagline">Evidence-based exam prep</div>
+        <div class="logo">Re<span>vise</span></div>
       </div>
-    </div>
-  </header>
-
-  <nav class="tabs">
-    <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
-    <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
-    <button class="tab" onclick="showPage('progress',this)">Progress</button>
-    <button class="tab" onclick="showPage('prefs',this)">⚙️ Prefs</button>
-  </nav>
-
-  <!-- SUBJECTS -->
-  <div id="page-subjects" class="page active">
-    <div class="stitle">Add a subject</div>
-    <div class="card" style="margin-bottom:20px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 56px auto;gap:11px;align-items:end;margin-bottom:13px" class="fr3c">
-        <div class="fg"><label>Subject Name</label><input type="text" id="sn" placeholder="e.g. Mathematics" maxlength="40"></div>
-        <div class="fg"><label>Exam Date</label><input type="date" id="ed"></div>
-        <div class="fg"><label>Emoji</label><input type="text" id="emojiPick" placeholder="📗" maxlength="2" style="text-align:center;font-size:1.3rem;padding:6px;"></div>
-        <button class="btn btn-p" style="align-self:flex-end" onclick="addSubject()">+ Add</button>
-      </div>
-      <div class="fg"><label>Colour</label><div class="swatches" id="swatches"></div></div>
-    </div>
-    <div class="stitle">Your subjects</div>
-    <div class="sg" id="sg">
-      <div class="es"><div class="be">📚</div><p>Add subjects above, then expand to add topics and set your confidence on each one.</p></div>
-    </div>
-  </div>
-
-  <!-- SCHEDULE -->
-  <div id="page-schedule" class="page">
-    <div class="sh">
-      <div><div class="stitle">Daily sessions</div><div class="dlabel" id="dlabel">Today</div></div>
-      <div class="dnav">
-        <button onclick="changeDay(-1)">←</button>
-        <button onclick="goToday()">Today</button>
-        <button onclick="changeDay(1)">→</button>
-      </div>
-    </div>
-    <div class="wstrip" id="wstrip"></div>
-    <div id="upcoming-preview" style="margin-bottom:14px"></div>
-    <div class="slist" id="slist"></div>
-  </div>
-
-  <!-- PROGRESS -->
-  <div id="page-progress" class="page">
-    <div class="stitle">Progress &amp; topic confidence</div>
-    <div class="pg" id="pg">
-      <div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>
-    </div>
-  </div>
-
-  <!-- PREFS -->
-  <div id="page-prefs" class="page">
-    <div class="stitle">Study Preferences</div>
-    <div style="display:grid;gap:16px">
-
-      <div class="card">
-        <div class="stitle" style="margin-bottom:14px">Daily Schedule</div>
-        <div style="display:grid;gap:14px">
-          <div class="fg">
-            <label>Max sessions per day</label>
-            <div style="display:flex;align-items:center;gap:12px">
-              <input type="range" id="pref-maxpd" min="1" max="8" value="3" oninput="updPrefMaxPD(this.value)" style="flex:1;accent-color:var(--accent)">
-              <span id="pref-maxpd-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:20px">3</span>
-            </div>
-            <span style="font-size:0.72rem;color:var(--muted)">How many subjects you want to study per day</span>
-          </div>
-          <div class="fg">
-            <label>Session length (minutes)</label>
-            <div style="display:flex;align-items:center;gap:12px">
-              <input type="range" id="pref-sesslen" min="15" max="120" step="5" value="45" oninput="updPrefSessLen(this.value)" style="flex:1;accent-color:var(--accent)">
-              <span id="pref-sesslen-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:40px">45m</span>
-            </div>
-            <span style="font-size:0.72rem;color:var(--muted)">Used for time estimates and Pomodoro defaults</span>
-          </div>
-          <div class="fg">
-            <label>Pre-exam buffer days</label>
-            <div style="display:flex;align-items:center;gap:12px">
-              <input type="range" id="pref-buffer" min="0" max="7" value="2" oninput="updPrefBuffer(this.value)" style="flex:1;accent-color:var(--accent)">
-              <span id="pref-buffer-val" style="font-family:'DM Mono',monospace;font-size:1rem;min-width:20px">2</span>
-            </div>
-            <span style="font-size:0.72rem;color:var(--muted)">Days before exam to stop scheduling new sessions</span>
-          </div>
+      <div class="auth-area">
+        <div class="sync-dot" id="syncDot"></div>
+        <div class="auth-btn" id="authBtn" onclick="handleAuthClick()">
+          <span id="authContent"><span class="auth-label">Sign in with Google</span></span>
         </div>
       </div>
+    </header>
 
-      <div class="card">
-        <div class="stitle" style="margin-bottom:14px">Study Days</div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Which days of the week do you want to study?</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="pref-studydays">
+    <nav class="tabs">
+      <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
+      <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
+      <button class="tab" onclick="showPage('progress',this)">Progress</button>
+    </nav>
+
+    <!-- SUBJECTS -->
+    <div id="page-subjects" class="page active">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+        <div class="stitle" style="margin:0">Your subjects</div>
+        <button class="btn btn-g btn-sm" onclick="addCustomSubject()">+ Add custom subject</button>
+      </div>
+      <div class="sg" id="sg">
+        <div class="es"><div class="be">📚</div><p>Loading your subjects…</p></div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="page-schedule" class="page">
+      <div class="sh">
+        <div><div class="stitle">Daily sessions</div><div class="dlabel" id="dlabel">Today</div></div>
+        <div class="dnav">
+          <button onclick="changeDay(-1)">←</button>
+          <button onclick="goToday()">Today</button>
+          <button onclick="changeDay(1)">→</button>
         </div>
       </div>
+      <div class="wstrip" id="wstrip"></div>
+      <div class="slist" id="slist"></div>
+    </div>
 
-      <div class="card">
-        <div class="stitle" style="margin-bottom:14px">Priority Mode</div>
-        <div style="display:grid;gap:8px" id="pref-priority">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-balanced">
-            <input type="radio" name="priority" value="balanced" style="accent-color:var(--accent)"> 
-            <div><div style="font-size:0.84rem;font-weight:600">Balanced</div><div style="font-size:0.72rem;color:var(--muted)">Spread sessions evenly across all subjects</div></div>
-          </label>
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-urgent">
-            <input type="radio" name="priority" value="urgent" style="accent-color:var(--accent)">
-            <div><div style="font-size:0.84rem;font-weight:600">Urgency-first</div><div style="font-size:0.72rem;color:var(--muted)">Focus more time on subjects with exams soon</div></div>
-          </label>
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:8px" id="pm-weak">
-            <input type="radio" name="priority" value="weak" style="accent-color:var(--accent)">
-            <div><div style="font-size:0.84rem;font-weight:600">Weakness-first</div><div style="font-size:0.72rem;color:var(--muted)">Prioritise topics and subjects with low confidence</div></div>
-          </label>
-        </div>
+    <!-- PROGRESS -->
+    <div id="page-progress" class="page">
+      <div class="stitle">Progress &amp; topic confidence</div>
+      <div class="pg" id="pg">
+        <div class="es"><div class="be">📊</div><p>Complete sessions to track progress here.</p></div>
       </div>
-
-      <button class="btn btn-p" style="width:100%;padding:13px" onclick="savePrefs()">Save Preferences →</button>
     </div>
   </div>
 </div>
@@ -419,19 +433,181 @@ input[type="range"]{height:4px;border-radius:2px;outline:none;cursor:pointer;}
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDKs -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, onSnapshot, setDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ════════════════════════════════════════════════════════
-// FIREBASE CONFIG (hardcoded)
-// ════════════════════════════════════════════════════════
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const fbConfig = {
+// ══════════════════════════════════════════════════════════
+// CCEA CURRICULUM DATABASE
+// ══════════════════════════════════════════════════════════
+const CCEA = {
+  GCSE: [
+    { name:'Mathematics',         emoji:'📐', topics:['Number','Algebra','Ratio, Proportion & Rates of Change','Geometry & Measures','Probability','Statistics','Further Mathematics (Higher)'] },
+    { name:'Biology',             emoji:'🔬', topics:['Cell Biology','Osmosis & Transport in Plants','Photosynthesis & Respiration','The Digestive System','The Circulatory System','Reproduction, Fertility & Contraception','Genetics & DNA','Variation & Natural Selection','Health, Disease & Defence Mechanisms','Ecosystems & Biodiversity','Practical Skills'] },
+    { name:'Chemistry',           emoji:'⚗️', topics:['Atomic Structure & the Periodic Table','Ionic, Covalent & Metallic Bonding','Chemical Calculations & Quantitative Chemistry','Acids, Bases & Salts','Rates of Reaction','Energetics','Electrochemistry','Organic Chemistry','Further Chemical Reactions','Practical Skills'] },
+    { name:'Physics',             emoji:'⚡', topics:['Forces & Motion','Energy','Waves','Electricity & Magnetism','Radioactivity & Nuclear Physics','Space Physics','Density & Pressure','Kinetic Theory','Practical Skills'] },
+    { name:'Double Award Science',emoji:'🧪', topics:['Biology: Cells & Living Processes','Biology: Body Systems & Genetics','Chemistry: Atomic Structure & Reactions','Chemistry: Organic & Quantitative Chemistry','Physics: Forces, Energy & Radioactivity','Physics: Waves, Electricity & Space','Practical Skills'] },
+    { name:'English Language',    emoji:'✍️', topics:['Reading & Comprehension','Writing for Purpose & Audience','Descriptive Writing','Narrative Writing','Transactional Writing','Speaking & Listening'] },
+    { name:'English Literature',  emoji:'📖', topics:['Poetry Anthology','Unseen Poetry','Prose Text','Drama Text','Comparative Writing','Context & Themes'] },
+    { name:'History',             emoji:'🏛️', topics:['Germany 1918–1945','The USA 1920–1973','Ireland 1900–1993','World War One','Cold War','Historical Investigation (coursework)'] },
+    { name:'Geography',           emoji:'🌍', topics:['Natural Environments (Rivers & Coasts)','Ecosystems','Population & Urbanisation','Development & Global Issues','Tourism','Climate Change','Fieldwork'] },
+    { name:'Religious Studies',   emoji:'🕊️', topics:['Christian Beliefs & Teachings','Christian Practices','Ethics & Moral Issues','Philosophy of Religion','World Religions','Textual Analysis'] },
+    { name:'Business Studies',    emoji:'💼', topics:['Business Ownership & Objectives','Marketing','Finance','Human Resources','Operations Management','Business in the Economy'] },
+    { name:'Digital Technology',    emoji:'💻', topics:['Hardware & Software','Networks & the Internet','Data Representation & Binary','Databases','Spreadsheets & Data Handling','Programming & Algorithms','Cybersecurity','Social & Ethical Issues','Systems Analysis & Design','Impact of Technology'] },
+    { name:'ICT',                    emoji:'🖥️', topics:['ICT Systems & Components','Networks','Data & Information','Software Applications','Spreadsheets','Databases','Presentation & Communication','Social & Legal Issues'] },
+    { name:'French',              emoji:'🇫🇷', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism','Reading Comprehension','Listening Comprehension','Speaking','Writing'] },
+    { name:'Spanish',             emoji:'🇪🇸', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism','Reading Comprehension','Listening Comprehension','Speaking','Writing'] },
+    { name:'Irish',               emoji:'🇮🇪', topics:['Oral Irish','Reading & Comprehension','Written Irish','Aural Comprehension','Cultural Context'] },
+    { name:'Music',               emoji:'🎵', topics:['Performing','Composing','Listening & Appraising','Music Theory','Set Works'] },
+    { name:'Art & Design',        emoji:'🎨', topics:['Drawing & Painting','3D Design','Printmaking','Photography','Critical & Contextual Studies','Portfolio Development'] },
+    { name:'Physical Education',  emoji:'🏃', topics:['Physical Activity & Health','Skill Acquisition','Physiology & Anatomy','Biomechanics','Psychology in Sport','Practical Performance'] },
+    { name:'Home Economics',      emoji:'🍽️', topics:['Nutrition & Dietary Needs','Food Science','Consumer Studies','Textile Technology','Family & Child Studies'] },
+    { name:'Technology & Design', emoji:'🔧', topics:['Design Process & Communication','Materials & Manufacturing','Electronics & Control Systems','Mechanisms & Motion','CAD/CAM','Sustainability & Society'] },
+    { name:'Further Mathematics',   emoji:'🔢', topics:['Algebra & Functions','Coordinate Geometry','Sequences & Series','Trigonometry','Calculus: Differentiation','Calculus: Integration','Matrices','Complex Numbers','Statistics','Mechanics'] },
+  ],
+  'A-Level': [
+    { name:'Mathematics',         emoji:'📐', topics:['Pure 1: Algebra & Functions','Pure 1: Coordinate Geometry','Pure 1: Sequences & Series','Pure 1: Trigonometry','Pure 1: Exponentials & Logarithms','Pure 1: Differentiation','Pure 1: Integration','Pure 2: Further Algebra','Pure 2: Further Calculus','Pure 2: Differential Equations','Statistics: Data Representation','Statistics: Probability','Statistics: Distributions','Mechanics: Kinematics','Mechanics: Forces & Newton\'s Laws','Mechanics: Moments'] },
+    { name:'Further Mathematics', emoji:'🔢', topics:['Complex Numbers','Matrices','Further Vectors','Proof','Further Calculus','Polar Coordinates','Hyperbolic Functions','Further Statistics','Decision Mathematics'] },
+    { name:'Biology',             emoji:'🔬', topics:['AS1: Cell Biology & Biochemistry','AS1: DNA, Genes & Protein Synthesis','AS1: Enzymes','AS2: Organisms & the Environment','AS2: Osmosis & Cell Transport','AS2: Photosynthesis & Respiration','A2 1: Physiology & Ecosystems','A2 1: Homeostasis & Control','A2 2: Genetics, Evolution & Biodiversity','A2 2: Biotechnology','Practical Skills'] },
+    { name:'Chemistry',           emoji:'⚗️', topics:['AS1: Atomic Structure & Bonding','AS1: Periodic Table & Trends','AS1: Organic Chemistry Intro','AS2: Energetics & Equilibria','AS2: Electrochemistry','AS2: Rates of Reaction','A2 1: Further Organic Chemistry','A2 1: Transition Metals','A2 2: Analytical Techniques','A2 2: Synoptic Chemistry','Practical Skills'] },
+    { name:'Physics',             emoji:'⚡', topics:['AS1: Forces & Energy','AS1: Waves','AS1: Electricity','AS2: Circular Motion & Oscillations','AS2: Thermal Physics','AS2: Medical Physics Intro','A2 1: Deformation of Solids','A2 1: Capacitors & AC Circuits','A2 2: Magnetic Fields','A2 2: Nuclear Physics','A2 2: Particle Physics','Practical Skills'] },
+    { name:'English Literature',  emoji:'📖', topics:['AS Poetry','AS Prose','AS Drama','A2 Comparative Study','A2 Shakespeare','A2 Unseen Texts','Internal Assessment (coursework)'] },
+    { name:'History',             emoji:'🏛️', topics:['Germany 1918–1945','The British Empire','Ireland in the 20th Century','USA Civil Rights & Society','Historical Investigation','Synoptic Element'] },
+    { name:'Geography',           emoji:'🌍', topics:['Physical Environments: Rivers','Physical Environments: Coasts','Ecosystems','Population & Urbanisation','Development & Global Issues','AS Fieldwork','A2 Independent Investigation'] },
+    { name:'Business Studies',    emoji:'💼', topics:['Business Objectives & Strategy','Marketing Planning','Financial Planning & Analysis','Human Resource Management','Operations & Supply Chain','The Global Business Environment','Business Decision Making'] },
+    { name:'Economics',           emoji:'📊', topics:['Microeconomics: Markets & Price','Microeconomics: Market Failure','Macroeconomics: National Economy','Macroeconomics: Economic Policy','International Trade','Development Economics','Behavioural Economics'] },
+    { name:'Psychology',          emoji:'🧠', topics:['Research Methods','Social Psychology','Cognitive Psychology','Biological Psychology','Developmental Psychology','Psychopathology','Individual Differences'] },
+    { name:'Religious Studies',   emoji:'🕊️', topics:['Philosophy of Religion','Ethics','New Testament Studies','Old Testament Studies','World Religions','Systematic Theology'] },
+    { name:'Politics',            emoji:'🗳️', topics:['Northern Ireland Politics','UK Government & Parliament','Political Parties & Elections','Rights & Liberties','Comparative Politics','International Relations'] },
+    { name:'ICT / Digital Technology', emoji:'💻', topics:['Systems Analysis & Design','Databases','Networks & Communication','Programming','Software Development','Digital Society & Ethics'] },
+    { name:'Art & Design',        emoji:'🎨', topics:['Personal Investigation','Externally Set Assignment','Critical & Contextual Studies','Practical Portfolio'] },
+    { name:'Music',               emoji:'🎵', topics:['Performing','Composing','Listening & Analysis','Music History','Set Works'] },
+    { name:'French',              emoji:'🇫🇷', topics:['Social Issues & Trends','Political & Artistic Culture','Grammar & Writing','Listening & Reading','Speaking (oral)','Translation'] },
+    { name:'Spanish',             emoji:'🇪🇸', topics:['Social Issues & Trends','Political & Artistic Culture','Grammar & Writing','Listening & Reading','Speaking (oral)','Translation'] },
+    { name:'Irish',               emoji:'🇮🇪', topics:['Oral Irish','Written Irish','Aural Comprehension','Literature & Culture','Translation'] },
+    { name:'Physical Education',  emoji:'🏃', topics:['Anatomy & Physiology','Skill Acquisition & Performance','Psychology of Sport','Biomechanics','Contemporary Issues','Practical Performance'] },
+    { name:'Home Economics',      emoji:'🍽️', topics:['Human Nutrition & Dietetics','Food Science & Technology','Consumer Studies','Textiles','Research & Investigative Study'] },
+  ]
+};
+
+const COLORS=['#c8f564','#64c8f5','#f5a664','#f564a0','#a064f5','#64f5c8','#f5e664','#f56464','#64a0f5','#c864f5'];
+const CLABEL=['','Lost','Shaky','Getting it','Almost there','Nailed it'];
+const CCLASS=['cb0','cb1','cb2','cb3','cb4','cb5'];
+const CCOLOR=['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
+
+// ══════════════════════════════════════════════════════════
+// ONBOARDING STATE
+// ══════════════════════════════════════════════════════════
+let obStep = 0;
+let obLevel = '';
+let obSelected = new Set();
+const OB_STEPS = 5; // 0–4
+
+function obRenderProgress() {
+  const p = document.getElementById('obProgress');
+  p.innerHTML = Array.from({length: OB_STEPS}, (_,i) =>
+    `<div class="ob-pip${i < obStep ? ' done' : i === obStep ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+window.obNext = function() {
+  if (obStep === 1 && !obLevel) return tk('Please choose a level');
+  if (obStep === 2 && obSelected.size === 0) return tk('Pick at least one subject');
+  if (obStep === 3) {
+    // validate all dates filled
+    const inputs = document.querySelectorAll('#examDateList input[type="date"]');
+    for (const inp of inputs) {
+      if (!inp.value) return tk(`Enter an exam date for ${inp.dataset.name}`);
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (new Date(inp.value) <= today) return tk(`Exam date for ${inp.dataset.name} must be in the future`);
+    }
+  }
+  obStep++; obGo();
+};
+
+window.obBack = function() { obStep = Math.max(0, obStep - 1); obGo(); };
+
+function obGo() {
+  document.querySelectorAll('.ob-step').forEach((el,i) => el.classList.toggle('active', i === obStep));
+  obRenderProgress();
+  if (obStep === 2) renderSubjectPicker();
+  if (obStep === 3) renderExamDateList();
+}
+
+window.pickLevel = function(level) {
+  obLevel = level;
+  document.getElementById('lvlGCSE').classList.toggle('sel', level === 'GCSE');
+  document.getElementById('lvlALevel').classList.toggle('sel', level === 'A-Level');
+};
+
+function renderSubjectPicker() {
+  const grid = document.getElementById('subjectPicker');
+  const subjects = CCEA[obLevel] || [];
+  grid.innerHTML = subjects.map(s => {
+    const isSel = obSelected.has(s.name);
+    return `<div class="sp-item${isSel?' sel':''}" onclick="toggleSubjectPick('${esc(s.name)}')">
+      <span class="sp-emoji">${s.emoji}</span>
+      <span class="sp-name">${esc(s.name)}</span>
+      <span class="sp-check">${isSel?'✓':''}</span>
+    </div>`;
+  }).join('');
+}
+
+window.toggleSubjectPick = function(name) {
+  if (obSelected.has(name)) obSelected.delete(name);
+  else obSelected.add(name);
+  renderSubjectPicker();
+};
+
+function renderExamDateList() {
+  const list = document.getElementById('examDateList');
+  const today = new Date().toISOString().split('T')[0];
+  list.innerHTML = [...obSelected].map(name => {
+    const s = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚'};
+    return `<div class="edrow">
+      <div class="edrow-left">
+        <div class="edrow-name"><span class="edrow-emoji">${s.emoji}</span>${esc(name)}</div>
+      </div>
+      <input type="date" min="${today}" data-name="${esc(name)}" placeholder="Exam date">
+    </div>`;
+  }).join('');
+}
+
+window.finishOnboarding = function() {
+  // Build subjects from selections + exam dates
+  const inputs = document.querySelectorAll('#examDateList input[type="date"]');
+  const dateMap = {};
+  inputs.forEach(inp => { dateMap[inp.dataset.name] = inp.value; });
+
+  const subjects = [...obSelected].map((name, i) => {
+    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', topics:[]};
+    return {
+      id: 'sub_'+Date.now()+'_'+i,
+      name,
+      examDate: dateMap[name],
+      color: COLORS[i % COLORS.length],
+      emoji: preset.emoji,
+      level: obLevel,
+      topics: preset.topics.map((t,j) => ({id:'t_'+Date.now()+'_'+i+'_'+j, name:t, conf:0, lastStudied:null}))
+    };
+  });
+
+  const newState = { subjects, sessions:{}, ci: subjects.length % COLORS.length };
+  localStorage.setItem('rv4', JSON.stringify(newState));
+  localStorage.setItem('rv_ob_done', '1');
+
+  document.getElementById('onboarding').classList.remove('visible');
+  document.getElementById('mainApp').style.display = 'block';
+  bootApp(FIREBASE_CONFIG);
+};
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCWJpPdlTTiAhoDCZlTDXi6BC90XOJ4PbI",
   authDomain: "revise-dd7ba.firebaseapp.com",
   projectId: "revise-dd7ba",
@@ -441,241 +617,156 @@ const fbConfig = {
   measurementId: "G-GVGX16XEEC"
 };
 
-const STORAGE_CONFIG_KEY = 'revise_fb_config'; // kept for legacy compat
+const obDone = localStorage.getItem('rv_ob_done');
 
+if (!obDone) {
+  obRenderProgress();
+  document.getElementById('onboarding').classList.add('visible');
+} else {
+  document.getElementById('mainApp').style.display = 'block';
+  bootApp(FIREBASE_CONFIG);
+}
 
-
-// ════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════
-document.getElementById('mainApp').style.display = 'block';
-bootApp(fbConfig);
-
+// ══════════════════════════════════════════════════════════
+// MAIN APP
+// ══════════════════════════════════════════════════════════
 function bootApp(fbConfig) {
-  const app  = initializeApp(fbConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  // ── LOCAL STATE (used before/after auth) ──────────────
-  const COLORS = ['#c8f564','#64c8f5','#f5a664','#f564a0','#a064f5','#64f5c8','#f5e664','#f56464','#64a0f5','#c864f5'];
-  const EMOJIS = ['📗','📘','📙','📕','📓','📔','📒','📃','🔬','🧪'];
-  const CLABEL = ['','Lost','Shaky','Getting it','Almost there','Nailed it'];
-  const CCLASS = ['cb0','cb1','cb2','cb3','cb4','cb5'];
-  const CCOLOR = ['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
-
-  let S = JSON.parse(localStorage.getItem('rv4') || 'null') || { subjects:[], sessions:{}, ci:0, prefs:{} };
-  if (!S.prefs) S.prefs = {};
-  // Default prefs
-  const PREFS_DEF = { maxPerDay:3, studyDays:[1,2,3,4,5], sessionLen:45, breakDays:[], buffer:2, priorityMode:'balanced' };
-  Object.keys(PREFS_DEF).forEach(k => { if (S.prefs[k] === undefined) S.prefs[k] = PREFS_DEF[k]; });
-
-  // Schedule cache — invalidated on every save
-  let _schedCache = null, _schedCacheKey = '';
-  function invalidateSchedCache() { _schedCache = null; _schedCacheKey = ''; }
-
-  let currentUser = null;
-  let firestoreUnsub = null;
-  let saveTimer = null;
-  let ignoreSnapshot = false;
-
-  // ── SYNC STATUS ────────────────────────────────────────
-  function setSyncDot(state) {
-    const d = document.getElementById('syncDot');
-    d.className = 'sync-dot ' + state; // '', 'syncing', 'synced', 'err'
+  let auth = null, db = null;
+  if (fbConfig) {
+    try {
+      const app = initializeApp(fbConfig);
+      auth = getAuth(app);
+      db   = getFirestore(app);
+    } catch(e) { console.warn('Firebase init failed:', e); }
   }
 
-  // ── FIRESTORE SAVE (debounced 1.2s) ───────────────────
+  let S = JSON.parse(localStorage.getItem('rv4')||'null') || { subjects:[], sessions:{}, ci:0 };
+  let currentUser = null, firestoreUnsub = null, saveTimer = null, ignoreSnap = false;
+
+  function setSyncDot(state) { document.getElementById('syncDot').className = 'sync-dot ' + state; }
+
   function scheduleSave() {
-    if (!currentUser) { localStorage.setItem('rv4', JSON.stringify(S)); return; }
+    if (!currentUser || !db) { localStorage.setItem('rv4', JSON.stringify(S)); return; }
     setSyncDot('syncing');
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
       try {
-        ignoreSnapshot = true;
-        await setDoc(doc(db, 'users', currentUser.uid, 'data', 'state'), S);
-        setSyncDot('synced');
-        setTimeout(() => setSyncDot(''), 2000);
-      } catch(e) {
-        console.error('Save error', e);
-        setSyncDot('err');
-        tk('Sync error — check your connection', false);
-      } finally {
-        setTimeout(() => { ignoreSnapshot = false; }, 500);
-      }
+        ignoreSnap = true;
+        await setDoc(doc(db,'users',currentUser.uid,'data','state'), S);
+        setSyncDot('synced'); setTimeout(()=>setSyncDot(''), 2000);
+      } catch(e) { setSyncDot('err'); tk('Sync error'); }
+      finally { setTimeout(()=>ignoreSnap=false, 500); }
     }, 1200);
   }
+  function save() { localStorage.setItem('rv4', JSON.stringify(S)); scheduleSave(); }
 
-  function save() {
-    invalidateSchedCache();
-    localStorage.setItem('rv4', JSON.stringify(S));
-    scheduleSave();
-  }
-
-  // ── FIRESTORE REALTIME LISTENER ───────────────────────
   function attachListener(uid) {
     if (firestoreUnsub) firestoreUnsub();
-    firestoreUnsub = onSnapshot(
-      doc(db, 'users', uid, 'data', 'state'),
-      (snap) => {
-        if (ignoreSnapshot) return;
-        if (snap.exists()) {
-          S = snap.data();
-          if (!S.prefs) S.prefs = {};
-          Object.keys(PREFS_DEF).forEach(k => { if (S.prefs[k] === undefined) S.prefs[k] = PREFS_DEF[k]; });
-          invalidateSchedCache();
-          localStorage.setItem('rv4', JSON.stringify(S));
-          renderAll();
-          setSyncDot('synced');
-          setTimeout(() => setSyncDot(''), 1500);
-        }
-      },
-      (err) => {
-        console.error('Listener error', err);
-        setSyncDot('err');
-      }
-    );
+    firestoreUnsub = onSnapshot(doc(db,'users',uid,'data','state'), snap => {
+      if (ignoreSnap) return;
+      if (snap.exists()) { S = snap.data(); localStorage.setItem('rv4',JSON.stringify(S)); renderAll(); setSyncDot('synced'); setTimeout(()=>setSyncDot(''),1500); }
+    }, e => { setSyncDot('err'); });
   }
 
-  // ── AUTH ───────────────────────────────────────────────
+  if (auth) {
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      const c = document.getElementById('authContent');
+      if (user) {
+        c.innerHTML = `<img src="${user.photoURL||''}" onerror="this.style.display='none'"><div><div class="auth-label">${esc(user.displayName||'Signed in')}</div><div class="auth-sub">Tap to sign out</div></div>`;
+        attachListener(user.uid); tk('Synced ✓', true);
+      } else {
+        c.innerHTML = '<span class="auth-label">Sign in with Google</span>';
+        if (firestoreUnsub) { firestoreUnsub(); firestoreUnsub=null; } setSyncDot('');
+      }
+    });
+  } else {
+    document.getElementById('authBtn').style.display = 'none';
+    document.getElementById('syncDot').style.display = 'none';
+  }
+
   window.handleAuthClick = function() {
-    if (currentUser) {
-      if (confirm('Sign out of Google?')) {
-        signOut(auth);
-      }
-    } else {
-      signInWithPopup(auth, new GoogleAuthProvider()).catch(e => {
-        tk('Sign-in failed: ' + e.message);
-      });
-    }
+    if (!auth) return;
+    if (currentUser) { if(confirm('Sign out?')) signOut(auth); }
+    else signInWithPopup(auth, new GoogleAuthProvider()).catch(e => tk('Sign-in failed'));
   };
 
-  onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-    const btn = document.getElementById('authBtnContent');
-    if (user) {
-      btn.innerHTML = `
-        <img src="${user.photoURL||''}" onerror="this.style.display='none'">
-        <div>
-          <div class="auth-btn-label">${esc(user.displayName||'Signed in')}</div>
-          <div class="auth-btn-sub">Tap to sign out</div>
-        </div>`;
-      attachListener(user.uid);
-      tk('Signed in — syncing ✓', true);
-    } else {
-      btn.innerHTML = `<span class="auth-btn-label">Sign in with Google</span>`;
-      if (firestoreUnsub) { firestoreUnsub(); firestoreUnsub = null; }
-      setSyncDot('');
-    }
-  });
-
-  // ════════════════════════════════════════════════════════
-  // SWATCHES
-  // ════════════════════════════════════════════════════════
-  function renderSwatches() {
-    document.getElementById('swatches').innerHTML = COLORS.map((c,i) =>
-      `<div class="sw${i===S.ci?' on':''}" style="background:${c}" onclick="pickC(${i})"></div>`).join('');
-  }
-  window.pickC = function(i) { S.ci = i; renderSwatches(); };
-
-  // ════════════════════════════════════════════════════════
-  // SUBJECTS
-  // ════════════════════════════════════════════════════════
-  window.addSubject = function() {
-    const n = document.getElementById('sn').value.trim();
-    const d = document.getElementById('ed').value;
-    if (!n) return tk('Enter a subject name');
-    if (!d) return tk('Pick an exam date');
-    const today = parseDate(todayStr());
-    if (parseDate(d) <= today) return tk('Exam must be in the future');
-    const chosenEmoji = document.getElementById('emojiPick').value.trim() || EMOJIS[S.subjects.length % EMOJIS.length];
-    S.subjects.push({ id:''+Date.now(), name:n, examDate:d, color:COLORS[S.ci], emoji:chosenEmoji, topics:[] });
-    S.ci = (S.ci + 1) % COLORS.length;
-    save();
-    document.getElementById('sn').value = '';
-    document.getElementById('ed').value = '';
-    document.getElementById('emojiPick').value = '';
-    renderSwatches(); renderSubjects(); tk('Subject added ✓', true);
-  };
-
-  window.setSubjectEmoji = function(id) {
-    const sub = S.subjects.find(s => s.id === id); if (!sub) return;
-    const em = prompt('Enter an emoji for this subject:', sub.emoji);
-    if (em && em.trim()) { sub.emoji = em.trim().slice(0,2); save(); renderSubjects(); setTimeout(()=>document.getElementById('sc-'+id)?.classList.add('open'),8); }
+  // ── SUBJECTS ──────────────────────────────────────────
+  window.addCustomSubject = function() {
+    const name = prompt('Subject name:'); if (!name) return;
+    const date = prompt('Exam date (YYYY-MM-DD):'); if (!date) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (new Date(date) <= today) return tk('Date must be in the future');
+    S.subjects.push({ id:''+Date.now(), name:name.trim(), examDate:date, color:COLORS[S.ci%COLORS.length], emoji:'📚', topics:[] });
+    S.ci = (S.ci+1)%COLORS.length;
+    save(); renderSubjects(); tk('Subject added ✓', true);
   };
 
   window.rmSubject = function(id) {
     if (!confirm('Remove this subject?')) return;
-    S.subjects = S.subjects.filter(s => s.id !== id);
-    Object.keys(S.sessions).filter(k => k.startsWith(id+'_')).forEach(k => delete S.sessions[k]);
+    S.subjects = S.subjects.filter(s=>s.id!==id);
+    Object.keys(S.sessions).filter(k=>k.startsWith(id+'_')).forEach(k=>delete S.sessions[k]);
     save(); renderSubjects(); renderProgress();
   };
 
   window.toggleCard = function(id) { document.getElementById('sc-'+id)?.classList.toggle('open'); };
 
   window.addTopic = function(sid) {
-    const inp = document.getElementById('ti-'+sid);
-    const n = inp.value.trim(); if (!n) return;
-    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
-    sub.topics.push({ id:''+Date.now(), name:n, conf:0, lastStudied:null });
-    save(); inp.value = ''; renderSubjects();
-    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+    const inp = document.getElementById('ti-'+sid); const n = inp.value.trim(); if(!n)return;
+    const sub = S.subjects.find(s=>s.id===sid); if(!sub)return;
+    sub.topics.push({id:''+Date.now(),name:n,conf:0,lastStudied:null});
+    save(); inp.value=''; renderSubjects();
+    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
   };
 
-  window.rmTopic = function(sid, tid) {
-    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
-    sub.topics = sub.topics.filter(t => t.id !== tid);
+  window.rmTopic = function(sid,tid) {
+    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
+    sub.topics=sub.topics.filter(t=>t.id!==tid);
     save(); renderSubjects();
-    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
   };
 
-  window.setConf = function(sid, tid, level) {
-    const sub = S.subjects.find(s => s.id === sid); if (!sub) return;
-    const t = sub.topics.find(t => t.id === tid); if (!t) return;
-    t.conf = (t.conf === level) ? 0 : level;
+  window.setConf = function(sid,tid,level) {
+    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
+    const t=sub.topics.find(t=>t.id===tid); if(!t)return;
+    t.conf=(t.conf===level)?0:level;
     save(); renderSubjects(); renderProgress();
-    setTimeout(() => document.getElementById('sc-'+sid)?.classList.add('open'), 8);
+    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
   };
 
   function renderSubjects() {
     const grid = document.getElementById('sg');
-    if (!S.subjects.length) {
-      grid.innerHTML = '<div class="es"><div class="be">📚</div><p>Add subjects above, then expand to add topics and set your confidence on each one.</p></div>';
-      return;
-    }
-    const today = parseDate(todayStr());
-    const sorted = [...S.subjects].sort((a,b) => parseDate(a.examDate) - parseDate(b.examDate));
-    grid.innerHTML = sorted.map(sub => {
-      const exam = parseDate(sub.examDate);
-      const days = Math.round((exam - today) / 86400000);
-      const bc = days<=7?'du':days<=14?'ds':days<=30?'do':'dp';
-      const schd = genSched(sub);
-      const done = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
-      const examStr = exam.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
-      const ratedTopics = sub.topics.filter(t => t.conf > 0);
-      const avgConf = ratedTopics.length ? Math.round(ratedTopics.reduce((a,t) => a+t.conf, 0) / ratedTopics.length * 10) / 10 : 0;
+    if (!S.subjects.length) { grid.innerHTML='<div class="es"><div class="be">📚</div><p>No subjects yet. Use "Add custom subject" to add one.</p></div>'; return; }
+    const today=new Date(); today.setHours(0,0,0,0);
+    const sorted=[...S.subjects].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
+    grid.innerHTML=sorted.map(sub=>{
+      const exam=new Date(sub.examDate);
+      const days=Math.ceil((exam-today)/86400000);
+      const bc=days<=7?'du':days<=14?'ds':days<=30?'do':'dp';
+      const schd=genSched(sub);
+      const done=schd.filter(s=>S.sessions[sk(s)]?.completedAt).length;
+      const examStr=exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const rated=sub.topics.filter(t=>t.conf>0);
+      const avg=rated.length?Math.round(rated.reduce((a,t)=>a+t.conf,0)/rated.length*10)/10:0;
 
-      const topicsHtml = sub.topics.length
-        ? sub.topics.map(t => `
-          <div class="trow">
-            <div class="trow-name">${esc(t.name)}</div>
-            <div class="conf5">
-              ${[1,2,3,4,5].map(l => `<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CLABEL[l].split(' ')[0]}</button>`).join('')}
-            </div>
-            <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
-          </div>`).join('')
-        : '<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
+      const topicsHtml=sub.topics.length
+        ?sub.topics.map(t=>`<div class="trow">
+          <div class="trow-name">${esc(t.name)}</div>
+          <div class="conf5">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CLABEL[l].split(' ')[0]}</button>`).join('')}</div>
+          <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
+        </div>`).join('')
+        :'<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
 
-      return `
-      <div class="sc" id="sc-${sub.id}" style="--c:${sub.color}">
+      return `<div class="sc" id="sc-${sub.id}" style="--c:${sub.color}">
         <div class="sc-h" onclick="toggleCard('${sub.id}')">
-          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color};cursor:pointer" title="Click to change emoji" onclick="event.stopPropagation();setSubjectEmoji('${sub.id}')">${sub.emoji}</div>
+          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color}">${sub.emoji}</div>
           <div class="sc-info">
-            <div class="sc-name">${esc(sub.name)}</div>
+            <div class="sc-name">${esc(sub.name)}${sub.level?` <span style="font-size:0.6rem;color:var(--muted);font-weight:400">${sub.level}</span>`:''}</div>
             <div class="sc-meta">
               <span>📅 ${examStr}</span>
-              <span>📋 ${done}/${schd.length} sessions</span>
-              <span>🏷 ${sub.topics.length} topic${sub.topics.length!==1?'s':''}</span>
-              ${avgConf > 0 ? `<span style="color:${CCOLOR[Math.round(avgConf)]}">avg: ${avgConf}/5</span>` : ''}
+              <span>📋 ${done}/${schd.length}</span>
+              <span>🏷 ${sub.topics.length} topics</span>
+              ${avg>0?`<span style="color:${CCOLOR[Math.round(avg)]}">avg ${avg}/5</span>`:''}
             </div>
           </div>
           <span class="dbadge ${bc}">${days===1?'1 day':days+' days'}</span>
@@ -683,11 +774,10 @@ function bootApp(fbConfig) {
           <span class="chev">▾</span>
         </div>
         <div class="tp">
-          <div class="stitle" style="margin-bottom:9px">Topics &amp; confidence <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— 1 (Lost) → 5 (Nailed it)</span></div>
+          <div class="stitle" style="margin-bottom:9px">Topics <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— rate 1 (Lost) → 5 (Nailed it)</span></div>
           <div class="tlist">${topicsHtml}</div>
           <div class="add-tr">
-            <input type="text" id="ti-${sub.id}" placeholder="Add a topic" maxlength="60"
-              onkeydown="if(event.key==='Enter')addTopic('${sub.id}')">
+            <input type="text" id="ti-${sub.id}" placeholder="Add a topic" maxlength="80" onkeydown="if(event.key==='Enter')addTopic('${sub.id}')">
             <button class="btn btn-p btn-sm" onclick="addTopic('${sub.id}')">+ Topic</button>
           </div>
         </div>
@@ -695,555 +785,153 @@ function bootApp(fbConfig) {
     }).join('');
   }
 
-  // ════════════════════════════════════════════════════════
-  // SCHEDULING ENGINE — clean rewrite
-  // ════════════════════════════════════════════════════════
+  // ── SCHEDULE GEN ──────────────────────────────────────
+  function genSched(sub) {
+    const today=new Date(); today.setHours(0,0,0,0);
+    const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const d=Math.ceil((exam-today)/86400000); if(d<=0)return[];
+    let iv;
+    if(d<=3)iv=[0,1,2]; else if(d<=7)iv=[0,1,3,6]; else if(d<=14)iv=[0,1,3,6,10,13];
+    else if(d<=30)iv=[0,1,3,6,10,15,21,28]; else if(d<=60)iv=[0,1,3,7,12,18,25,35,45,55];
+    else{iv=[];let g=1,day=0;while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);}if(iv[iv.length-1]<d-2)iv.push(d-2);}
+    const types=['first','review','review','test','review','test','review','test','review','test'];
+    return iv.map((off,i)=>{const dt=new Date(today);dt.setDate(dt.getDate()+off);if(dt>=today&&dt<exam)return{date:dt.toISOString().split('T')[0],subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};return null;}).filter(Boolean);
+  }
+  function allSess(){return S.subjects.flatMap(s=>genSched(s));}
+  function sessForDate(ds){return allSess().filter(s=>s.date===ds);}
+  function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
-  // Parse a YYYY-MM-DD string into a local-midnight Date safely
-  function parseDate(ds) {
-    const [y,m,d] = ds.split('-').map(Number);
-    return new Date(y, m-1, d);
+  // ── TOPIC SUGGESTIONS ─────────────────────────────────
+  function suggestTopics(sub, sessType, n=3) {
+    if(!sub.topics.length)return[];
+    const today=new Date();today.setHours(0,0,0,0);
+    const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
+    const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
+    return sub.topics.map(t=>{
+      const cv=t.conf===0?2.5:t.conf;
+      let rec=t.lastStudied?Math.min(Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000),30)/30*3:3;
+      const urg=daysLeft<=7?1.5:daysLeft<=14?1.2:1.0;
+      let boost=(sessType==='test'&&t.conf>=3)?0.5:(sessType==='first'&&t.conf===0)?1:0;
+      return{...t,score:(5-cv)*urg+rec+boost+Math.random()*0.3};
+    }).sort((a,b)=>b.score-a.score).slice(0,n);
   }
-  // Format a local Date to YYYY-MM-DD
-  function fmtDate(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${dd}`;
-  }
-  // Today as YYYY-MM-DD (local time, no UTC shift)
-  function todayStr() {
-    return fmtDate(new Date());
-  }
-  // Add N calendar days to a date string
-  function addDays(ds, n) {
-    const d = parseDate(ds); d.setDate(d.getDate() + n); return fmtDate(d);
-  }
-  // Day-of-week index (0=Sun..6=Sat) for a date string
-  function dowOf(ds) { return parseDate(ds).getDay(); }
-
-  // Advance ds forward until it lands on a study day
-  function snapToStudyDay(ds, studyDays) {
-    let d = parseDate(ds);
-    let attempts = 0;
-    while (!studyDays.includes(d.getDay()) && attempts < 14) {
-      d.setDate(d.getDate() + 1);
-      attempts++;
-    }
-    return fmtDate(d);
-  }
-
-  // Given total calendar days until exam, return spacing offsets (from today)
-  function spacingOffsets(total) {
-    if (total <= 0) return [];
-    if (total === 1) return [0];
-    if (total <= 3) return [0, total - 1];
-    if (total <= 7) return [0, 1, Math.round(total * 0.5), total - 1];
-    if (total <= 14) return [0, 1, 3, 7, total - 2, total - 1];
-    if (total <= 30) return [0, 1, 3, 7, 12, 18, total - 3, total - 2, total - 1];
-    // Long: fibonacci-ish growth up to 14-day gap, then cram near exam
-    const offs = [0, 1]; let gap = 2;
-    while (true) {
-      const next = offs[offs.length-1] + gap;
-      if (next >= total - 4) break;
-      offs.push(next);
-      gap = Math.min(Math.ceil(gap * 1.6), 14);
-    }
-    offs.push(total - 4, total - 3, total - 2, total - 1);
-    return [...new Set(offs)].filter(x => x >= 0).sort((a,b) => a-b);
+  function suggReason(t,sub,sessType){
+    const today=new Date();today.setHours(0,0,0,0);
+    const daysLeft=Math.ceil((new Date(sub.examDate)-today)/86400000);
+    if(t.conf===0)return'Not yet rated — start here';
+    if(t.conf<=2)return daysLeft<=7?'⚠️ Exam soon & low confidence':'Low confidence — needs work';
+    if(t.lastStudied){const days=Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000);if(days>=7)return`Not studied in ${days} days`;if(days>=3)return`Last studied ${days} days ago`;}
+    return sessType==='test'?'Good to self-test on this':'Due for spaced review';
   }
 
-  // Session type sequence
-  const SESSION_TYPES = ['first','review','review','review','test','review','test','review','test','review','test'];
-
-  // Build the full schedule. Returns array of session objects, each with assignedDate.
-  // sk() key is based on subjectId + original offset index (stable, not date-dependent).
-  function _buildMasterSchedule() {
-    const today = todayStr();
-    const studyDays = (S.prefs.studyDays && S.prefs.studyDays.length) ? S.prefs.studyDays : [0,1,2,3,4,5,6];
-    const maxPD     = Math.max(1, S.prefs.maxPerDay || 3);
-    const buffer    = S.prefs.buffer ?? 2;
-
-    // Build desired sessions per subject
-    const allDesired = [];
-    for (const sub of S.subjects) {
-      const examD  = parseDate(sub.examDate);
-      const todayD = parseDate(today);
-      const daysToExam = Math.round((examD - todayD) / 86400000);
-      if (daysToExam <= 0) continue;
-
-      const effectiveDays = Math.max(1, daysToExam - buffer);
-      const offsets = spacingOffsets(effectiveDays);
-
-      for (let i = 0; i < offsets.length; i++) {
-        const idealDate = addDays(today, offsets[i]);
-        allDesired.push({
-          subjectId: sub.id,
-          idx: i,
-          idealDate,
-          type: SESSION_TYPES[Math.min(i, SESSION_TYPES.length-1)],
-        });
-      }
-    }
-
-    // Sort by idealDate so earlier sessions get first pick of capacity
-    allDesired.sort((a,b) => a.idealDate.localeCompare(b.idealDate) || a.subjectId.localeCompare(b.subjectId));
-
-    // Assign each session to a calendar day, respecting maxPD and studyDays
-    const dayLoad = {}; // ds -> count
-    const result  = [];
-
-    for (const sess of allDesired) {
-      const sessKey = `${sess.subjectId}_${sess.idx}`; // stable key
-      const alreadyDone = S.sessions[sessKey]?.completedAt;
-
-      // Start from idealDate; if in the past, start from today
-      let assignDate = sess.idealDate < today ? today : sess.idealDate;
-
-      // Snap to a valid study day
-      assignDate = snapToStudyDay(assignDate, studyDays);
-
-      // If over capacity, keep advancing one day at a time (respecting study days)
-      if (!alreadyDone) {
-        let safety = 0;
-        while ((dayLoad[assignDate] || 0) >= maxPD && safety < 90) {
-          assignDate = addDays(assignDate, 1);
-          assignDate = snapToStudyDay(assignDate, studyDays);
-          safety++;
-        }
-      }
-
-      dayLoad[assignDate] = (dayLoad[assignDate] || 0) + 1;
-
-      const carried = !alreadyDone && sess.idealDate < today;
-      result.push({ ...sess, assignedDate: assignDate, carried });
-    }
-
-    return result;
-  }
-
-  // Stable session key — based on subjectId + offset index, NOT date
-  function sk(s) { return `${s.subjectId}_${s.idx}`; }
-
-  // Memoised wrapper
-  function buildMasterSchedule() {
-    const key = JSON.stringify({
-      subs: S.subjects.map(s => ({ id:s.id, ed:s.examDate })),
-      prefs: S.prefs,
-      doneCount: Object.keys(S.sessions).length
-    });
-    if (_schedCache && _schedCacheKey === key) return _schedCache;
-    _schedCacheKey = key;
-    _schedCache = _buildMasterSchedule();
-    return _schedCache;
-  }
-
-  function allSess()       { return buildMasterSchedule(); }
-  function sessForDate(ds) { return buildMasterSchedule().filter(s => s.assignedDate === ds); }
-  function genSched(sub)   { return buildMasterSchedule().filter(s => s.subjectId === sub.id); }
-
-  // ════════════════════════════════════════════════════════
-  // WEEK STRIP & SESSIONS
-  // ════════════════════════════════════════════════════════
-  let selDate = todayStr();
-
-  function renderStrip() {
-    const today  = todayStr();
-    const all    = allSess();
-    const DAY_LBL = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-    const studyDays = (S.prefs.studyDays && S.prefs.studyDays.length) ? S.prefs.studyDays : [0,1,2,3,4,5,6];
-    document.getElementById('wstrip').innerHTML = Array.from({length:7}, (_,i) => {
-      const ds  = addDays(today, i);
-      const dow = dowOf(ds);
-      const daySess = all.filter(s => s.assignedDate === ds);
-      const dots = daySess.slice(0,4).map(s2 => {
-        const sub = S.subjects.find(s => s.id === s2.subjectId);
-        return sub ? `<div class="wdot${s2.carried?' wdot-c':''}" style="background:${sub.color}"></div>` : '';
-      }).join('');
-      const isOff = !studyDays.includes(dow);
-      return `<div class="wd${ds===today?' tod':''}${ds===selDate?' sel':''}${isOff?' wd-off':''}" onclick="selDay('${ds}')">
-        <div class="wdl">${DAY_LBL[dow]}</div>
-        <div class="wdn">${parseDate(ds).getDate()}</div>
-        <div class="wdd">${dots}</div>
-      </div>`;
+  // ── WEEK STRIP ────────────────────────────────────────
+  let selDate=new Date().toISOString().split('T')[0];
+  function renderStrip(){
+    const ts=new Date().toISOString().split('T')[0];
+    const all=allSess();
+    const sel=new Date(selDate+'T00:00:00');
+    const ws=new Date(sel);ws.setDate(sel.getDate()-sel.getDay());
+    const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'];
+    document.getElementById('wstrip').innerHTML=Array.from({length:7},(_,i)=>{
+      const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=d.toISOString().split('T')[0];
+      const dots=all.filter(s=>s.date===ds).slice(0,4).map(s2=>{const sub=S.subjects.find(s=>s.id===s2.subjectId);return sub?`<div class="wdot" style="background:${sub.color}"></div>`:'';}).join('');
+      return `<div class="wd${ds===ts?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')"><div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div><div class="wdd">${dots}</div></div>`;
     }).join('');
   }
+  window.selDay=function(ds){selDate=ds;renderStrip();renderSessions();const d=new Date(ds+'T00:00:00');document.getElementById('dlabel').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});};
+  window.changeDay=function(delta){const d=new Date(selDate+'T00:00:00');d.setDate(d.getDate()+delta);selDay(d.toISOString().split('T')[0]);};
+  window.goToday=function(){selDay(new Date().toISOString().split('T')[0]);};
 
-  window.selDay = function(ds) {
-    selDate = ds;
-    renderStrip();
-    renderSessions();
-    renderUpcoming();
-    const d = parseDate(ds);
-    document.getElementById('dlabel').textContent =
-      d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
-  };
-  window.changeDay = function(delta) {
-    selDay(addDays(selDate, delta));
-  };
-  window.goToday = function() { selDay(todayStr()); };
-
-  function renderUpcoming() {
-    const el = document.getElementById('upcoming-preview'); if (!el) return;
-    const today = todayStr();
-    if (selDate !== today) { el.innerHTML = ''; return; }
-    const all = allSess();
-    const rows = [1,2,3].map(offset => {
-      const ds = addDays(today, offset);
-      const daySess = all.filter(s => s.assignedDate === ds);
-      if (!daySess.length) return null;
-      const label = offset === 1 ? 'Tomorrow' : parseDate(ds).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-      const dots = daySess.slice(0,5).map(s2 => {
-        const sub = S.subjects.find(s => s.id === s2.subjectId);
-        return sub ? `<span style="font-size:0.85rem">${sub.emoji}</span>` : '';
-      }).join('');
-      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;cursor:pointer" onclick="selDay('${ds}')">
-        <span style="color:var(--muted);font-weight:600;min-width:72px">${label}</span>
-        <span style="display:flex;gap:3px">${dots}</span>
-        <span style="color:var(--muted);margin-left:auto">${daySess.length} session${daySess.length!==1?'s':''} →</span>
-      </div>`;
-    }).filter(Boolean);
-    el.innerHTML = rows.length ? `<div style="display:grid;gap:5px">${rows.join('')}</div>` : '';
-  }
-
-  // ════════════════════════════════════════════════════════
-  // TOPIC SUGGESTION ENGINE
-  // ════════════════════════════════════════════════════════
-  function suggestTopics(sub, sessType, n=3) {
-    if (!sub.topics.length) return [];
-    const today = parseDate(todayStr());
-    const exam  = parseDate(sub.examDate);
-    const daysLeft = Math.max(1, Math.round((exam - today) / 86400000));
-    const scored = sub.topics.map(t => {
-      const confVal = t.conf === 0 ? 2.5 : t.conf;
-      const confScore = (5 - confVal);
-      let recencyScore = t.lastStudied
-        ? Math.min(Math.round((today - parseDate(t.lastStudied)) / 86400000), 30) / 30 * 3
-        : 3;
-      const urgency = daysLeft <= 7 ? 1.5 : daysLeft <= 14 ? 1.2 : 1.0;
-      let typeBoost = 0;
-      if (sessType === 'test'  && t.conf >= 3) typeBoost = 0.5;
-      if (sessType === 'first' && t.conf === 0) typeBoost = 1;
-      return { ...t, score: (confScore * urgency) + recencyScore + typeBoost + (Math.random() * 0.3) };
-    });
-    return scored.sort((a,b) => b.score - a.score).slice(0, n);
-  }
-
-  function suggReason(t, sub, sessType) {
-    const today = parseDate(todayStr());
-    const exam  = parseDate(sub.examDate);
-    const daysLeft = Math.round((exam - today) / 86400000);
-    if (t.conf === 0) return 'Not yet rated — good time to start';
-    if (t.conf <= 2)  return daysLeft <= 7 ? '⚠️ Exam soon & low confidence' : 'Low confidence — needs work';
-    if (t.lastStudied) {
-      const days = Math.round((today - parseDate(t.lastStudied)) / 86400000);
-      if (days >= 7) return `Not studied in ${days} days`;
-      if (days >= 3) return `Last studied ${days} days ago`;
-    }
-    return sessType === 'test' ? 'Good to self-test on this' : 'Due for a spaced review';
-  }
-
-  function renderSessions() {
-    const list = document.getElementById('slist');
-    const sess = sessForDate(selDate);
-    if (!sess.length) {
-      list.innerHTML = `<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length ? 'Nothing scheduled today — rest up!' : 'Add subjects to generate your schedule.'}</p></div>`;
-      return;
-    }
-    const TL = {first:'First Look', review:'Spaced Review', test:'Self-Test'};
-
-    list.innerHTML = sess.map(s2 => {
-      const sub = S.subjects.find(s => s.id === s2.subjectId); if (!sub) return '';
-      const k   = sk(s2); const sd = S.sessions[k] || {}; const done = !!sd.completedAt;
-      const hasNotes = !!(sd.notes && sd.notes.trim());
-      const suggestions = suggestTopics(sub, s2.type, 3);
-
-      const suggHtml = sub.topics.length ? `
-        <div class="sugg-block">
-          <div class="sugg-label">Suggested topics <span>smart pick</span></div>
-          <div class="sugg-rows">
-            ${suggestions.map(t => {
-              const isSel = (sd.topicIds || []).includes(t.id);
-              const confBadge = t.conf > 0
-                ? `<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`
-                : '<span class="cb5l cb0">Unrated</span>';
-              return `<div class="sugg-row">
-                <div>
-                  <div class="sugg-name">${esc(t.name)}</div>
-                  <div class="sugg-reason">${suggReason(t, sub, s2.type)}</div>
-                </div>
-                ${confBadge}
-                <button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel ? '✓ Done' : 'Study'}</button>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>` : '';
-
-      const chips = sub.topics.length ? `<div class="tp-pick" style="--c:${sub.color}">
-        <span class="tp-pl">All topics (mark covered)</span>
-        <div class="tchips">${sub.topics.map(t => {
-          const isSel = (sd.topicIds || []).includes(t.id);
-          return `<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}</button>`;
-        }).join('')}</div></div>` : '';
-
-      return `
-      <div class="sess${done?' done':''}${s2.carried?' carried':''}" id="sc2-${k}" style="--c:${sub.color}">
+  function renderSessions(){
+    const list=document.getElementById('slist');
+    const sess=sessForDate(selDate);
+    if(!sess.length){list.innerHTML=`<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length?'Nothing scheduled today.':'Add subjects to generate your schedule.'}</p></div>`;return;}
+    const TL={first:'First Look',review:'Spaced Review',test:'Self-Test'};
+    const TIPS={first:'Read notes. Summarise in your own words.',review:'Cover notes — recall from memory.',test:'Quiz yourself — no notes.'};
+    list.innerHTML=sess.map(s2=>{
+      const sub=S.subjects.find(s=>s.id===s2.subjectId);if(!sub)return'';
+      const k=sk(s2);const sd=S.sessions[k]||{};const done=!!sd.completedAt;
+      const hasNotes=!!(sd.notes&&sd.notes.trim());
+      const suggestions=suggestTopics(sub,s2.type,3);
+      const suggHtml=sub.topics.length?`<div class="sugg-block">
+        <div class="sugg-label">Suggested topics <span>smart pick</span></div>
+        <div class="sugg-rows">${suggestions.map(t=>{
+          const isSel=(sd.topicIds||[]).includes(t.id);
+          const badge=t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:'<span class="cb5l cb0">Unrated</span>';
+          return `<div class="sugg-row"><div><div class="sugg-name">${esc(t.name)}</div><div class="sugg-reason">${suggReason(t,sub,s2.type)}</div></div>${badge}<button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel?'✓ Done':'Study'}</button></div>`;
+        }).join('')}</div></div>`:'';
+      const chips=sub.topics.length?`<div class="tp-pick" style="--c:${sub.color}"><span class="tp-pl">All topics</span><div class="tchips">${sub.topics.map(t=>{const isSel=(sd.topicIds||[]).includes(t.id);return`<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}</button>`;}).join('')}</div></div>`:'';
+      return `<div class="sess${done?' done':''}" id="sc2-${k}" style="--c:${sub.color}">
         <div class="sess-main">
-          <div class="sck" onclick="toggleDone('${k}')">${done ? '✓' : ''}</div>
+          <div class="sck" onclick="toggleDone('${k}')">${done?'✓':''}</div>
           <div class="si">
-            <div class="stit">${sub.emoji} ${esc(sub.name)}${s2.carried?'<span class="carried-badge">↩ carried over</span>':''}</div>
-            <div class="smeta">
-              <span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span>
-              <span style="color:var(--muted)">~${S.prefs.sessionLen||45} min</span>
-            </div>
+            <div class="stit">${sub.emoji} ${esc(sub.name)}</div>
+            <div class="smeta"><span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span><span>${TIPS[s2.type]}</span></div>
             ${suggHtml}
           </div>
           <div class="sa">
-            <button class="sib" onclick="openPomo('${k}','${esc(sub.name)}')">🍅</button>
+            <button class="sib${hasNotes?' on':''}" onclick="openPomo('${k}','${esc(sub.name)}')">🍅</button>
             <button class="sib${hasNotes?' on':''}" onclick="toggleExp('${k}')">✏️</button>
           </div>
         </div>
-        <div class="sess-exp" id="exp-${k}">
-          ${chips}
-          <label class="nlbl">Session Notes</label>
-          <textarea id="nt-${k}" placeholder="What did you cover? Anything to remember?">${esc(sd.notes || '')}</textarea>
-          <button class="btn btn-g btn-sm" style="margin-top:7px" onclick="saveNotes('${k}')">Save Notes</button>
-        </div>
+        <div class="sess-exp" id="exp-${k}">${chips}<label class="nlbl">Session Notes</label><textarea id="nt-${k}" placeholder="What did you cover?">${esc(sd.notes||'')}</textarea><button class="btn btn-g btn-sm" style="margin-top:7px" onclick="saveNotes('${k}')">Save Notes</button></div>
       </div>`;
     }).join('');
   }
 
-  window.toggleExp = function(k) {
-    const e = document.getElementById('exp-'+k);
-    e.style.display = e.style.display === 'block' ? 'none' : 'block';
-  };
-  window.toggleDone = function(k) {
-    const sd = S.sessions[k] || {};
-    if (sd.completedAt) { delete S.sessions[k]; }
-    else { S.sessions[k] = {...sd, completedAt: new Date().toISOString()}; tk('Session complete ✓', true); }
-    save(); renderSessions(); renderProgress(); renderSubjects();
-  };
-  window.toggleTopic = function(k, tid, sid) {
-    if (!S.sessions[k]) S.sessions[k] = {};
-    const sd = S.sessions[k]; if (!sd.topicIds) sd.topicIds = [];
-    const i = sd.topicIds.indexOf(tid);
-    if (i > -1) { sd.topicIds.splice(i, 1); }
-    else {
-      sd.topicIds.push(tid);
-      const sub = S.subjects.find(s => s.id === sid);
-      if (sub) { const t = sub.topics.find(t => t.id === tid); if (t) t.lastStudied = todayStr(); }
-    }
-    save(); renderSessions();
-    setTimeout(() => { const e = document.getElementById('exp-'+k); if(e) e.style.display = 'block'; }, 8);
-  };
-  window.saveNotes = function(k) {
-    const v = document.getElementById('nt-'+k).value;
-    if (!S.sessions[k]) S.sessions[k] = {};
-    S.sessions[k].notes = v; save(); tk('Notes saved ✓', true);
-    renderSessions();
-    setTimeout(() => { const e = document.getElementById('exp-'+k); if(e) e.style.display = 'block'; }, 8);
-  };
+  window.toggleExp=function(k){const e=document.getElementById('exp-'+k);e.style.display=e.style.display==='block'?'none':'block';};
+  window.toggleDone=function(k){const sd=S.sessions[k]||{};if(sd.completedAt)delete S.sessions[k];else{S.sessions[k]={...sd,completedAt:new Date().toISOString()};tk('Session complete ✓',true);}save();renderSessions();renderProgress();renderSubjects();};
+  window.toggleTopic=function(k,tid,sid){if(!S.sessions[k])S.sessions[k]={};const sd=S.sessions[k];if(!sd.topicIds)sd.topicIds=[];const i=sd.topicIds.indexOf(tid);if(i>-1)sd.topicIds.splice(i,1);else{sd.topicIds.push(tid);const sub=S.subjects.find(s=>s.id===sid);if(sub){const t=sub.topics.find(t=>t.id===tid);if(t)t.lastStudied=new Date().toISOString().split('T')[0];}}save();renderSessions();setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);};
+  window.saveNotes=function(k){const v=document.getElementById('nt-'+k).value;if(!S.sessions[k])S.sessions[k]={};S.sessions[k].notes=v;save();tk('Notes saved ✓',true);renderSessions();setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);};
 
-  // ════════════════════════════════════════════════════════
-  // POMODORO
-  // ════════════════════════════════════════════════════════
-  let P = {run:false, iv:null, left:0, total:0, phase:'focus', round:1, rounds:4, key:null};
+  // ── POMODORO ──────────────────────────────────────────
+  let P={run:false,iv:null,left:0,total:0,phase:'focus',round:1,rounds:4,key:null};
+  window.openPomo=function(k,name){P.key=k;document.getElementById('pomoTitle').textContent='🍅 '+name;document.getElementById('mnt').value=(S.sessions[k]||{}).notes||'';resetPomo();document.getElementById('pomoOvl').classList.add('open');};
+  window.closePomo=function(){if(P.run)togglePomo();document.getElementById('pomoOvl').classList.remove('open');P.key=null;};
+  const gf=()=>Math.max(1,parseInt(document.getElementById('pfoc').value)||25)*60;
+  const gb=()=>Math.max(1,parseInt(document.getElementById('pbrk').value)||5)*60;
+  const gr=()=>Math.max(1,parseInt(document.getElementById('prnd').value)||4);
+  window.resetPomo=function(){if(P.iv){clearInterval(P.iv);P.iv=null;}P.run=false;P.phase='focus';P.round=1;P.rounds=gr();P.total=gf();P.left=P.total;document.getElementById('pstbtn').textContent='Start';updPomo();};
+  window.togglePomo=function(){if(P.run){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Resume';}else{P.run=true;document.getElementById('pstbtn').textContent='Pause';P.iv=setInterval(tickPomo,1000);}};
+  function tickPomo(){P.left--;if(P.left<=0){if(P.phase==='focus'){tk(`Round ${P.round} done! 🎉`,true);if(P.round>=P.rounds){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Done! 🏆';return;}P.phase='break';P.total=gb();P.left=P.total;}else{P.round++;P.phase='focus';P.total=gf();P.left=P.total;tk(`Round ${P.round} starting!`);}}updPomo();}
+  function updPomo(){const m=Math.floor(P.left/60),s=P.left%60;document.getElementById('ptm').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pph').textContent=P.phase==='focus'?`Round ${P.round}/${P.rounds}`:'Break';const circ=2*Math.PI*36,ring=document.getElementById('rfl');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ*(1-P.left/P.total);ring.className='rfl'+(P.phase==='break'?' brk':'');document.getElementById('pdots').innerHTML=Array.from({length:P.rounds},(_,i)=>{const cl=i<P.round-1?'dn':i===P.round-1&&P.phase==='focus'?'cu':'';return`<div class="pdot ${cl}"></div>`;}).join('');}
+  window.saveModalNotes=function(){if(!P.key)return;if(!S.sessions[P.key])S.sessions[P.key]={};S.sessions[P.key].notes=document.getElementById('mnt').value;save();tk('Notes saved ✓',true);};
+  document.getElementById('pomoOvl').addEventListener('click',e=>{if(e.target===document.getElementById('pomoOvl'))closePomo();});
 
-  window.openPomo = function(k, name) {
-    P.key = k; document.getElementById('pomoTitle').textContent = '🍅 ' + name;
-    const sd = S.sessions[k] || {};
-    document.getElementById('mnt').value = sd.notes || '';
-    resetPomo(); document.getElementById('pomoOvl').classList.add('open');
-  };
-  window.closePomo = function() { if (P.run) togglePomo(); document.getElementById('pomoOvl').classList.remove('open'); P.key = null; };
-  const gf = () => Math.max(1, parseInt(document.getElementById('pfoc').value)||25) * 60;
-  const gb = () => Math.max(1, parseInt(document.getElementById('pbrk').value)||5) * 60;
-  const gr = () => Math.max(1, parseInt(document.getElementById('prnd').value)||4);
-  window.resetPomo = function() {
-    if (P.iv) { clearInterval(P.iv); P.iv = null; }
-    P.run=false; P.phase='focus'; P.round=1; P.rounds=gr(); P.total=gf(); P.left=P.total;
-    document.getElementById('pstbtn').textContent = 'Start'; updPomo();
-  };
-  window.togglePomo = function() {
-    if (P.run) { clearInterval(P.iv); P.iv=null; P.run=false; document.getElementById('pstbtn').textContent='Resume'; }
-    else { P.run=true; document.getElementById('pstbtn').textContent='Pause'; P.iv=setInterval(tickPomo,1000); }
-  };
-  function tickPomo() {
-    P.left--;
-    if (P.left <= 0) {
-      if (P.phase === 'focus') {
-        tk(`Round ${P.round} done! Break time 🎉`, true);
-        if (P.round >= P.rounds) { clearInterval(P.iv); P.iv=null; P.run=false; document.getElementById('pstbtn').textContent='Done! 🏆'; return; }
-        P.phase='break'; P.total=gb(); P.left=P.total;
-      } else { P.round++; P.phase='focus'; P.total=gf(); P.left=P.total; tk(`Round ${P.round} starting!`); }
-    }
-    updPomo();
-  }
-  function updPomo() {
-    const m = Math.floor(P.left/60), s = P.left % 60;
-    document.getElementById('ptm').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    document.getElementById('pph').textContent  = P.phase==='focus' ? `Round ${P.round}/${P.rounds}` : 'Break';
-    const circ = 2*Math.PI*36, ring = document.getElementById('rfl');
-    ring.style.strokeDasharray = circ; ring.style.strokeDashoffset = circ * (1 - P.left/P.total);
-    ring.className = 'rfl' + (P.phase==='break' ? ' brk' : '');
-    document.getElementById('pdots').innerHTML = Array.from({length:P.rounds}, (_,i) => {
-      const cl = i < P.round-1 ? 'dn' : i === P.round-1 && P.phase==='focus' ? 'cu' : '';
-      return `<div class="pdot ${cl}"></div>`;
-    }).join('');
-  }
-  window.saveModalNotes = function() {
-    if (!P.key) return;
-    const v = document.getElementById('mnt').value;
-    if (!S.sessions[P.key]) S.sessions[P.key] = {};
-    S.sessions[P.key].notes = v; save(); tk('Notes saved ✓', true);
-  };
-  document.getElementById('pomoOvl').addEventListener('click', e => { if (e.target === document.getElementById('pomoOvl')) closePomo(); });
-
-  // ════════════════════════════════════════════════════════
-  // PROGRESS
-  // ════════════════════════════════════════════════════════
-  function renderProgress() {
-    const grid = document.getElementById('pg');
-    if (!S.subjects.length) {
-      grid.innerHTML = '<div class="es"><div class="be">📊</div><p>Add subjects, rate topic confidence, and complete sessions to track progress.</p></div>';
-      return;
-    }
-    const today  = parseDate(todayStr());
-    const sorted = [...S.subjects].sort((a,b) => parseDate(a.examDate) - parseDate(b.examDate));
-    grid.innerHTML = sorted.map(sub => {
-      const schd = genSched(sub);
-      const total = schd.length;
-      const done  = schd.filter(s => S.sessions[sk(s)]?.completedAt).length;
-      const pct   = total ? Math.round((done/total)*100) : 0;
-      const exam  = parseDate(sub.examDate);
-      const daysLeft = Math.max(0, Math.round((exam - today) / 86400000));
-      const struggling = sub.topics.filter(t => t.conf > 0 && t.conf <= 2);
-      const unrated    = sub.topics.filter(t => t.conf === 0);
-
-      const dts = schd.filter(s => S.sessions[sk(s)]?.completedAt).map(s => s.assignedDate).sort();
-      let streak = 0;
-      if (dts.length) { const u=[...new Set(dts)]; streak=1; for(let i=u.length-1;i>0;i--){if((parseDate(u[i])-parseDate(u[i-1]))/86400000===1)streak++;else break;} }
-      const next = schd.find(s => !S.sessions[sk(s)]?.completedAt && parseDate(s.assignedDate) >= today);
-      const nextStr = next ? parseDate(next.assignedDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—';
-
-      const tbHtml = sub.topics.length ? `<div class="tbd">
-        <div class="tbd-t">Topic breakdown</div>
-        ${sub.topics.map(t => {
-          const cl = CCLASS[t.conf]; const lbl = CLABEL[t.conf] || 'Not rated';
-          const barPct = t.conf > 0 ? (t.conf/5*100) : 0;
-          const lastStr = t.lastStudied
-            ? `Last: ${parseDate(t.lastStudied).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`
-            : 'Never studied';
-          return `<div class="tbr">
-            <div class="tbn">${esc(t.name)}</div>
-            <div class="last-studied">${lastStr}</div>
-            <div class="conf-bar"><div class="conf-bar-fill" style="width:${barPct}%;background:${CCOLOR[t.conf]}"></div></div>
-            <span class="cb5l ${cl}">${lbl}</span>
-          </div>`;
-        }).join('')}
-        ${struggling.length ? `<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t => esc(t.name)).join(', ')}</strong></div>` : ''}
-        ${unrated.length ? `<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t => esc(t.name)).join(', ')}</div>` : ''}
-      </div>` : '';
-
-      return `<div class="pc" style="--c:${sub.color}">
-        <div class="pch">
-          <div>
-            <div class="pcn">${sub.emoji} ${esc(sub.name)}</div>
-            <div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div>
-          </div>
-          <div class="pcs">
-            <div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Done</div></div>
-            <div class="stat"><div class="sv">${done}/${total}</div><div class="sl">Sessions</div></div>
-            <div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div>
-            <div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div>
-          </div>
-        </div>
-        <div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div>
-        <div style="font-size:0.73rem;color:var(--muted)">Next session: <strong style="color:var(--text)">${nextStr}</strong></div>
-        ${tbHtml}
-      </div>`;
+  // ── PROGRESS ─────────────────────────────────────────
+  function renderProgress(){
+    const grid=document.getElementById('pg');
+    if(!S.subjects.length){grid.innerHTML='<div class="es"><div class="be">📊</div><p>Complete sessions to track progress here.</p></div>';return;}
+    const today=new Date();today.setHours(0,0,0,0);
+    const sorted=[...S.subjects].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
+    grid.innerHTML=sorted.map(sub=>{
+      const schd=genSched(sub);const total=schd.length;
+      const done=schd.filter(s=>S.sessions[sk(s)]?.completedAt).length;
+      const pct=total?Math.round((done/total)*100):0;
+      const exam=new Date(sub.examDate);const daysLeft=Math.max(0,Math.ceil((exam-today)/86400000));
+      const struggling=sub.topics.filter(t=>t.conf>0&&t.conf<=2);
+      const unrated=sub.topics.filter(t=>t.conf===0);
+      const dts=schd.filter(s=>S.sessions[sk(s)]?.completedAt).map(s=>s.date).sort();
+      let streak=0;if(dts.length){const u=[...new Set(dts)];streak=1;for(let i=u.length-1;i>0;i--){if((new Date(u[i])-new Date(u[i-1]))/86400000===1)streak++;else break;}}
+      const next=schd.find(s=>!S.sessions[sk(s)]?.completedAt&&new Date(s.date+'T00:00:00')>=today);
+      const nextStr=next?new Date(next.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
+      const tbHtml=sub.topics.length?`<div class="tbd"><div class="tbd-t">Topic breakdown</div>${sub.topics.map(t=>{const cl=CCLASS[t.conf];const lbl=CLABEL[t.conf]||'Not rated';const lastStr=t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied';return`<div class="tbr"><div class="tbn">${esc(t.name)}</div><div class="lstu">${lastStr}</div><div class="conf-bar"><div class="conf-bar-fill" style="width:${t.conf>0?t.conf/5*100:0}%;background:${CCOLOR[t.conf]}"></div></div><span class="cb5l ${cl}">${lbl}</span></div>`;}).join('')}${struggling.length?`<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t=>esc(t.name)).join(', ')}</strong></div>`:''}${unrated.length?`<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t=>esc(t.name)).join(', ')}</div>`:''}</div>`:'';
+      return`<div class="pc" style="--c:${sub.color}"><div class="pch"><div><div class="pcn">${sub.emoji} ${esc(sub.name)}</div><div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div></div><div class="pcs"><div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Done</div></div><div class="stat"><div class="sv">${done}/${total}</div><div class="sl">Sessions</div></div><div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div><div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div></div></div><div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div><div style="font-size:0.73rem;color:var(--muted)">Next: <strong style="color:var(--text)">${nextStr}</strong></div>${tbHtml}</div>`;
     }).join('');
   }
 
-  // ════════════════════════════════════════════════════════
-  // UTILS
-  // ════════════════════════════════════════════════════════
-  window.showPage = function(p, el) {
-    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.getElementById('page-'+p).classList.add('active'); el.classList.add('active');
-    if (p === 'schedule') { renderStrip(); selDay(selDate); }
-    if (p === 'progress') renderProgress();
-    if (p === 'prefs') renderPrefs();
-  };
+  window.showPage=function(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');el.classList.add('active');if(p==='schedule'){renderStrip();selDay(selDate);}if(p==='progress')renderProgress();};
+  function renderAll(){renderSubjects();renderStrip();renderSessions();renderProgress();}
 
-  // ════════════════════════════════════════════════════════
-  // PREFERENCES
-  // ════════════════════════════════════════════════════════
-  function renderPrefs() {
-    const p = S.prefs;
-    const mxEl = document.getElementById('pref-maxpd');
-    mxEl.value = p.maxPerDay; document.getElementById('pref-maxpd-val').textContent = p.maxPerDay;
-    const slEl = document.getElementById('pref-sesslen');
-    slEl.value = p.sessionLen; document.getElementById('pref-sesslen-val').textContent = p.sessionLen + 'm';
-    const bufEl = document.getElementById('pref-buffer');
-    bufEl.value = p.buffer; document.getElementById('pref-buffer-val').textContent = p.buffer;
-
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    document.getElementById('pref-studydays').innerHTML = days.map((d,i) => {
-      const on = (p.studyDays||[1,2,3,4,5]).includes(i);
-      return `<button class="day-tog${on?' on':''}" data-day="${i}" onclick="toggleStudyDay(${i})">${d}</button>`;
-    }).join('');
-
-    document.querySelectorAll('input[name="priority"]').forEach(r => {
-      r.checked = (r.value === (p.priorityMode||'balanced'));
-    });
-  }
-
-  window.updPrefMaxPD = function(v) { document.getElementById('pref-maxpd-val').textContent = v; };
-  window.updPrefSessLen = function(v) { document.getElementById('pref-sesslen-val').textContent = v+'m'; };
-  window.updPrefBuffer = function(v) { document.getElementById('pref-buffer-val').textContent = v; };
-
-  window.toggleStudyDay = function(i) {
-    const btn = document.querySelector(`.day-tog[data-day="${i}"]`);
-    if (!btn) return;
-    const days = S.prefs.studyDays || [1,2,3,4,5];
-    const idx = days.indexOf(i);
-    if (idx > -1) { if (days.length <= 1) return tk('Need at least 1 study day'); days.splice(idx,1); }
-    else { days.push(i); days.sort(); }
-    S.prefs.studyDays = days;
-    btn.classList.toggle('on', days.includes(i));
-  };
-
-  window.savePrefs = function() {
-    S.prefs.maxPerDay = parseInt(document.getElementById('pref-maxpd').value) || 3;
-    S.prefs.sessionLen = parseInt(document.getElementById('pref-sesslen').value) || 45;
-    S.prefs.buffer = parseInt(document.getElementById('pref-buffer').value) || 2;
-    const pm = document.querySelector('input[name="priority"]:checked');
-    if (pm) S.prefs.priorityMode = pm.value;
-    save(); tk('Preferences saved ✓', true);
-    // Reset pomodoro focus time to match session length
-    const focEl = document.getElementById('pfoc');
-    if (focEl) { focEl.value = Math.min(S.prefs.sessionLen, 60); resetPomo(); }
-  };
-
-  function renderAll() { renderSubjects(); renderStrip(); renderSessions(); renderUpcoming(); renderProgress(); }
-
-  document.getElementById('ed').min = todayStr();
-  renderSwatches(); renderSubjects();
-  selDay(todayStr());
+  renderAll();
+  selDay(new Date().toISOString().split('T')[0]);
   updPomo();
 }
 
-// ── TOAST (global, needed by saveConfig before app boots) ──
-window.tk = function(msg, ac=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show' + (ac ? ' ac' : '');
-  clearTimeout(window._tkT);
-  window._tkT = setTimeout(() => t.className = 'toast', 2600);
-};
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-window.esc = esc;
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+window.esc=esc;
+let tT;
+window.tk=function(msg,ac=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(ac?' ac':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);};
 </script>
 </body>
 </html>
