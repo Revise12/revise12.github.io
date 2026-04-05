@@ -50,15 +50,26 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .sp-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-left:auto;transition:all 0.15s;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:transparent;}
 .sp-item.sel .sp-check{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
 
-/* Step 3: exam dates */
-.exam-date-list{display:grid;gap:10px;margin-bottom:20px;max-height:360px;overflow-y:auto;}
-.edrow{background:var(--surface2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
-.edrow-left{flex:1;}
-.edrow-name{font-size:0.9rem;font-weight:700;margin-bottom:4px;}
-.edrow-emoji{font-size:1rem;margin-right:4px;}
-.edrow input[type="date"]{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.84rem;outline:none;width:160px;}
-.edrow input[type="date"]:focus{border-color:var(--accent);}
-.edrow input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
+/* Step 3: unit picker */
+.exam-date-list{display:grid;gap:14px;margin-bottom:20px;max-height:420px;overflow-y:auto;padding-right:4px;}
+.exam-date-list::-webkit-scrollbar{width:4px;}
+.exam-date-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.subj-unit-block{background:var(--surface2);border-radius:10px;overflow:hidden;}
+.subj-unit-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.subj-unit-emoji{font-size:1.1rem;}
+.subj-unit-name{font-size:0.88rem;font-weight:700;}
+.unit-rows{display:grid;gap:0;}
+.unit-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.unit-row:last-child{border-bottom:none;}
+.unit-row.done-unit{opacity:0.45;}
+.unit-toggle{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:transparent;transition:all 0.15s;background:transparent;}
+.unit-toggle.checked{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
+.unit-label{flex:1;font-size:0.8rem;font-weight:600;line-height:1.3;}
+.unit-date-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.unit-date-wrap input[type="date"]{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.76rem;outline:none;width:145px;}
+.unit-date-wrap input[type="date"]:focus{border-color:var(--accent);}
+.unit-date-wrap input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
+.unit-done-badge{font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);white-space:nowrap;}
 
 /* Firebase setup */
 .setup-steps{display:grid;gap:12px;margin-bottom:22px;}
@@ -321,10 +332,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
       </div>
     </div>
 
-    <!-- STEP 3: Exam Dates -->
+    <!-- STEP 3: Units & Exam Dates -->
     <div class="ob-step" id="ob3">
-      <div class="ob-heading">When are your exams?</div>
-      <p class="ob-sub">Enter the date for each subject. You can always change these later.</p>
+      <div class="ob-heading">Which units are you still sitting?</div>
+      <p class="ob-sub">Tick the units you haven't done yet and set a date for each. Untick any you've already completed — they won't be scheduled.</p>
       <div class="exam-date-list" id="examDateList"></div>
       <div class="ob-actions">
         <button class="btn btn-g" onclick="obBack()">← Back</button>
@@ -445,28 +456,136 @@ import { getFirestore, doc, onSnapshot, setDoc }
 // ══════════════════════════════════════════════════════════
 const CCEA = {
   GCSE: [
-    { name:'Mathematics',         emoji:'📐', topics:['Number','Algebra','Ratio, Proportion & Rates of Change','Geometry & Measures','Probability','Statistics','Further Mathematics (Higher)'] },
-    { name:'Biology',             emoji:'🔬', topics:['Cell Biology','Osmosis & Transport in Plants','Photosynthesis & Respiration','The Digestive System','The Circulatory System','Reproduction, Fertility & Contraception','Genetics & DNA','Variation & Natural Selection','Health, Disease & Defence Mechanisms','Ecosystems & Biodiversity','Practical Skills'] },
-    { name:'Chemistry',           emoji:'⚗️', topics:['Atomic Structure & the Periodic Table','Ionic, Covalent & Metallic Bonding','Chemical Calculations & Quantitative Chemistry','Acids, Bases & Salts','Rates of Reaction','Energetics','Electrochemistry','Organic Chemistry','Further Chemical Reactions','Practical Skills'] },
-    { name:'Physics',             emoji:'⚡', topics:['Forces & Motion','Energy','Waves','Electricity & Magnetism','Radioactivity & Nuclear Physics','Space Physics','Density & Pressure','Kinetic Theory','Practical Skills'] },
-    { name:'Double Award Science',emoji:'🧪', topics:['Biology: Cells & Living Processes','Biology: Body Systems & Genetics','Chemistry: Atomic Structure & Reactions','Chemistry: Organic & Quantitative Chemistry','Physics: Forces, Energy & Radioactivity','Physics: Waves, Electricity & Space','Practical Skills'] },
-    { name:'English Language',    emoji:'✍️', topics:['Reading & Comprehension','Writing for Purpose & Audience','Descriptive Writing','Narrative Writing','Transactional Writing','Speaking & Listening'] },
-    { name:'English Literature',  emoji:'📖', topics:['Poetry Anthology','Unseen Poetry','Prose Text','Drama Text','Comparative Writing','Context & Themes'] },
-    { name:'History',             emoji:'🏛️', topics:['Germany 1918–1945','The USA 1920–1973','Ireland 1900–1993','World War One','Cold War','Historical Investigation (coursework)'] },
-    { name:'Geography',           emoji:'🌍', topics:['Natural Environments (Rivers & Coasts)','Ecosystems','Population & Urbanisation','Development & Global Issues','Tourism','Climate Change','Fieldwork'] },
-    { name:'Religious Studies',   emoji:'🕊️', topics:['Christian Beliefs & Teachings','Christian Practices','Ethics & Moral Issues','Philosophy of Religion','World Religions','Textual Analysis'] },
-    { name:'Business Studies',    emoji:'💼', topics:['Business Ownership & Objectives','Marketing','Finance','Human Resources','Operations Management','Business in the Economy'] },
-    { name:'Digital Technology',    emoji:'💻', topics:['Hardware & Software','Networks & the Internet','Data Representation & Binary','Databases','Spreadsheets & Data Handling','Programming & Algorithms','Cybersecurity','Social & Ethical Issues','Systems Analysis & Design','Impact of Technology'] },
-    { name:'ICT',                    emoji:'🖥️', topics:['ICT Systems & Components','Networks','Data & Information','Software Applications','Spreadsheets','Databases','Presentation & Communication','Social & Legal Issues'] },
-    { name:'French',              emoji:'🇫🇷', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism','Reading Comprehension','Listening Comprehension','Speaking','Writing'] },
-    { name:'Spanish',             emoji:'🇪🇸', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism','Reading Comprehension','Listening Comprehension','Speaking','Writing'] },
-    { name:'Irish',               emoji:'🇮🇪', topics:['Oral Irish','Reading & Comprehension','Written Irish','Aural Comprehension','Cultural Context'] },
-    { name:'Music',               emoji:'🎵', topics:['Performing','Composing','Listening & Appraising','Music Theory','Set Works'] },
-    { name:'Art & Design',        emoji:'🎨', topics:['Drawing & Painting','3D Design','Printmaking','Photography','Critical & Contextual Studies','Portfolio Development'] },
-    { name:'Physical Education',  emoji:'🏃', topics:['Physical Activity & Health','Skill Acquisition','Physiology & Anatomy','Biomechanics','Psychology in Sport','Practical Performance'] },
-    { name:'Home Economics',      emoji:'🍽️', topics:['Nutrition & Dietary Needs','Food Science','Consumer Studies','Textile Technology','Family & Child Studies'] },
-    { name:'Technology & Design', emoji:'🔧', topics:['Design Process & Communication','Materials & Manufacturing','Electronics & Control Systems','Mechanisms & Motion','CAD/CAM','Sustainability & Society'] },
-    { name:'Further Mathematics',   emoji:'🔢', topics:['Algebra & Functions','Coordinate Geometry','Sequences & Series','Trigonometry','Calculus: Differentiation','Calculus: Integration','Matrices','Complex Numbers','Statistics','Mechanics'] },
+    { name:'Mathematics',         emoji:'📐',
+      units:[
+        {id:'u1', name:'Unit 1: Session 1 (Calculator)', topics:['Number','Ratio, Proportion & Rates of Change','Algebra','Geometry & Measures']},
+        {id:'u2', name:'Unit 1: Session 2 (Non-Calculator + Calculator)', topics:['Probability','Statistics','Further Number','Further Algebra','Further Geometry']},
+      ]},
+    { name:'Further Mathematics',   emoji:'🔢',
+      units:[
+        {id:'u1', name:'Paper 1 (Non-Calculator)', topics:['Algebra & Functions','Coordinate Geometry','Sequences & Series','Trigonometry','Differentiation']},
+        {id:'u2', name:'Paper 2 (Calculator)', topics:['Integration','Matrices','Complex Numbers','Statistics','Mechanics']},
+      ]},
+    { name:'Biology',             emoji:'🔬',
+      units:[
+        {id:'u1', name:'Unit 1: Cells, Living Processes & Biodiversity', topics:['Cell Structure & Organisation','Biological Molecules','Enzymes & Digestion','Photosynthesis & Respiration','Ecosystems & Biodiversity']},
+        {id:'u2', name:'Unit 2: Body Systems, Genetics & Health', topics:['Osmosis & Plant Transport','The Circulatory System','Reproduction & Fertility','Genetics & DNA','Variation & Natural Selection','Health & Disease']},
+        {id:'u3', name:'Unit 3: Practical Skills', topics:['Practical Techniques','Planning Experiments','Data Analysis','Evaluating Methods']},
+      ]},
+    { name:'Chemistry',           emoji:'⚗️',
+      units:[
+        {id:'u1', name:'Unit 1: Structures, Trends, Chemical Reactions, Quantitative Chemistry & Analysis', topics:['Atomic Structure & the Periodic Table','Ionic & Covalent Bonding','Acids, Bases & Salts','Quantitative Chemistry','Metals & Reactivity','Chemical Analysis']},
+        {id:'u2', name:'Unit 2: Further Chemical Reactions, Rates, Equilibrium, Calculations & Organic Chemistry', topics:['Rates of Reaction','Energetics','Electrochemistry','Equilibrium','Organic Chemistry','Further Calculations']},
+        {id:'u3', name:'Unit 3: Practical Skills', topics:['Practical Techniques','Planning Experiments','Data Analysis','Evaluating Methods']},
+      ]},
+    { name:'Physics',             emoji:'⚡',
+      units:[
+        {id:'u1', name:'Unit 1: Motion, Force, Moments, Energy, Density, Kinetic Theory, Radioactivity, Nuclear Fission & Fusion', topics:['Motion & Forces','Moments & Pressure','Energy & Power','Density & Kinetic Theory','Radioactivity','Nuclear Fission & Fusion']},
+        {id:'u2', name:'Unit 2: Waves, Light, Electricity, Magnetism, Electromagnetism & Space Physics', topics:['Waves & Sound','Light & Optics','Electricity & Circuits','Magnetism & Electromagnetism','Space Physics']},
+        {id:'u3', name:'Unit 3: Practical Skills', topics:['Practical Techniques','Planning Experiments','Data Analysis','Evaluating Methods']},
+      ]},
+    { name:'English Literature',  emoji:'📖',
+      units:[
+        {id:'u1', name:'Unit 1: Poetry & Drama', topics:['Poetry Anthology — Conflict','Unseen Poetry','Drama Text (set play)','Dramatic Techniques','Comparative Writing']},
+        {id:'u2', name:'Unit 2: Prose', topics:['Prose Text (set novel)','Unseen Prose Extract','Context & Themes','Character & Language Analysis']},
+      ]},
+    { name:'Religious Studies',   emoji:'🕊️',
+      units:[
+        {id:'u1', name:"Module 1: Christianity — Mark's Gospel", topics:["The Identity of Jesus","The Galilean Ministry","Miracles","The Passion Narrative","Discipleship","Faith & Doubt"]},
+        {id:'u2', name:'Module 2: Christian Ethics', topics:['Matters of Life & Death','Personal Relationships & Family Life','Prejudice & Discrimination','Crime & Punishment','World Poverty','Peace & Conflict']},
+      ]},
+    { name:'French',              emoji:'🇫🇷',
+      units:[
+        {id:'u1', name:'Unit 1: Listening', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism']},
+        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-play Scenarios','Photo Card Discussion','General Conversation']},
+        {id:'u3', name:'Unit 3: Reading', topics:['Reading Comprehension','Vocabulary in Context','Inferring Meaning']},
+        {id:'u4', name:'Unit 4: Writing', topics:['Structured Writing Tasks','Translation into French','Extended Writing']},
+      ]},
+    { name:'Technology & Design', emoji:'🔧',
+      units:[
+        {id:'u1', name:'Unit 1: Technology & Design Core (Written Exam)', topics:['Design Process & Communication','Electronics & Control Systems','Mechanical Systems','Pneumatic Systems','CAD/CAM','Materials & Properties','Health & Safety']},
+        {id:'u2', name:'Unit 2: Optional Area of Study', topics:['Electronic & Microelectronic Control','Mechanical & Pneumatic Systems','Product Design — dependent on option chosen']},
+        {id:'u3', name:'Unit 3: Design & Manufacturing Project (Controlled Assessment)', topics:['Identifying & Researching a Problem','Design Proposals','Prototyping & Testing','Manufacturing a Solution','Evaluation']},
+      ]},
+    { name:'Digital Technology',    emoji:'💻',
+      units:[
+        {id:'u1', name:'Unit 1: Digital Technology (Written Exam)', topics:['Digital Data & Binary','Software Types & Uses','Database Applications','Spreadsheet Applications','Computer Hardware','Network Technologies','Cybersecurity & Data Transfer','Cloud Computing','Ethical, Legal & Environmental Impact']},
+        {id:'u2', name:'Unit 2: Digital Authoring / Development Concepts (Written Exam)', topics:['Designing Solutions','Digital Development Considerations','Multimedia Applications (Route A)','Database Development (Route A)','Programming Concepts (Route B)','Object-Oriented Programming (Route B)','Testing & Evaluation']},
+        {id:'u3', name:'Unit 3/5: Controlled Assessment (Practical)', topics:['Project Brief & Research','Designing the Solution','Building & Testing','Evaluating the Solution']},
+      ]},
+    { name:'Double Award Science',emoji:'🧪',
+      units:[
+        {id:'b1', name:'Biology Unit B1: Cells, Living Processes & Biodiversity', topics:['Cell Biology','Enzymes','Photosynthesis & Respiration','Ecosystems']},
+        {id:'b2', name:'Biology Unit B2: Body Systems, Genetics & Health', topics:['Osmosis','Circulatory System','Genetics','Health & Disease']},
+        {id:'c1', name:'Chemistry Unit C1: Structures, Reactions & Analysis', topics:['Atomic Structure','Bonding','Acids & Salts','Quantitative Chemistry']},
+        {id:'c2', name:'Chemistry Unit C2: Further Chemistry & Organic', topics:['Rates','Energetics','Electrochemistry','Organic Chemistry']},
+        {id:'p1', name:'Physics Unit P1: Motion, Energy & Radioactivity', topics:['Forces','Energy','Density','Radioactivity']},
+        {id:'p2', name:'Physics Unit P2: Waves, Electricity & Space', topics:['Waves','Electricity','Magnetism','Space Physics']},
+        {id:'u7', name:'Unit 7: Practical Skills', topics:['Biology Practicals','Chemistry Practicals','Physics Practicals']},
+      ]},
+    { name:'English Language',    emoji:'✍️',
+      units:[
+        {id:'u1', name:'Unit 1: Communication (Reading & Writing)', topics:['Reading for Meaning','Analysing Language & Structure','Writing for Purpose & Audience','Descriptive & Narrative Writing']},
+        {id:'u2', name:'Unit 2: Personal & Imaginative Communication', topics:['Transactional Writing','Speaking & Listening']},
+      ]},
+    { name:'History',             emoji:'🏛️',
+      units:[
+        {id:'u1', name:'Unit 1: International Relations (Written)', topics:['Causes of WWI','Paris Peace Conference','League of Nations','Road to WWII']},
+        {id:'u2', name:'Unit 2: Depth Study (Written)', topics:['Germany 1918–1945','USA 1920–1973','Ireland 1900–1993 — depends on school choice']},
+        {id:'u3', name:'Unit 3: Historical Investigation (Coursework)', topics:['Source Analysis','Historical Enquiry','Presenting Evidence','Evaluation']},
+      ]},
+    { name:'Geography',           emoji:'🌍',
+      units:[
+        {id:'u1', name:'Unit 1: Physical Geography (Written)', topics:['Rivers & Flooding','Coasts','Ecosystems','Atmosphere & Climate Change']},
+        {id:'u2', name:'Unit 2: Human Geography (Written)', topics:['Population','Urbanisation','Development','Tourism']},
+        {id:'u3', name:'Unit 3: Fieldwork Investigation (Coursework)', topics:['Fieldwork Planning','Data Collection','Analysis & Conclusions']},
+      ]},
+    { name:'Business Studies',    emoji:'💼',
+      units:[
+        {id:'u1', name:'Unit 1: Setting Up a Business (Written)', topics:['Business Ownership','Market Research','Marketing Mix','Finance Basics','Business Location']},
+        {id:'u2', name:'Unit 2: Growing as a Business (Written)', topics:['Business Growth','Human Resources','Operations Management','Financial Planning','Business & Economy']},
+      ]},
+    { name:'ICT',                    emoji:'🖥️',
+      units:[
+        {id:'u1', name:'Unit 1: ICT in Context (Written)', topics:['ICT Systems','Networks','Data & Information','Social & Legal Issues']},
+        {id:'u2', name:'Unit 2: Handling Data (Written)', topics:['Databases','Spreadsheets','Data Modelling']},
+        {id:'u3', name:'Unit 3: Coursework', topics:['Practical Task','Documentation','Testing & Evaluation']},
+      ]},
+    { name:'Spanish',             emoji:'🇪🇸',
+      units:[
+        {id:'u1', name:'Unit 1: Listening', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism']},
+        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-play Scenarios','Photo Card Discussion','General Conversation']},
+        {id:'u3', name:'Unit 3: Reading', topics:['Reading Comprehension','Vocabulary in Context','Inferring Meaning']},
+        {id:'u4', name:'Unit 4: Writing', topics:['Structured Writing Tasks','Translation into Spanish','Extended Writing']},
+      ]},
+    { name:'Irish',               emoji:'🇮🇪',
+      units:[
+        {id:'u1', name:'Unit 1: Listening (Aural)', topics:['Spoken Irish Comprehension','Everyday Contexts']},
+        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-play','Conversation','Prepared Topics']},
+        {id:'u3', name:'Unit 3: Reading', topics:['Reading Comprehension','Vocabulary']},
+        {id:'u4', name:'Unit 4: Writing', topics:['Structured Writing','Extended Pieces']},
+      ]},
+    { name:'Music',               emoji:'🎵',
+      units:[
+        {id:'u1', name:'Unit 1: Performing', topics:['Solo Performance','Ensemble Performance','Technical Control','Expression']},
+        {id:'u2', name:'Unit 2: Composing', topics:['Composition Portfolio','Use of Notation','Creative Techniques']},
+        {id:'u3', name:'Unit 3: Listening & Appraising (Written)', topics:['Set Works','Aural Analysis','Music Theory','Historical Context']},
+      ]},
+    { name:'Art & Design',        emoji:'🎨',
+      units:[
+        {id:'u1', name:'Unit 1: Portfolio of Work (Coursework)', topics:['Drawing & Painting','3D Work','Printmaking/Photography','Critical Studies','Development Work']},
+        {id:'u2', name:'Unit 2: Externally Set Task', topics:['Preparation Period','Final Piece (10-hour exam)']},
+      ]},
+    { name:'Physical Education',  emoji:'🏃',
+      units:[
+        {id:'u1', name:'Unit 1: Knowledge & Understanding (Written)', topics:['Physical Activity & Health','Anatomy & Physiology','Skill Acquisition','Biomechanics','Psychology in Sport']},
+        {id:'u2', name:'Unit 2: Practical Performance', topics:['Performance in Sport/Activity','Coaching/Leadership Role','Official Role']},
+      ]},
+    { name:'Home Economics',      emoji:'🍽️',
+      units:[
+        {id:'u1', name:'Unit 1: Written Paper', topics:['Nutrition & Dietary Needs','Food Science & Technology','Consumer Studies']},
+        {id:'u2', name:'Unit 2: Practical & Coursework', topics:['Practical Skills','Textile Technology','Family & Child Studies','Investigative Study']},
+      ]},
   ],
   'A-Level': [
     { name:'Mathematics',         emoji:'📐', topics:['Pure 1: Algebra & Functions','Pure 1: Coordinate Geometry','Pure 1: Sequences & Series','Pure 1: Trigonometry','Pure 1: Exponentials & Logarithms','Pure 1: Differentiation','Pure 1: Integration','Pure 2: Further Algebra','Pure 2: Further Calculus','Pure 2: Differential Equations','Statistics: Data Representation','Statistics: Probability','Statistics: Distributions','Mechanics: Kinematics','Mechanics: Forces & Newton\'s Laws','Mechanics: Moments'] },
@@ -517,13 +636,21 @@ window.obNext = function() {
   if (obStep === 1 && !obLevel) return tk('Please choose a level');
   if (obStep === 2 && obSelected.size === 0) return tk('Pick at least one subject');
   if (obStep === 3) {
-    // validate all dates filled
+    // Check every ticked unit has a date
     const inputs = document.querySelectorAll('#examDateList input[type="date"]');
+    const today = new Date(); today.setHours(0,0,0,0);
+    let hasAny = false;
     for (const inp of inputs) {
-      if (!inp.value) return tk(`Enter an exam date for ${inp.dataset.name}`);
-      const today = new Date(); today.setHours(0,0,0,0);
-      if (new Date(inp.value) <= today) return tk(`Exam date for ${inp.dataset.name} must be in the future`);
+      hasAny = true;
+      if (!inp.value) {
+        const unitLabel = inp.closest('.unit-row')?.querySelector('.unit-label')?.textContent || 'a unit';
+        return tk(`Enter an exam date for: ${unitLabel.split(':')[0]}`);
+      }
+      if (new Date(inp.value) <= today) {
+        return tk('All exam dates must be in the future');
+      }
     }
+    if (!hasAny) return tk('Tick at least one unit you still need to sit');
   }
   obStep++; obGo();
 };
@@ -562,40 +689,93 @@ window.toggleSubjectPick = function(name) {
   renderSubjectPicker();
 };
 
+// Track which units are ticked (subjectName -> Set of unitIds)
+let obUnitChecked = {};
+
 function renderExamDateList() {
   const list = document.getElementById('examDateList');
   const today = new Date().toISOString().split('T')[0];
+
+  // Init unit check state — all units checked by default on first render
+  [...obSelected].forEach(name => {
+    const preset = (CCEA[obLevel]||[]).find(x => x.name === name);
+    if (!preset) return;
+    if (!obUnitChecked[name]) {
+      obUnitChecked[name] = new Set((preset.units||[]).map(u => u.id));
+    }
+  });
+
   list.innerHTML = [...obSelected].map(name => {
-    const s = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚'};
-    return `<div class="edrow">
-      <div class="edrow-left">
-        <div class="edrow-name"><span class="edrow-emoji">${s.emoji}</span>${esc(name)}</div>
+    const preset = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚', units:[]};
+    const units = preset.units || [];
+    const unitRows = units.map(u => {
+      const isChecked = (obUnitChecked[name]||new Set()).has(u.id);
+      return `<div class="unit-row${!isChecked?' done-unit':''}">
+        <div class="unit-toggle${isChecked?' checked':''}" onclick="toggleUnit('${esc(name)}','${u.id}')">${isChecked?'✓':''}</div>
+        <div class="unit-label">${esc(u.name)}</div>
+        <div class="unit-date-wrap">
+          ${isChecked
+            ? `<input type="date" min="${today}"
+                data-subject="${esc(name)}" data-unit="${u.id}"
+                placeholder="Exam date">`
+            : `<span class="unit-done-badge">Already done</span>`
+          }
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="subj-unit-block">
+      <div class="subj-unit-header">
+        <span class="subj-unit-emoji">${preset.emoji}</span>
+        <span class="subj-unit-name">${esc(name)}</span>
       </div>
-      <input type="date" min="${today}" data-name="${esc(name)}" placeholder="Exam date">
+      <div class="unit-rows">${unitRows}</div>
     </div>`;
   }).join('');
 }
 
-window.finishOnboarding = function() {
-  // Build subjects from selections + exam dates
-  const inputs = document.querySelectorAll('#examDateList input[type="date"]');
-  const dateMap = {};
-  inputs.forEach(inp => { dateMap[inp.dataset.name] = inp.value; });
+window.toggleUnit = function(subjectName, unitId) {
+  if (!obUnitChecked[subjectName]) obUnitChecked[subjectName] = new Set();
+  if (obUnitChecked[subjectName].has(unitId)) obUnitChecked[subjectName].delete(unitId);
+  else obUnitChecked[subjectName].add(unitId);
+  renderExamDateList();
+};
 
-  const subjects = [...obSelected].map((name, i) => {
-    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', topics:[]};
-    return {
-      id: 'sub_'+Date.now()+'_'+i,
-      name,
-      examDate: dateMap[name],
-      color: COLORS[i % COLORS.length],
-      emoji: preset.emoji,
-      level: obLevel,
-      topics: preset.topics.map((t,j) => ({id:'t_'+Date.now()+'_'+i+'_'+j, name:t, conf:0, lastStudied:null}))
-    };
+window.finishOnboarding = function() {
+  // Collect unit dates
+  const inputs = document.querySelectorAll('#examDateList input[type="date"]');
+  // Map: subjectName -> unitId -> date
+  const unitDateMap = {};
+  inputs.forEach(inp => {
+    const sn = inp.dataset.subject, uid = inp.dataset.unit;
+    if (!unitDateMap[sn]) unitDateMap[sn] = {};
+    unitDateMap[sn][uid] = inp.value;
   });
 
-  const newState = { subjects, sessions:{}, ci: subjects.length % COLORS.length };
+  // Build one subject entry per unit that has been ticked & given a date
+  const subjects = [];
+  let colorIdx = 0;
+  [...obSelected].forEach(name => {
+    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', units:[]};
+    const checkedUnits = obUnitChecked[name] || new Set();
+    (preset.units||[]).forEach(u => {
+      if (!checkedUnits.has(u.id)) return; // skip already-done units
+      const examDate = (unitDateMap[name]||{})[u.id];
+      if (!examDate) return; // skip undated (validation catches this)
+      subjects.push({
+        id: 'sub_'+Date.now()+'_'+colorIdx,
+        name: name + ' — ' + u.name,
+        examDate,
+        color: COLORS[colorIdx % COLORS.length],
+        emoji: preset.emoji,
+        level: obLevel,
+        parentSubject: name,
+        topics: (u.topics||[]).map((t,j) => ({id:'t_'+Date.now()+'_'+colorIdx+'_'+j, name:t, conf:0, lastStudied:null}))
+      });
+      colorIdx++;
+    });
+  });
+
+  const newState = { subjects, sessions:{}, ci: colorIdx % COLORS.length };
   localStorage.setItem('rv4', JSON.stringify(newState));
   localStorage.setItem('rv_ob_done', '1');
 
