@@ -208,6 +208,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .sugg-label span{background:var(--accent);color:#0e0e0f;border-radius:4px;padding:1px 6px;font-size:0.6rem;}
 .sugg-rows{display:grid;gap:5px;}
 .sugg-row{display:flex;align-items:center;gap:9px;padding:6px 8px;background:var(--surface);border-radius:7px;border:1px solid var(--border);}
+.sugg-row.sugg-sel{flex-direction:column;align-items:stretch;border-color:var(--accent);background:rgba(200,245,100,0.04);}
+.sugg-top{display:flex;align-items:center;gap:9px;}
+.sugg-diff{display:flex;align-items:center;gap:7px;padding:7px 2px 2px;margin-top:2px;flex-wrap:wrap;}
+.sdiff-lbl{font-size:0.61rem;color:var(--muted);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.sdiff-cur{font-size:0.65rem;font-weight:700;margin-left:3px;}
+.diff-rate-section{background:var(--surface2);border-radius:9px;padding:11px 13px;margin-bottom:12px;}
+.diff-rate-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.diff-rate-row:last-child{border-bottom:none;padding-bottom:0;}
+.diff-tname{font-size:0.8rem;font-weight:600;flex:1;min-width:100px;}
 .sugg-name{flex:1;font-size:0.82rem;font-weight:600;}
 .sugg-reason{font-size:0.68rem;color:var(--muted);}
 .cb5l{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;}
@@ -717,6 +726,7 @@ const COLORS=['#c8f564','#64c8f5','#f5a664','#f564a0','#a064f5','#64f5c8','#f5e6
 const CLABEL=['','Lost','Shaky','Getting it','Almost there','Nailed it'];
 const CCLASS=['cb0','cb1','cb2','cb3','cb4','cb5'];
 const CCOLOR=['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
+const CSHORT=['','1','2','3','4','5'];
 
 // ══════════════════════════════════════════════════════════
 // ONBOARDING STATE
@@ -1025,6 +1035,14 @@ function bootApp(fbConfig) {
     setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
   };
 
+  window.setTopicDiff = function(sid,tid,level,k) {
+    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
+    const t=sub.topics.find(t=>t.id===tid); if(!t)return;
+    t.conf=(t.conf===level)?0:level;
+    save(); renderSessions(); renderProgress();
+    if(k) setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);
+  };
+
   function renderSubjects() {
     const grid = document.getElementById('sg');
     if (!S.subjects.length) { grid.innerHTML='<div class="es"><div class="be">📚</div><p>No subjects yet. Use "Add custom subject" to add one.</p></div>'; return; }
@@ -1040,14 +1058,10 @@ function bootApp(fbConfig) {
       const rated=sub.topics.filter(t=>t.conf>0);
       const avg=rated.length?Math.round(rated.reduce((a,t)=>a+t.conf,0)/rated.length*10)/10:0;
 
-      const CSHORT=['','1','2','3','4','5'];
       const topicsHtml=sub.topics.length
         ?sub.topics.map(t=>`<div class="trow">
           <div class="trow-name">${esc(t.name)}</div>
-          <div class="conf5">
-            ${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}
-            <span style="font-size:0.68rem;font-weight:700;margin-left:5px;min-width:62px;color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'}">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span>
-          </div>
+          ${t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:`<span class="cb5l cb0" style="opacity:0.5">Unrated</span>`}
           <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
         </div>`).join('')
         :'<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
@@ -1070,7 +1084,7 @@ function bootApp(fbConfig) {
           <span class="chev">▾</span>
         </div>
         <div class="tp">
-          <div class="stitle" style="margin-bottom:9px">Topics <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— rate 1 (Lost) → 5 (Nailed it)</span></div>
+          <div class="stitle" style="margin-bottom:9px">Topics <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— rate difficulty on the Schedule page after studying</span></div>
           <div class="tlist">${topicsHtml}</div>
           <div class="add-tr">
             <input type="text" id="ti-${sub.id}" placeholder="Add a topic" maxlength="80" onkeydown="if(event.key==='Enter')addTopic('${sub.id}')">
@@ -1264,9 +1278,12 @@ function bootApp(fbConfig) {
         <div class="sugg-rows">${suggestions.map(t=>{
           const isSel=(sd.topicIds||[]).includes(t.id);
           const badge=t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:'<span class="cb5l cb0">Unrated</span>';
-          return `<div class="sugg-row"><div><div class="sugg-name">${esc(t.name)}</div><div class="sugg-reason">${suggReason(t,sub,s2.type)}</div></div>${badge}<button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel?'✓ Done':'Study'}</button></div>`;
+          const diffPicker=isSel?`<div class="sugg-diff"><span class="sdiff-lbl">How hard?</span><div class="conf5" style="display:inline-flex;gap:3px">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="event.stopPropagation();setTopicDiff('${sub.id}','${t.id}',${l},'${k}')" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}</div><span class="sdiff-cur" style="color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'}">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span></div>`:'';
+          return `<div class="sugg-row${isSel?' sugg-sel':''}"><div class="sugg-top"><div style="flex:1"><div class="sugg-name">${esc(t.name)}</div><div class="sugg-reason">${suggReason(t,sub,s2.type)}</div></div>${badge}<button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel?'✓ Done':'Study'}</button></div>${diffPicker}</div>`;
         }).join('')}</div></div>`:'';
       const chips=sub.topics.length?`<div class="tp-pick" style="--c:${sub.color}"><span class="tp-pl">All topics</span><div class="tchips">${sub.topics.map(t=>{const isSel=(sd.topicIds||[]).includes(t.id);return`<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}</button>`;}).join('')}</div></div>`:'';
+      const selectedTopics=(sd.topicIds||[]).map(tid=>sub.topics.find(t=>t.id===tid)).filter(Boolean);
+      const diffRateHtml=selectedTopics.length?`<div class="diff-rate-section"><span class="nlbl" style="display:block;margin-bottom:9px">Rate difficulty — how hard was each topic?</span>${selectedTopics.map(t=>`<div class="diff-rate-row"><span class="diff-tname">${esc(t.name)}</span><div class="conf5" style="display:inline-flex;gap:3px;align-items:center">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setTopicDiff('${sub.id}','${t.id}',${l},'${k}')" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}<span class="sdiff-cur" style="color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'};">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span></div></div>`).join('')}</div>`:'';
       return `<div class="sess${done?' done':''}" id="sc2-${k}" style="--c:${sub.color}">
         <div class="sess-main">
           <div class="sck" onclick="toggleDone('${k}')">${done?'✓':''}</div>
@@ -1280,7 +1297,7 @@ function bootApp(fbConfig) {
             <button class="sib${hasNotes?' on':''}" onclick="toggleExp('${k}')">✏️</button>
           </div>
         </div>
-        <div class="sess-exp" id="exp-${k}">${chips}<label class="nlbl">Session Notes</label><textarea id="nt-${k}" placeholder="What did you cover?">${esc(sd.notes||'')}</textarea><button class="btn btn-g btn-sm" style="margin-top:7px" onclick="saveNotes('${k}')">Save Notes</button></div>
+        <div class="sess-exp" id="exp-${k}">${chips}${diffRateHtml}<label class="nlbl">Session Notes</label><textarea id="nt-${k}" placeholder="What did you cover?">${esc(sd.notes||'')}</textarea><button class="btn btn-g btn-sm" style="margin-top:7px" onclick="saveNotes('${k}')">Save Notes</button></div>
       </div>`;
     }).join('');
   }
