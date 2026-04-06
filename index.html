@@ -153,17 +153,21 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .tlist{display:grid;gap:6px;margin-bottom:12px;}
 .trow{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:9px 12px;flex-wrap:wrap;}
 .trow-name{font-size:0.83rem;font-weight:600;flex:1;min-width:120px;}
-.conf5{display:flex;gap:3px;}
-.c5btn{padding:4px 0;width:34px;border-radius:6px;font-size:0.6rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;opacity:0.32;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;}
-.c5btn:hover{opacity:0.7;}.c5btn.on{opacity:1;}
-.l1{background:rgba(220,50,50,0.15);color:#e05555;border-color:rgba(220,50,50,0.3);}
-.l2{background:rgba(245,130,60,0.15);color:#f5823c;border-color:rgba(245,130,60,0.3);}
-.l3{background:rgba(245,200,60,0.15);color:#e8c040;border-color:rgba(245,200,60,0.3);}
-.l4{background:rgba(140,220,80,0.15);color:#8edc50;border-color:rgba(140,220,80,0.3);}
-.l5{background:rgba(80,220,120,0.15);color:#50dc78;border-color:rgba(80,220,120,0.3);}
-.l1.on{background:rgba(220,50,50,0.28);}.l2.on{background:rgba(245,130,60,0.28);}
-.l3.on{background:rgba(245,200,60,0.28);}.l4.on{background:rgba(140,220,80,0.28);}
-.l5.on{background:rgba(80,220,120,0.28);}
+.conf5{display:flex;gap:3px;align-items:center;}
+.c5btn{padding:5px 0;width:36px;border-radius:6px;font-size:0.58rem;font-weight:700;cursor:pointer;border:1px solid var(--border);transition:all 0.15s;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;background:var(--surface);color:var(--muted);}
+.c5btn:hover{border-color:var(--muted);color:var(--text);}
+.c5btn.on{border-color:transparent;}
+.l1{}.l2{}.l3{}.l4{}.l5{}
+.l1:hover,.l1.on{background:rgba(220,50,50,0.25);color:#ff6b6b;border-color:rgba(220,50,50,0.5);}
+.l2:hover,.l2.on{background:rgba(245,130,60,0.25);color:#f5923c;border-color:rgba(245,130,60,0.5);}
+.l3:hover,.l3.on{background:rgba(245,200,60,0.25);color:#e8c040;border-color:rgba(245,200,60,0.5);}
+.l4:hover,.l4.on{background:rgba(140,220,80,0.25);color:#8edc50;border-color:rgba(140,220,80,0.5);}
+.l5:hover,.l5.on{background:rgba(80,220,120,0.25);color:#50dc78;border-color:rgba(80,220,120,0.5);}
+.l1.on{box-shadow:0 0 0 2px rgba(220,50,50,0.3);}
+.l2.on{box-shadow:0 0 0 2px rgba(245,130,60,0.3);}
+.l3.on{box-shadow:0 0 0 2px rgba(245,200,60,0.3);}
+.l4.on{box-shadow:0 0 0 2px rgba(140,220,80,0.3);}
+.l5.on{box-shadow:0 0 0 2px rgba(80,220,120,0.3);}
 .add-tr{display:flex;gap:8px;}.add-tr input{flex:1;}
 
 .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
@@ -279,7 +283,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
   .edrow{flex-wrap:wrap;}.edrow input[type="date"]{width:100%;}
   .logo{font-size:2.2rem;}
   .tab{font-size:0.67rem;padding:8px 4px;}
-  .conf5{flex-wrap:wrap;}
+  .conf5{flex-wrap:wrap;gap:4px;}
   .auth-sub{display:none;}
 }
 </style>
@@ -1036,10 +1040,14 @@ function bootApp(fbConfig) {
       const rated=sub.topics.filter(t=>t.conf>0);
       const avg=rated.length?Math.round(rated.reduce((a,t)=>a+t.conf,0)/rated.length*10)/10:0;
 
+      const CSHORT=['','1','2','3','4','5'];
       const topicsHtml=sub.topics.length
         ?sub.topics.map(t=>`<div class="trow">
           <div class="trow-name">${esc(t.name)}</div>
-          <div class="conf5">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CLABEL[l].split(' ')[0]}</button>`).join('')}</div>
+          <div class="conf5">
+            ${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setConf('${sub.id}','${t.id}',${l})" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}
+            <span style="font-size:0.68rem;font-weight:700;margin-left:5px;min-width:62px;color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'}">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span>
+          </div>
           <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
         </div>`).join('')
         :'<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
