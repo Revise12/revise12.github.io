@@ -706,8 +706,22 @@ window.toggleSubjectPick = function(name) {
 
 // Track which units are ticked (subjectName -> Set of unitIds)
 let obUnitChecked = {};
+// Track entered exam dates (subjectName -> unitId -> dateString)
+let obUnitDates = {};
+
+function saveDateInputs() {
+  document.querySelectorAll('#examDateList input[type="date"]').forEach(inp => {
+    const sn = inp.dataset.subject, uid = inp.dataset.unit;
+    if (!sn || !uid) return;
+    if (!obUnitDates[sn]) obUnitDates[sn] = {};
+    obUnitDates[sn][uid] = inp.value;
+  });
+}
 
 function renderExamDateList() {
+  // Save any currently-typed dates before rebuilding HTML
+  saveDateInputs();
+
   const list = document.getElementById('examDateList');
   const today = new Date().toISOString().split('T')[0];
 
@@ -725,6 +739,7 @@ function renderExamDateList() {
     const units = preset.units || [];
     const unitRows = units.map(u => {
       const isChecked = (obUnitChecked[name]||new Set()).has(u.id);
+      const savedDate = (obUnitDates[name]||{})[u.id] || '';
       return `<div class="unit-row${!isChecked?' done-unit':''}">
         <div class="unit-toggle${isChecked?' checked':''}" onclick="toggleUnit('${esc(name)}','${u.id}')">${isChecked?'✓':''}</div>
         <div class="unit-label">${esc(u.name)}</div>
@@ -732,6 +747,7 @@ function renderExamDateList() {
           ${isChecked
             ? `<input type="date" min="${today}"
                 data-subject="${esc(name)}" data-unit="${u.id}"
+                value="${savedDate}"
                 placeholder="Exam date">`
             : `<span class="unit-done-badge">Already done</span>`
           }
@@ -756,15 +772,9 @@ window.toggleUnit = function(subjectName, unitId) {
 };
 
 window.finishOnboarding = function() {
-  // Collect unit dates
-  const inputs = document.querySelectorAll('#examDateList input[type="date"]');
-  // Map: subjectName -> unitId -> date
-  const unitDateMap = {};
-  inputs.forEach(inp => {
-    const sn = inp.dataset.subject, uid = inp.dataset.unit;
-    if (!unitDateMap[sn]) unitDateMap[sn] = {};
-    unitDateMap[sn][uid] = inp.value;
-  });
+  // Save any dates currently visible in the DOM, then use obUnitDates as source of truth
+  saveDateInputs();
+  const unitDateMap = obUnitDates;
 
   // Build one subject entry per unit that has been ticked & given a date
   const subjects = [];
