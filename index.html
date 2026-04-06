@@ -377,6 +377,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
       <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
       <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
       <button class="tab" onclick="showPage('progress',this)">Progress</button>
+      <button class="tab" onclick="showPage('prefs',this)">Preferences</button>
     </nav>
 
     <!-- SUBJECTS -->
@@ -402,6 +403,51 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
       </div>
       <div class="wstrip" id="wstrip"></div>
       <div class="slist" id="slist"></div>
+    </div>
+
+    <!-- PREFERENCES -->
+    <div id="page-prefs" class="page">
+      <div class="stitle" style="margin-bottom:18px">Preferences</div>
+      <div style="display:grid;gap:14px;max-width:480px">
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Sessions per day</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Max number of study sessions shown on any single day.</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="pref-sessPerDay" min="1" max="12" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
+            <span id="pref-sessPerDay-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:20px;text-align:right"></span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Topics suggested per session</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">How many smart-pick topic suggestions appear on each session card.</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="pref-topicsPerSess" min="1" max="8" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
+            <span id="pref-topicsPerSess-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:20px;text-align:right"></span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Default focus length (minutes)</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Default Pomodoro focus timer length when you open a session.</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="pref-focusLen" min="5" max="60" step="5" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
+            <span id="pref-focusLen-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:28px;text-align:right"></span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Default break length (minutes)</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Default Pomodoro break timer length.</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="pref-breakLen" min="1" max="20" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
+            <span id="pref-breakLen-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:28px;text-align:right"></span>
+          </div>
+        </div>
+
+        <button class="btn btn-p" onclick="savePrefs()" style="margin-top:4px">Save preferences</button>
+      </div>
     </div>
 
     <!-- PROGRESS -->
@@ -1024,7 +1070,11 @@ function bootApp(fbConfig) {
     return iv.map((off,i)=>{const dt=new Date(today);dt.setDate(dt.getDate()+off);if(dt>=today&&dt<exam)return{date:dt.toISOString().split('T')[0],subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};return null;}).filter(Boolean);
   }
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
-  function sessForDate(ds){return allSess().filter(s=>s.date===ds);}
+  function sessForDate(ds){
+    const all=allSess().filter(s=>s.date===ds);
+    const limit=(S.prefs&&S.prefs.sessPerDay)||6;
+    return all.slice(0,limit);
+  }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
   // ── TOPIC SUGGESTIONS ─────────────────────────────────
@@ -1056,8 +1106,11 @@ function bootApp(fbConfig) {
     const ts=new Date().toISOString().split('T')[0];
     const all=allSess();
     const sel=new Date(selDate+'T00:00:00');
-    const ws=new Date(sel);ws.setDate(sel.getDate()-sel.getDay());
-    const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const ws=new Date(sel);
+    // Start week on Monday: getDay() gives 0=Sun,1=Mon...6=Sat; shift so Mon=0
+    const dow=sel.getDay();const mondayOff=dow===0?-6:1-dow;
+    ws.setDate(sel.getDate()+mondayOff);
+    const lbl=['Mo','Tu','We','Th','Fr','Sa','Su'];
     document.getElementById('wstrip').innerHTML=Array.from({length:7},(_,i)=>{
       const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=d.toISOString().split('T')[0];
       const dots=all.filter(s=>s.date===ds).slice(0,4).map(s2=>{const sub=S.subjects.find(s=>s.id===s2.subjectId);return sub?`<div class="wdot" style="background:${sub.color}"></div>`:'';}).join('');
@@ -1078,7 +1131,7 @@ function bootApp(fbConfig) {
       const sub=S.subjects.find(s=>s.id===s2.subjectId);if(!sub)return'';
       const k=sk(s2);const sd=S.sessions[k]||{};const done=!!sd.completedAt;
       const hasNotes=!!(sd.notes&&sd.notes.trim());
-      const suggestions=suggestTopics(sub,s2.type,3);
+      const suggestions=suggestTopics(sub,s2.type,(S.prefs&&S.prefs.topicsPerSess)||3);
       const suggHtml=sub.topics.length?`<div class="sugg-block">
         <div class="sugg-label">Suggested topics <span>smart pick</span></div>
         <div class="sugg-rows">${suggestions.map(t=>{
@@ -1179,10 +1232,43 @@ function bootApp(fbConfig) {
     }).join('');
   }
 
-  window.showPage=function(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');el.classList.add('active');if(p==='schedule'){renderStrip();selDay(selDate);}if(p==='progress')renderProgress();};
+  // ── PREFERENCES ───────────────────────────────────────
+  const DEFAULT_PREFS={sessPerDay:6,topicsPerSess:3,focusLen:25,breakLen:5};
+  function getPrefs(){return Object.assign({},DEFAULT_PREFS,S.prefs||{});}
+  function renderPrefs(){
+    const p=getPrefs();
+    const set=(id,val)=>{document.getElementById(id).value=val;document.getElementById(id+'-val').textContent=val;};
+    set('pref-sessPerDay',p.sessPerDay);
+    set('pref-topicsPerSess',p.topicsPerSess);
+    set('pref-focusLen',p.focusLen);
+    set('pref-breakLen',p.breakLen);
+    // also sync pomodoro inputs to prefs
+    document.getElementById('pfoc').value=p.focusLen;
+    document.getElementById('pbrk').value=p.breakLen;
+  }
+  window.prefsChanged=function(){
+    ['pref-sessPerDay','pref-topicsPerSess','pref-focusLen','pref-breakLen'].forEach(id=>{
+      document.getElementById(id+'-val').textContent=document.getElementById(id).value;
+    });
+  };
+  window.savePrefs=function(){
+    S.prefs={
+      sessPerDay:parseInt(document.getElementById('pref-sessPerDay').value),
+      topicsPerSess:parseInt(document.getElementById('pref-topicsPerSess').value),
+      focusLen:parseInt(document.getElementById('pref-focusLen').value),
+      breakLen:parseInt(document.getElementById('pref-breakLen').value),
+    };
+    // sync pomo defaults
+    document.getElementById('pfoc').value=S.prefs.focusLen;
+    document.getElementById('pbrk').value=S.prefs.breakLen;
+    save();renderAll();tk('Preferences saved ✓',true);
+  };
+
+  window.showPage=function(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');el.classList.add('active');if(p==='schedule'){renderStrip();selDay(selDate);}if(p==='progress')renderProgress();if(p==='prefs')renderPrefs();};
   function renderAll(){renderSubjects();renderStrip();renderSessions();renderProgress();}
 
   renderAll();
+  renderPrefs();
   selDay(new Date().toISOString().split('T')[0]);
   updPomo();
 }
