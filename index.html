@@ -1078,20 +1078,31 @@ function bootApp(fbConfig) {
   function genSched(sub) {
     const today=new Date(); today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const d=Math.ceil((exam-today)/86400000); if(d<=0)return[];
-    let iv;
-    if(d<=3)iv=[0,1,2]; else if(d<=7)iv=[0,1,3,6]; else if(d<=14)iv=[0,1,3,6,10,13];
-    else if(d<=30)iv=[0,1,3,6,10,15,21,28]; else if(d<=60)iv=[0,1,3,7,12,18,25,35,45,55];
-    else{iv=[];let g=1,day=0;while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);}if(iv[iv.length-1]<d-2)iv.push(d-2);}
-    const types=['first','review','review','test','review','test','review','test','review','test'];
+    const totalDays=Math.ceil((exam-today)/86400000); if(totalDays<=0)return[];
     const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
-    // Helper: advance a date to the nearest study day (on or after)
-    const snapToStudyDay=dt=>{let safety=0;while(!studyDays.includes(dt.getDay())&&safety++<7)dt.setDate(dt.getDate()+1);return dt;};
-    return iv.map((off,i)=>{
-      const dt=snapToStudyDay(new Date(today.getTime()+off*86400000));
-      if(dt>=today&&dt<exam)return{date:toLocalDate(dt),subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};
-      return null;
-    }).filter(Boolean);
+
+    // Build ordered list of valid study dates between today and exam
+    const validDates=[];
+    for(let i=0;i<totalDays;i++){
+      const dt=new Date(today);dt.setDate(today.getDate()+i);
+      if(studyDays.includes(dt.getDay()))validDates.push(toLocalDate(dt));
+    }
+    const n=validDates.length; if(n===0)return[];
+
+    // Pick session indices from validDates using spaced-repetition pattern
+    // (same spacing logic but now indexed into study-day slots, not calendar days)
+    let iv;
+    if(n<=3)iv=[0,1,2]; else if(n<=7)iv=[0,1,3,6]; else if(n<=14)iv=[0,1,3,6,10,13];
+    else if(n<=30)iv=[0,1,3,6,10,15,21,28]; else if(n<=60)iv=[0,1,3,7,12,18,25,35,45,55];
+    else{iv=[];let g=1,slot=0;while(slot<n-1){iv.push(slot);slot+=g;g=Math.min(Math.ceil(g*1.5),14);}if(iv[iv.length-1]<n-2)iv.push(n-2);}
+
+    const types=['first','review','review','test','review','test','review','test','review','test'];
+    return iv.filter(i=>i<n).map((slotIdx,i)=>({
+      date:validDates[slotIdx],
+      subjectId:sub.id,
+      type:types[Math.min(i,types.length-1)],
+      idx:i
+    }));
   }
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
   function sessForDate(ds){
