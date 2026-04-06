@@ -117,6 +117,8 @@ header{display:flex;align-items:flex-end;justify-content:space-between;margin-bo
 .tab{flex:1;padding:10px 6px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.2s;}
 .tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 8px rgba(0,0,0,0.4);}
 .tab:hover:not(.active){color:var(--text);}
+.day-tog{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.day-tog.on{background:rgba(200,245,100,0.1);border-color:var(--accent);color:var(--accent);}
 .page{display:none;}.page.active{display:block;}
 .stitle{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:13px;font-weight:600;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;}
@@ -443,6 +445,20 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
           <div style="display:flex;align-items:center;gap:12px">
             <input type="range" id="pref-breakLen" min="1" max="20" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
             <span id="pref-breakLen-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:28px;text-align:right"></span>
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Study days</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:14px">Sessions will only be scheduled on the days you select. At least one day must be chosen.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="pref-studyDays">
+            <button class="day-tog" data-day="1" onclick="toggleStudyDay(1)">Mon</button>
+            <button class="day-tog" data-day="2" onclick="toggleStudyDay(2)">Tue</button>
+            <button class="day-tog" data-day="3" onclick="toggleStudyDay(3)">Wed</button>
+            <button class="day-tog" data-day="4" onclick="toggleStudyDay(4)">Thu</button>
+            <button class="day-tog" data-day="5" onclick="toggleStudyDay(5)">Fri</button>
+            <button class="day-tog" data-day="6" onclick="toggleStudyDay(6)">Sat</button>
+            <button class="day-tog" data-day="0" onclick="toggleStudyDay(0)">Sun</button>
           </div>
         </div>
 
@@ -1068,7 +1084,14 @@ function bootApp(fbConfig) {
     else if(d<=30)iv=[0,1,3,6,10,15,21,28]; else if(d<=60)iv=[0,1,3,7,12,18,25,35,45,55];
     else{iv=[];let g=1,day=0;while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);}if(iv[iv.length-1]<d-2)iv.push(d-2);}
     const types=['first','review','review','test','review','test','review','test','review','test'];
-    return iv.map((off,i)=>{const dt=new Date(today);dt.setDate(dt.getDate()+off);if(dt>=today&&dt<exam)return{date:toLocalDate(dt),subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};return null;}).filter(Boolean);
+    const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
+    // Helper: advance a date to the nearest study day (on or after)
+    const snapToStudyDay=dt=>{let safety=0;while(!studyDays.includes(dt.getDay())&&safety++<7)dt.setDate(dt.getDate()+1);return dt;};
+    return iv.map((off,i)=>{
+      const dt=snapToStudyDay(new Date(today.getTime()+off*86400000));
+      if(dt>=today&&dt<exam)return{date:toLocalDate(dt),subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};
+      return null;
+    }).filter(Boolean);
   }
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
   function sessForDate(ds){
@@ -1234,7 +1257,7 @@ function bootApp(fbConfig) {
   }
 
   // ── PREFERENCES ───────────────────────────────────────
-  const DEFAULT_PREFS={sessPerDay:6,topicsPerSess:3,focusLen:25,breakLen:5};
+  const DEFAULT_PREFS={sessPerDay:6,topicsPerSess:3,focusLen:25,breakLen:5,studyDays:[1,2,3,4,5]};
   function getPrefs(){return Object.assign({},DEFAULT_PREFS,S.prefs||{});}
   function renderPrefs(){
     const p=getPrefs();
@@ -1243,21 +1266,39 @@ function bootApp(fbConfig) {
     set('pref-topicsPerSess',p.topicsPerSess);
     set('pref-focusLen',p.focusLen);
     set('pref-breakLen',p.breakLen);
-    // also sync pomodoro inputs to prefs
+    // sync pomodoro inputs to prefs
     document.getElementById('pfoc').value=p.focusLen;
     document.getElementById('pbrk').value=p.breakLen;
+    // render study day toggles
+    document.querySelectorAll('.day-tog').forEach(btn=>{
+      const day=parseInt(btn.dataset.day);
+      btn.classList.toggle('on',p.studyDays.includes(day));
+    });
   }
+  window.toggleStudyDay=function(day){
+    const p=getPrefs();
+    const idx=p.studyDays.indexOf(day);
+    if(idx>-1){if(p.studyDays.length===1)return;p.studyDays.splice(idx,1);}
+    else p.studyDays.push(day);
+    if(!S.prefs)S.prefs={};
+    S.prefs.studyDays=p.studyDays;
+    document.querySelectorAll('.day-tog').forEach(btn=>{
+      btn.classList.toggle('on',p.studyDays.includes(parseInt(btn.dataset.day)));
+    });
+  };
   window.prefsChanged=function(){
     ['pref-sessPerDay','pref-topicsPerSess','pref-focusLen','pref-breakLen'].forEach(id=>{
       document.getElementById(id+'-val').textContent=document.getElementById(id).value;
     });
   };
   window.savePrefs=function(){
+    const currentDays=(S.prefs&&S.prefs.studyDays)||DEFAULT_PREFS.studyDays;
     S.prefs={
       sessPerDay:parseInt(document.getElementById('pref-sessPerDay').value),
       topicsPerSess:parseInt(document.getElementById('pref-topicsPerSess').value),
       focusLen:parseInt(document.getElementById('pref-focusLen').value),
       breakLen:parseInt(document.getElementById('pref-breakLen').value),
+      studyDays:currentDays,
     };
     // sync pomo defaults
     document.getElementById('pfoc').value=S.prefs.focusLen;
