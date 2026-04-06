@@ -442,6 +442,26 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
   </div>
 </div>
 
+<div class="ovl" id="editSubjOvl">
+  <div class="modal">
+    <div class="mh"><div class="mt">&#x270F;&#xFE0F; Edit Subject</div><button class="mcl" onclick="closeEditSubj()">&#x2715;</button></div>
+    <div style="display:grid;gap:14px;margin-top:4px">
+      <div>
+        <label class="nlbl">Subject name</label>
+        <input type="text" id="esName" maxlength="100" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;outline:none;">
+      </div>
+      <div>
+        <label class="nlbl">Exam date</label>
+        <input type="date" id="esDate" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;outline:none;">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:18px">
+      <button class="btn btn-p" style="flex:1" onclick="saveEditSubj()">Save changes</button>
+      <button class="btn btn-g" onclick="closeEditSubj()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -975,6 +995,7 @@ function bootApp(fbConfig) {
             </div>
           </div>
           <span class="dbadge ${bc}">${days===1?'1 day':days+' days'}</span>
+          <button class="btn btn-g btn-sm" onclick="event.stopPropagation();openEditSubj('${sub.id}')">Edit</button>
           <button class="btn btn-d btn-sm" onclick="event.stopPropagation();rmSubject('${sub.id}')">Remove</button>
           <span class="chev">▾</span>
         </div>
@@ -1102,6 +1123,39 @@ function bootApp(fbConfig) {
   function updPomo(){const m=Math.floor(P.left/60),s=P.left%60;document.getElementById('ptm').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pph').textContent=P.phase==='focus'?`Round ${P.round}/${P.rounds}`:'Break';const circ=2*Math.PI*36,ring=document.getElementById('rfl');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ*(1-P.left/P.total);ring.className='rfl'+(P.phase==='break'?' brk':'');document.getElementById('pdots').innerHTML=Array.from({length:P.rounds},(_,i)=>{const cl=i<P.round-1?'dn':i===P.round-1&&P.phase==='focus'?'cu':'';return`<div class="pdot ${cl}"></div>`;}).join('');}
   window.saveModalNotes=function(){if(!P.key)return;if(!S.sessions[P.key])S.sessions[P.key]={};S.sessions[P.key].notes=document.getElementById('mnt').value;save();tk('Notes saved ✓',true);};
   document.getElementById('pomoOvl').addEventListener('click',e=>{if(e.target===document.getElementById('pomoOvl'))closePomo();});
+
+  // ── EDIT SUBJECT ──────────────────────────────────────
+  let editSubjId = null;
+  window.openEditSubj = function(id) {
+    const sub = S.subjects.find(s => s.id === id);
+    if (!sub) return;
+    editSubjId = id;
+    document.getElementById('esName').value = sub.name;
+    document.getElementById('esDate').value = sub.examDate;
+    document.getElementById('editSubjOvl').classList.add('open');
+  };
+  window.closeEditSubj = function() {
+    document.getElementById('editSubjOvl').classList.remove('open');
+    editSubjId = null;
+  };
+  window.saveEditSubj = function() {
+    if (!editSubjId) return;
+    const sub = S.subjects.find(s => s.id === editSubjId);
+    if (!sub) return;
+    const newName = document.getElementById('esName').value.trim();
+    const newDate = document.getElementById('esDate').value;
+    if (!newName) { tk('Name cannot be empty'); return; }
+    if (!newDate) { tk('Please pick an exam date'); return; }
+    sub.name = newName;
+    sub.examDate = newDate;
+    save();
+    closeEditSubj();
+    renderAll();
+    tk('Subject updated ✓', true);
+  };
+  document.getElementById('editSubjOvl').addEventListener('click', e => {
+    if (e.target === document.getElementById('editSubjOvl')) closeEditSubj();
+  });
 
   // ── PROGRESS ─────────────────────────────────────────
   function renderProgress(){
