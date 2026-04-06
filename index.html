@@ -1058,6 +1058,7 @@ function bootApp(fbConfig) {
   }
 
   // ── SCHEDULE GEN ──────────────────────────────────────
+  const toLocalDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   function genSched(sub) {
     const today=new Date(); today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
@@ -1067,7 +1068,7 @@ function bootApp(fbConfig) {
     else if(d<=30)iv=[0,1,3,6,10,15,21,28]; else if(d<=60)iv=[0,1,3,7,12,18,25,35,45,55];
     else{iv=[];let g=1,day=0;while(day<d-1){iv.push(day);day+=g;g=Math.min(Math.ceil(g*1.5),14);}if(iv[iv.length-1]<d-2)iv.push(d-2);}
     const types=['first','review','review','test','review','test','review','test','review','test'];
-    return iv.map((off,i)=>{const dt=new Date(today);dt.setDate(dt.getDate()+off);if(dt>=today&&dt<exam)return{date:dt.toISOString().split('T')[0],subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};return null;}).filter(Boolean);
+    return iv.map((off,i)=>{const dt=new Date(today);dt.setDate(dt.getDate()+off);if(dt>=today&&dt<exam)return{date:toLocalDate(dt),subjectId:sub.id,type:types[Math.min(i,types.length-1)],idx:i};return null;}).filter(Boolean);
   }
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
   function sessForDate(ds){
@@ -1101,25 +1102,25 @@ function bootApp(fbConfig) {
   }
 
   // ── WEEK STRIP ────────────────────────────────────────
-  let selDate=new Date().toISOString().split('T')[0];
+  let selDate=toLocalDate(new Date());
   function renderStrip(){
-    const ts=new Date().toISOString().split('T')[0];
+    const ts=toLocalDate(new Date());
     const all=allSess();
     const sel=new Date(selDate+'T00:00:00');
     const ws=new Date(sel);
     // Start week on Monday: getDay() gives 0=Sun,1=Mon...6=Sat; shift so Mon=0
     const dow=sel.getDay();const mondayOff=dow===0?-6:1-dow;
     ws.setDate(sel.getDate()+mondayOff);
-    const lbl=['Mo','Tu','We','Th','Fr','Sa','Su'];
+    const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'];
     document.getElementById('wstrip').innerHTML=Array.from({length:7},(_,i)=>{
-      const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=d.toISOString().split('T')[0];
+      const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=toLocalDate(d);
       const dots=all.filter(s=>s.date===ds).slice(0,4).map(s2=>{const sub=S.subjects.find(s=>s.id===s2.subjectId);return sub?`<div class="wdot" style="background:${sub.color}"></div>`:'';}).join('');
       return `<div class="wd${ds===ts?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')"><div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div><div class="wdd">${dots}</div></div>`;
     }).join('');
   }
   window.selDay=function(ds){selDate=ds;renderStrip();renderSessions();const d=new Date(ds+'T00:00:00');document.getElementById('dlabel').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});};
-  window.changeDay=function(delta){const d=new Date(selDate+'T00:00:00');d.setDate(d.getDate()+delta);selDay(d.toISOString().split('T')[0]);};
-  window.goToday=function(){selDay(new Date().toISOString().split('T')[0]);};
+  window.changeDay=function(delta){const d=new Date(selDate+'T00:00:00');d.setDate(d.getDate()+delta);selDay(toLocalDate(d));};
+  window.goToday=function(){selDay(toLocalDate(new Date()));};
 
   function renderSessions(){
     const list=document.getElementById('slist');
@@ -1269,7 +1270,7 @@ function bootApp(fbConfig) {
 
   renderAll();
   renderPrefs();
-  selDay(new Date().toISOString().split('T')[0]);
+  selDay(toLocalDate(new Date()));
   updPomo();
 }
 
