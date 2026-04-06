@@ -1081,7 +1081,7 @@ function bootApp(fbConfig) {
     const totalDays=Math.ceil((exam-today)/86400000); if(totalDays<=0)return[];
     const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
 
-    // Build ordered list of ALL valid study dates between today and exam
+    // Build ordered list of valid study dates between today and exam
     const validDates=[];
     for(let i=0;i<totalDays;i++){
       const dt=new Date(today);dt.setDate(today.getDate()+i);
@@ -1089,45 +1089,127 @@ function bootApp(fbConfig) {
     }
     const n=validDates.length; if(n===0)return[];
 
-    // Session type progression based on how far through the study period we are
+    // Spaced repetition intervals (in study-day slots, not calendar days):
+    // First session always on slot 0 (today). Then review at increasing gaps.
+    // Pattern: 0, 1, 3, 7, 14, 21, 30, 45, 60 ... capped at n-1
+    const intervals=[0,1,3,7,14,21,30,45,60,90];
+    const slots=new Set();
+    slots.add(0);
+    // Always include a session 1-2 slots before exam
+    if(n>1)slots.add(n-1);
+    if(n>2)slots.add(n-2);
+    for(const iv of intervals){if(iv<n)slots.add(iv);}
+    // Fill remaining gaps if subject has many days — add midpoints
+    if(n>30){for(let s=0;s<n;s+=15)slots.add(s);}
+    if(n>60){for(let s=0;s<n;s+=8)slots.add(s);}
+
+    const sortedSlots=[...slots].sort((a,b)=>a-b);
     const types=['first','review','review','test','review','test','review','test','review','test'];
-    // Schedule a session on EVERY valid study day, with type determined by position
-    return validDates.map((date,i)=>({
-      date,
+    return sortedSlots.map((slot,i)=>({
+      date:validDates[slot],
       subjectId:sub.id,
-      type:types[Math.min(Math.floor(i/(n/types.length)),types.length-1)],
+      // Session type based on session number, not calendar position
+      type:types[Math.min(i,types.length-1)],
       idx:i
     }));
   }
+
+  function subjectUrgencyScore(sub){
+    // Higher = show this subject sooner on busy days
+    const today=new Date();today.setHours(0,0,0,0);
+    const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
+    const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
+    // Average weakness of topics (conf 0 treated as 2.5)
+    const avgConf=sub.topics.length
+      ?sub.topics.reduce((a,t)=>a+(t.conf===0?2.5:t.conf),0)/sub.topics.length
+      :2.5;
+    const weakness=5-avgConf; // 0(all nailed) to 4(all lost)
+    // Urgency: exam proximity (1/daysLeft scales up as exam approaches)
+    const urgency=100/daysLeft;
+    return urgency*1.5+weakness;
+  }
+
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
   function sessForDate(ds){
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-    return all.slice(0,limit);
+    if(all.length<=limit)return all;
+    // Priority: sort by subject urgency (exam proximity × weakness), never random
+    return all
+      .map(s=>({...s,_pri:subjectUrgencyScore(S.subjects.find(x=>x.id===s.subjectId)||{})}))
+      .sort((a,b)=>b._pri-a._pri)
+      .slice(0,limit);
   }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
   // ── TOPIC SUGGESTIONS ─────────────────────────────────
-  function suggestTopics(sub, sessType, n=3) {
+  function suggestTopics(sub, sessType, n=3, date='') {
     if(!sub.topics.length)return[];
     const today=new Date();today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
     const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
-    return sub.topics.map(t=>{
-      const cv=t.conf===0?2.5:t.conf;
-      let rec=t.lastStudied?Math.min(Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000),30)/30*3:3;
-      const urg=daysLeft<=7?1.5:daysLeft<=14?1.2:1.0;
-      let boost=(sessType==='test'&&t.conf>=3)?0.5:(sessType==='first'&&t.conf===0)?1:0;
-      return{...t,score:(5-cv)*urg+rec+boost+Math.random()*0.3};
+
+    // Deterministic per-date seed — stable on reload, different each day
+    const seed=date?date.split('-').reduce((a,v)=>a*31+parseInt(v),1):Date.now();
+    const seededRand=(i)=>{const x=Math.sin(seed*7+i*13)*99991;return x-Math.floor(x);};
+
+    return sub.topics.map((t,i)=>{
+      const conf=t.conf===0?2.5:t.conf; // unrated = treat as mid confidence
+
+      // ── 1. DIFFICULTY (0–4) ─────────────────────────────
+      // Lower confidence = more urgent to study
+      const diffScore=5-conf;
+
+      // ── 2. FORGETTING CURVE (0–4) ───────────────────────
+      // Models Ebbinghaus: memory retention drops fast then plateaus.
+      // A topic studied yesterday needs much less review than one from 2 weeks ago.
+      // conf=5 (nailed it) → retention decays slowly (review after ~14 days)
+      // conf=1 (lost)      → retention decays fast   (review after ~2 days)
+      const optimalGap=conf<=1?2:conf<=2?4:conf<=3?7:conf<=4?12:18;
+      const daysSince=t.lastStudied
+        ?Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000))
+        :999;
+      // How overdue vs ideal gap: 0=reviewed today, 1=right on schedule, >1=overdue
+      const overdue=daysSince/optimalGap;
+      // Sigmoid-like: plateaus at 4 once very overdue, near 0 if just reviewed
+      const forgettingScore=Math.min(4,overdue*2);
+
+      // ── 3. EXAM URGENCY MULTIPLIER ──────────────────────
+      const urg=daysLeft<=7?2.0:daysLeft<=14?1.5:daysLeft<=30?1.2:1.0;
+
+      // ── 4. SESSION TYPE ALIGNMENT BOOST (0–1.5) ─────────
+      // Reward topics that match the intent of this session type
+      let boost=0;
+      if(sessType==='first'&&t.conf===0)boost=1.5;       // unrated = perfect for first look
+      if(sessType==='review'&&daysSince>=optimalGap)boost=1; // overdue = needs review
+      if(sessType==='test'&&t.conf>=3)boost=1;           // confident = good to self-test
+      if(sessType==='test'&&t.conf<=2)boost=0.5;         // weak = also important to test
+
+      // ── 5. CORE SCORE ────────────────────────────────────
+      // Difficulty and forgetting curve are the dominant signals (~0–8 range)
+      // Urgency scales both. Boost rewards session-type fit.
+      const core=(diffScore+forgettingScore)*urg+boost;
+
+      // ── 6. TIEBREAKER JITTER (max 0.2) ──────────────────
+      // Only shuffles topics with near-identical scores. Cannot override real signals.
+      const jitter=seededRand(i)*0.2;
+
+      return{...t,score:core+jitter};
     }).sort((a,b)=>b.score-a.score).slice(0,n);
   }
   function suggReason(t,sub,sessType){
     const today=new Date();today.setHours(0,0,0,0);
     const daysLeft=Math.ceil((new Date(sub.examDate)-today)/86400000);
+    const daysSince=t.lastStudied?Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000):null;
+    const optimalGap=t.conf<=1?2:t.conf<=2?4:t.conf<=3?7:t.conf<=4?12:18;
     if(t.conf===0)return'Not yet rated — start here';
-    if(t.conf<=2)return daysLeft<=7?'⚠️ Exam soon & low confidence':'Low confidence — needs work';
-    if(t.lastStudied){const days=Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000);if(days>=7)return`Not studied in ${days} days`;if(days>=3)return`Last studied ${days} days ago`;}
-    return sessType==='test'?'Good to self-test on this':'Due for spaced review';
+    if(daysLeft<=7&&t.conf<=3)return'⚠️ Exam soon — needs urgent attention';
+    if(t.conf<=2)return'Low confidence — prioritise this';
+    if(daysSince!==null&&daysSince>=optimalGap*1.5)return`Overdue — last studied ${daysSince} day${daysSince!==1?'s':''} ago`;
+    if(daysSince!==null&&daysSince>=optimalGap)return`Due for review (${daysSince} days since last study)`;
+    if(sessType==='test'&&t.conf>=3)return'Confident — good time to self-test';
+    if(sessType==='review')return'Spaced review keeping this fresh';
+    return'Maintaining knowledge';
   }
 
   // ── WEEK STRIP ────────────────────────────────────────
@@ -1161,7 +1243,7 @@ function bootApp(fbConfig) {
       const sub=S.subjects.find(s=>s.id===s2.subjectId);if(!sub)return'';
       const k=sk(s2);const sd=S.sessions[k]||{};const done=!!sd.completedAt;
       const hasNotes=!!(sd.notes&&sd.notes.trim());
-      const suggestions=suggestTopics(sub,s2.type,(S.prefs&&S.prefs.topicsPerSess)||3);
+      const suggestions=suggestTopics(sub,s2.type,(S.prefs&&S.prefs.topicsPerSess)||3,s2.date);
       const suggHtml=sub.topics.length?`<div class="sugg-block">
         <div class="sugg-label">Suggested topics <span>smart pick</span></div>
         <div class="sugg-rows">${suggestions.map(t=>{
