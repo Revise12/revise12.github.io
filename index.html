@@ -209,7 +209,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .sugg-rows{display:grid;gap:5px;}
 .sugg-row{display:flex;align-items:center;gap:9px;padding:6px 8px;background:var(--surface);border-radius:7px;border:1px solid var(--border);}
 .sugg-row.sugg-sel{flex-direction:column;align-items:stretch;border-color:var(--accent);background:rgba(200,245,100,0.04);}
-.sugg-top{display:flex;align-items:center;gap:9px;}
+.sugg-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
 .sugg-diff{display:flex;align-items:center;gap:7px;padding:7px 2px 2px;margin-top:2px;flex-wrap:wrap;}
 .sdiff-lbl{font-size:0.61rem;color:var(--muted);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;white-space:nowrap;flex-shrink:0;}
 .sdiff-cur{font-size:0.65rem;font-weight:700;margin-left:3px;}
@@ -217,6 +217,95 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .diff-rate-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .diff-rate-row:last-child{border-bottom:none;padding-bottom:0;}
 .diff-tname{font-size:0.8rem;font-weight:600;flex:1;min-width:100px;}
+
+/* ── MODE / STATUS BADGES ── */
+.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;flex-shrink:0;}
+.mode-first{background:rgba(200,245,100,0.13);color:var(--accent);}
+.mode-practice{background:rgba(245,100,100,0.13);color:var(--danger);}
+.mode-review{background:rgba(100,200,245,0.13);color:var(--accent2);}
+.mode-test{background:rgba(245,166,100,0.13);color:var(--accent3);}
+
+/* ── URGENT BANNER & STUDY TIP ── */
+.urgent-banner{background:rgba(245,100,100,0.07);border:1px solid rgba(245,100,100,0.22);border-radius:8px;padding:8px 12px;font-size:0.77rem;color:var(--danger);margin:5px 0 8px;line-height:1.5;}
+.study-tip{font-size:0.72rem;color:var(--muted);line-height:1.55;margin:2px 0 9px;padding:7px 11px;background:var(--surface2);border-radius:7px;border-left:2px solid var(--border);}
+.nxt-rev{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+
+/* ── DUE-TODAY BANNER ── */
+.due-banner{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.18);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.due-banner-stat{display:flex;flex-direction:column;align-items:center;min-width:44px;}
+.due-banner-num{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:500;line-height:1;color:var(--accent);}
+.due-banner-num.warn{color:var(--danger);}
+.due-banner-lbl{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:2px;}
+.due-banner-div{width:1px;height:30px;background:var(--border);}
+.due-banner-msg{font-size:0.79rem;color:var(--muted);flex:1;line-height:1.5;}
+
+/* ── CHIP STATUS DOTS ── */
+.chip-dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:4px;vertical-align:middle;flex-shrink:0;}
+.chip-dot-new{background:var(--accent);box-shadow:0 0 4px var(--accent);}
+.chip-dot-due{background:var(--accent3);}
+.chip-dot-overdue{background:var(--danger);}
+
+/* ── PROGRESS: SM-2 HEALTH ── */
+.health-bar-w{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin:8px 0 4px;}
+.health-bar{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.forecast-row{display:flex;gap:4px;margin-top:10px;}
+.fc-day{flex:1;background:var(--surface2);border-radius:7px;padding:7px 4px;text-align:center;min-width:0;}
+.fc-day-lbl{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
+.fc-day-num{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;line-height:1.2;margin:2px 0;}
+.fc-day-sub{font-size:0.56rem;color:var(--muted);}
+.fc-day.has-due .fc-day-num{color:var(--accent);}
+.fc-day.overloaded .fc-day-num{color:var(--accent3);}
+.ef-chip{font-family:'DM Mono',monospace;font-size:0.65rem;padding:2px 7px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);}
+.retention-pct{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;line-height:1;}
+
+/* ── MASTERY ROW ── */
+.mastery-row{display:flex;gap:10px;flex-wrap:wrap;background:var(--surface2);border-radius:9px;padding:11px 14px;margin:10px 0;}
+.mastery-stat{display:flex;flex-direction:column;align-items:center;flex:1;min-width:50px;}
+.mastery-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;line-height:1.1;color:var(--text);}
+.mastery-lbl{font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px;}
+
+/* ── RETENTION BAR ── */
+.ret-bar{width:60px;height:4px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
+.ret-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+
+/* ── INSIGHT BOX ── */
+.insight-box{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.16);border-radius:8px;padding:10px 13px;font-size:0.79rem;color:var(--text);line-height:1.55;margin:10px 0;}
+.nxt-rev.overdue{color:var(--danger)!important;}
+
+/* ── FORECAST ── */
+.forecast-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;}
+
+/* ── SCHEDULE ENHANCEMENTS ── */
+.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;flex-shrink:0;}
+.mode-first{background:rgba(200,245,100,0.13);color:var(--accent);}
+.mode-practice{background:rgba(245,100,100,0.13);color:var(--danger);}
+.mode-review{background:rgba(100,200,245,0.13);color:var(--accent2);}
+.mode-test{background:rgba(245,166,100,0.13);color:var(--accent3);}
+.urgent-banner{background:rgba(245,100,100,0.08);border:1px solid rgba(245,100,100,0.2);border-radius:8px;padding:8px 11px;font-size:0.76rem;color:var(--danger);margin:5px 0 6px;line-height:1.5;}
+.study-tip{font-size:0.72rem;color:var(--muted);margin:4px 0 8px;line-height:1.55;background:var(--surface2);border-radius:7px;padding:7px 10px;border-left:2px solid var(--border);}
+.nxt-rev{font-size:0.61rem;color:var(--muted);margin-left:4px;}
+.nxt-rev.overdue{color:var(--danger);}
+.due-pill{font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(245,100,100,0.13);color:var(--danger);border:1px solid rgba(245,100,100,0.2);white-space:nowrap;}
+.due-pill-ok{background:rgba(200,245,100,0.1);color:var(--accent);border-color:rgba(200,245,100,0.2);}
+
+/* ── PROGRESS ENHANCEMENTS ── */
+.ret-bar{width:56px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;flex-shrink:0;}
+.ret-fill{height:100%;border-radius:2px;transition:width 0.4s;}
+.mastery-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.mastery-stat{flex:1;text-align:center;}
+.mastery-val{font-family:'DM Mono',monospace;font-size:1.2rem;line-height:1;margin-bottom:2px;}
+.mastery-lbl{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
+.insight-box{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.12);border-radius:8px;padding:9px 12px;font-size:0.75rem;color:var(--muted);margin-top:8px;line-height:1.55;}
+.insight-box strong{color:var(--accent);}
+.urgent-banner{background:rgba(245,100,100,0.1);border:1px solid rgba(245,100,100,0.3);border-radius:8px;padding:9px 13px;font-size:0.78rem;color:var(--danger);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;flex-shrink:0;}
+.mode-first{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.mode-practice{background:rgba(245,166,100,0.15);color:var(--accent3);}
+.mode-review{background:rgba(200,245,100,0.12);color:var(--accent);}
+.mode-test{background:rgba(160,100,245,0.15);color:#c89cf5;}
+.nxt-rev{font-size:0.63rem;color:var(--muted);margin-top:2px;}
+.mastery-ring{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;}
+.study-tip{background:var(--surface2);border-radius:7px;padding:7px 11px;font-size:0.73rem;color:var(--muted);margin-bottom:10px;line-height:1.5;border-left:2px solid var(--accent);}
 .sugg-name{flex:1;font-size:0.82rem;font-weight:600;}
 .sugg-reason{font-size:0.68rem;color:var(--muted);}
 .cb5l{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;}
@@ -992,6 +1081,40 @@ function bootApp(fbConfig) {
     else signInWithPopup(auth, new GoogleAuthProvider()).catch(e => tk('Sign-in failed'));
   };
 
+  // ── SM-2 SPACED REPETITION ENGINE ────────────────────
+  // Based on the SM-2 algorithm (SuperMemo 2), the gold standard for spaced repetition.
+  // Each topic tracks: interval (days), easeFactor (≥1.3), repetitions, nextReview.
+  // Reference: Wozniak, P.A. (1990). "Optimization of learning"
+  function sm2Update(topic, quality) {
+    // quality: 0=complete fail, 1=recalled wrong, 3=hard pass, 4=correct+hesitation, 5=perfect
+    if (!topic.easeFactor) topic.easeFactor = 2.5;
+    if (!topic.repetitions) topic.repetitions = 0;
+    if (!topic.interval) topic.interval = 0;
+    if (quality < 3) {
+      // Failed — reset to short interval (but keep EF for now, it updates below)
+      topic.repetitions = 0;
+      topic.interval = 1;
+    } else {
+      // Passed — graduated interval increase
+      if (topic.repetitions === 0) topic.interval = 1;
+      else if (topic.repetitions === 1) topic.interval = 6;
+      else topic.interval = Math.max(1, Math.round(topic.interval * topic.easeFactor));
+      topic.repetitions++;
+    }
+    // EF update (SM-2 formula, floored at 1.3 to prevent degenerate intervals)
+    topic.easeFactor = Math.max(1.3, topic.easeFactor + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    // Set the next review date
+    const nxt = new Date(); nxt.setDate(nxt.getDate() + topic.interval);
+    topic.nextReview = nxt.toISOString().split('T')[0];
+  }
+
+  // Map user's 1-5 confidence rating to SM-2 quality scale (0-5)
+  // 1=Lost→0, 2=Shaky→1, 3=Getting it→3, 4=Almost there→4, 5=Nailed it→5
+  function confToQuality(conf) { return [0,0,1,3,4,5][conf] ?? 0; }
+
+  // Best-guess interval for a topic with no SM-2 history yet (based on conf alone)
+  function getDefaultInterval(conf) { return [0,1,2,5,12,21][conf] ?? 1; }
+
   // ── SUBJECTS ──────────────────────────────────────────
   window.addCustomSubject = function() {
     const name = prompt('Subject name:'); if (!name) return;
@@ -1039,6 +1162,8 @@ function bootApp(fbConfig) {
     const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
     const t=sub.topics.find(t=>t.id===tid); if(!t)return;
     t.conf=(t.conf===level)?0:level;
+    // Run SM-2 when a rating is set (not when toggled off)
+    if(t.conf>0) sm2Update(t, confToQuality(t.conf));
     save(); renderSessions(); renderProgress();
     if(k) setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);
   };
@@ -1134,9 +1259,32 @@ function bootApp(fbConfig) {
     const today=new Date();today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
     const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
-    const avgConf=sub.topics.length
-      ?sub.topics.reduce((a,t)=>a+(t.conf===0?2.5:t.conf),0)/sub.topics.length:2.5;
-    return (100/daysLeft)*1.5+(5-avgConf);
+
+    // ── 1. EXAM PROXIMITY — exponential urgency, spikes in final fortnight ──
+    // Based on Cepeda et al. (2006): optimal review frequency rises steeply near test.
+    const timeScore=daysLeft<=3?600:daysLeft<=7?280:daysLeft<=14?130:daysLeft<=30?65:100/Math.sqrt(daysLeft);
+
+    // ── 2. MASTERY GAP — confidence-weighted deficit across all topics ──
+    const topics=sub.topics;
+    const avgConf=topics.length?topics.reduce((a,t)=>a+(t.conf===0?2.5:t.conf),0)/topics.length:2.5;
+    const masteryGap=(5-avgConf)*8;
+
+    // ── 3. SM-2 OVERDUE COUNT — weighted by severity ──
+    // A weak topic that's overdue is a crisis; a strong one just needs maintenance.
+    const overdueScore=topics.reduce((total,t)=>{
+      const isOverdue=(!t.nextReview&&!t.lastStudied)||
+        (t.nextReview&&new Date(t.nextReview+'T00:00:00')<=today);
+      if(!isOverdue) return total;
+      // Weight: conf 0 = unknown (treat as low), conf 1-2 = critical, 3 = moderate, 4-5 = low
+      const w=t.conf===0?3:t.conf<=2?4:t.conf===3?2:1;
+      return total+w;
+    },0);
+
+    // ── 4. EXAM CRISIS MULTIPLIER — weak topics near exam = maximum urgency ──
+    const weakCount=topics.filter(t=>t.conf>0&&t.conf<=2).length;
+    const crisisMult=daysLeft<=14&&weakCount?1+weakCount*0.15:1;
+
+    return (timeScore+masteryGap+overdueScore)*crisisMult;
   }
 
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
@@ -1146,24 +1294,27 @@ function bootApp(fbConfig) {
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
     if(all.length<=limit)return all;
 
-    // Score each subject by urgency — but also apply a day-based rotation offset
-    // so that subjects that were bumped yesterday get priority today
     const dayIndex=buildValidDates(365).indexOf(ds);
     const numSubjects=S.subjects.length;
+    const dsDate=new Date(ds+'T00:00:00');
 
     return all
       .map(s=>{
         const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
         const urgency=subjectUrgencyScore(sub);
-        // Find this subject's position in the urgency-sorted list
+        // Count SM-2 topics overdue as of this session date — adds short-term priority
+        const overdueNow=(sub.topics||[]).filter(t=>
+          t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
+        ).length;
+        // Find rank in urgency-sorted list for rotation
         const subRank=S.subjects
           .map(x=>({id:x.id,u:subjectUrgencyScore(x)}))
           .sort((a,b)=>b.u-a.u)
           .findIndex(x=>x.id===s.subjectId);
-        // Rotate rank by dayIndex so every subject cycles into the top slots
+        // Rotate rank: ensures every subject eventually surfaces, preventing starvation
         const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
-        // Still weight urgency heavily so near-exam subjects always appear
-        const score=urgency*10+(numSubjects-rotatedRank);
+        // Score: urgency dominates, rotation prevents lock-out, overdue adds burst priority
+        const score=urgency*10+(numSubjects-rotatedRank)+overdueNow*5;
         return{...s,_score:score};
       })
       .sort((a,b)=>b._score-a._score)
@@ -1171,74 +1322,108 @@ function bootApp(fbConfig) {
   }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
-  // ── TOPIC SUGGESTIONS ─────────────────────────────────
-  function suggestTopics(sub, sessType, n=3, date='') {
-    if(!sub.topics.length)return[];
-    const today=new Date();today.setHours(0,0,0,0);
-    const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
-    const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
+  // ── TOPIC SUGGESTIONS — SM-2 + Interleaving ──────────
+  // Scientific basis:
+  //  • Forgetting curve (Ebbinghaus 1885) — retrieval urgency from SM-2 overdueRatio
+  //  • Confidence deficit weighting — low conf = higher repetition need
+  //  • Ease factor penalty (SM-2) — intrinsically hard topics need shorter intervals
+  //  • Exam proximity multiplier (Cepeda et al. 2006) — spike urgency near test date
+  //  • Interleaved selection (Kornell & Bjork 2008; Rohrer & Taylor 2007) — mixing
+  //    topics of different difficulty tiers improves long-term retention vs blocked study
+  function suggestTopics(sub, n=3, date='') {
+    if(!sub.topics.length) return [];
+    const today=new Date(); today.setHours(0,0,0,0);
+    const sessionDate=date?new Date(date+'T00:00:00'):today;
+    const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
+    const daysLeft=Math.max(1,Math.ceil((exam-sessionDate)/86400000));
 
-    // Deterministic per-date seed — stable on reload, different each day
     const seed=date?date.split('-').reduce((a,v)=>a*31+parseInt(v),1):Date.now();
-    const seededRand=(i)=>{const x=Math.sin(seed*7+i*13)*99991;return x-Math.floor(x);};
+    const seededRand=i=>{const x=Math.sin(seed*7+i*13)*99991;return x-Math.floor(x);};
 
-    return sub.topics.map((t,i)=>{
-      const conf=t.conf===0?2.5:t.conf; // unrated = treat as mid confidence
+    // Score every topic
+    const scored = sub.topics.map((t,i)=>{
+      // Never-studied: high base priority, shuffled so user doesn't always see same order
+      if(!t.lastStudied||t.conf===0){
+        return{...t,score:300+seededRand(i)*8,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
+      }
 
-      // ── 1. DIFFICULTY (0–4) ─────────────────────────────
-      // Lower confidence = more urgent to study
-      const diffScore=5-conf;
+      const daysSince=Math.max(0,Math.ceil((sessionDate-new Date(t.lastStudied+'T00:00:00'))/86400000));
+      const interval=t.interval||getDefaultInterval(t.conf);
+      const overdueRatio=interval>0?daysSince/interval:daysSince;
+      const overdueDays=Math.max(0,daysSince-interval);
 
-      // ── 2. FORGETTING CURVE (0–4) ───────────────────────
-      // Models Ebbinghaus: memory retention drops fast then plateaus.
-      // A topic studied yesterday needs much less review than one from 2 weeks ago.
-      // conf=5 (nailed it) → retention decays slowly (review after ~14 days)
-      // conf=1 (lost)      → retention decays fast   (review after ~2 days)
-      const optimalGap=conf<=1?2:conf<=2?4:conf<=3?7:conf<=4?12:18;
-      const daysSince=t.lastStudied
-        ?Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000))
-        :999;
-      // How overdue vs ideal gap: 0=reviewed today, 1=right on schedule, >1=overdue
-      const overdue=daysSince/optimalGap;
-      // Sigmoid-like: plateaus at 4 once very overdue, near 0 if just reviewed
-      const forgettingScore=Math.min(4,overdue*2);
+      // 1. Forgetting curve score (0–60): plateaus to prevent over-dominating
+      //    overdueRatio=1 means right on schedule; >1 = overdue
+      const forgetting=Math.min(60, overdueRatio*30);
 
-      // ── 3. EXAM URGENCY MULTIPLIER ──────────────────────
-      const urg=daysLeft<=7?2.0:daysLeft<=14?1.5:daysLeft<=30?1.2:1.0;
+      // 2. Confidence deficit (0–40): weak topics need more exposures
+      const confDeficit=(5-t.conf)*8;
 
-      // ── 4. SESSION TYPE ALIGNMENT BOOST (0–1.5) ─────────
-      // Reward topics that match the intent of this session type
-      let boost=0;
-      if(sessType==='first'&&t.conf===0)boost=1.5;       // unrated = perfect for first look
-      if(sessType==='review'&&daysSince>=optimalGap)boost=1; // overdue = needs review
-      if(sessType==='test'&&t.conf>=3)boost=1;           // confident = good to self-test
-      if(sessType==='test'&&t.conf<=2)boost=0.5;         // weak = also important to test
+      // 3. Ease factor penalty (0–14): low EF = student finds it intrinsically hard
+      const ef=t.easeFactor||2.5;
+      const efPenalty=Math.max(0,(2.5-ef)*14);
 
-      // ── 5. CORE SCORE ────────────────────────────────────
-      // Difficulty and forgetting curve are the dominant signals (~0–8 range)
-      // Urgency scales both. Boost rewards session-type fit.
-      const core=(diffScore+forgettingScore)*urg+boost;
+      // 4. Exam proximity multiplier — spikes urgency in final stretch
+      const examUrgency=daysLeft<=3?5.0:daysLeft<=7?3.0:daysLeft<=14?1.8:daysLeft<=30?1.3:1.0;
+      // Extra weight for weak topics as exam looms (retrieval practice effect)
+      const weakMult=t.conf<=2?1.9:t.conf===3?1.2:1.0;
 
-      // ── 6. TIEBREAKER JITTER (max 0.2) ──────────────────
-      // Only shuffles topics with near-identical scores. Cannot override real signals.
-      const jitter=seededRand(i)*0.2;
+      const core=(forgetting+confDeficit+efPenalty)*examUrgency*weakMult;
 
-      return{...t,score:core+jitter};
-    }).sort((a,b)=>b.score-a.score).slice(0,n);
+      // Per-topic recommended study mode
+      let _mode='review';
+      if(t.conf<=2) _mode='practice';
+      else if(t.conf>=4&&overdueRatio>=0.85) _mode='test';
+
+      return{...t,score:core+seededRand(i)*0.4,_mode,_overdueDays:overdueDays,_daysSince:daysSince,_interval:interval,_overdueRatio:overdueRatio};
+    });
+
+    const sorted=scored.slice().sort((a,b)=>b.score-a.score);
+    if(sorted.length<=n) return sorted;
+
+    // ── INTERLEAVED SELECTION ──────────────────────────────
+    // Cap any single confidence tier at 60% of suggestions, then fill from top scores.
+    // This ensures the session mixes urgent/weak topics with more stable ones — mimicking
+    // the beneficial difficulty of interleaved practice in the research literature.
+    const maxFromTier=Math.max(1,Math.ceil(n*0.6));
+    const tierCount={new:0,low:0,mid:0,high:0};
+    const getTier=t=>(!t.lastStudied||!t.conf)?'new':t.conf<=2?'low':t.conf<=3?'mid':'high';
+
+    const selected=[];
+    // Pass 1: best-scoring while respecting tier cap
+    for(const t of sorted){
+      if(selected.length>=n) break;
+      const tier=getTier(t);
+      if(tierCount[tier]<maxFromTier){selected.push(t);tierCount[tier]++;}
+    }
+    // Pass 2: fill any remaining slots from the uncapped top of the list
+    for(const t of sorted){
+      if(selected.length>=n) break;
+      if(!selected.includes(t)) selected.push(t);
+    }
+    return selected.slice(0,n);
   }
-  function suggReason(t,sub,sessType){
+
+  // Per-topic reason string — more precise with SM-2 data
+  function suggReason(t,sub){
     const today=new Date();today.setHours(0,0,0,0);
-    const daysLeft=Math.ceil((new Date(sub.examDate)-today)/86400000);
-    const daysSince=t.lastStudied?Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000):null;
-    const optimalGap=t.conf<=1?2:t.conf<=2?4:t.conf<=3?7:t.conf<=4?12:18;
-    if(t.conf===0)return'Not yet rated — start here';
-    if(daysLeft<=7&&t.conf<=3)return'⚠️ Exam soon — needs urgent attention';
-    if(t.conf<=2)return'Low confidence — prioritise this';
-    if(daysSince!==null&&daysSince>=optimalGap*1.5)return`Overdue — last studied ${daysSince} day${daysSince!==1?'s':''} ago`;
-    if(daysSince!==null&&daysSince>=optimalGap)return`Due for review (${daysSince} days since last study)`;
-    if(sessType==='test'&&t.conf>=3)return'Confident — good time to self-test';
-    if(sessType==='review')return'Spaced review keeping this fresh';
-    return'Maintaining knowledge';
+    const daysLeft=Math.max(0,Math.ceil((new Date(sub.examDate)-today)/86400000));
+    if(!t.lastStudied||t.conf===0) return'New topic — first exposure builds the memory trace';
+    const daysSince=t._daysSince??Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000));
+    const interval=t._interval??getDefaultInterval(t.conf);
+    const overdueRatio=t._overdueRatio??daysSince/Math.max(1,interval);
+    const overdueDays=t._overdueDays??Math.max(0,daysSince-interval);
+    if(daysLeft<=3&&t.conf<=4) return`🚨 Exam in ${daysLeft} day${daysLeft!==1?'s':''} — retrieve everything now`;
+    if(daysLeft<=7&&t.conf<=2) return`⚠️ Exam soon & low confidence — urgent practice`;
+    if(t.conf===1) return'Struggling — short daily sessions until this clicks';
+    if(t.conf===2) return'Shaky — active recall practice, not re-reading';
+    if(overdueDays>14) return`Overdue by ${overdueDays} days — forgetting curve is steep`;
+    if(overdueDays>3) return`${overdueDays} days overdue — retrieval now before memory fades`;
+    if(overdueDays>0) return`Just overdue — perfect time for retrieval practice`;
+    if(overdueRatio>=0.85) return`Due for review — hit it at the optimal spacing interval`;
+    if(t.conf>=5&&t.easeFactor>=2.6) return'Solid — self-test to confirm long-term retention';
+    if(t.conf>=4) return'Good — spaced retrieval to maintain strong memory';
+    return'On schedule — regular review preventing forgetting';
   }
 
   // ── WEEK STRIP ────────────────────────────────────────
@@ -1254,7 +1439,15 @@ function bootApp(fbConfig) {
     const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'];
     document.getElementById('wstrip').innerHTML=Array.from({length:7},(_,i)=>{
       const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=toLocalDate(d);
-      const dots=all.filter(s=>s.date===ds).slice(0,4).map(s2=>{const sub=S.subjects.find(s=>s.id===s2.subjectId);return sub?`<div class="wdot" style="background:${sub.color}"></div>`:'';}).join('');
+      const dsDate=new Date(ds+'T00:00:00');
+      const sessForDay=all.filter(s=>s.date===ds);
+      const dots=sessForDay.slice(0,4).map(s2=>{
+        const sub=S.subjects.find(s=>s.id===s2.subjectId);
+        if(!sub) return '';
+        // Highlight dot red if any topics in this subject are overdue on this day
+        const hasOverdue=sub.topics.some(t=>t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate&&t.lastStudied);
+        return `<div class="wdot" style="background:${hasOverdue?'var(--danger)':sub.color}"></div>`;
+      }).join('');
       return `<div class="wd${ds===ts?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')"><div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div><div class="wdd">${dots}</div></div>`;
     }).join('');
   }
@@ -1265,31 +1458,109 @@ function bootApp(fbConfig) {
   function renderSessions(){
     const list=document.getElementById('slist');
     const sess=sessForDate(selDate);
-    if(!sess.length){list.innerHTML=`<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length?'Nothing scheduled today.':'Add subjects to generate your schedule.'}</p></div>`;return;}
-    const TL={first:'First Look',review:'Spaced Review',test:'Self-Test'};
-    const TIPS={first:'Read notes. Summarise in your own words.',review:'Cover notes — recall from memory.',test:'Quiz yourself — no notes.'};
-    list.innerHTML=sess.map(s2=>{
+    const selDateObj=new Date(selDate+'T00:00:00');
+    const today=new Date();today.setHours(0,0,0,0);
+    const isToday=selDate===toLocalDate(new Date());
+
+    // ── GLOBAL DUE-TODAY BANNER ──────────────────────────
+    // Counts across ALL subjects so student has a full picture up front
+    let totalDue=0,totalNew=0,totalOverdue=0;
+    S.subjects.forEach(sub=>{
+      sub.topics.forEach(t=>{
+        if(!t.lastStudied||t.conf===0){totalNew++;return;}
+        if(t.nextReview){
+          const nr=new Date(t.nextReview+'T00:00:00');
+          if(nr<=selDateObj){
+            const daysOver=Math.ceil((selDateObj-nr)/86400000);
+            totalDue++;
+            if(daysOver>0) totalOverdue++;
+          }
+        }
+      });
+    });
+    const bannerHtml=(totalDue>0||totalNew>0)?`<div class="due-banner">
+      ${totalDue>0?`<div class="due-banner-stat"><span class="due-banner-num${totalOverdue>0?' warn':''}">${totalDue}</span><span class="due-banner-lbl">Due${isToday?' today':''}</span></div>`:''}
+      ${totalOverdue>0?`<div class="due-banner-stat"><span class="due-banner-num warn">${totalOverdue}</span><span class="due-banner-lbl">Overdue</span></div>`:''}
+      ${totalNew>0?`<div class="due-banner-stat"><span class="due-banner-num" style="color:var(--accent2)">${totalNew}</span><span class="due-banner-lbl">New</span></div>`:''}
+      ${(totalDue>0||totalOverdue>0)?'<div class="due-banner-div"></div>':''}
+      <span class="due-banner-msg">${totalOverdue>0?`<strong>${totalOverdue} topic${totalOverdue!==1?'s':''} overdue</strong> — forgetting curve is active. Prioritise these first.`:totalDue>0?`<strong>${totalDue} review${totalDue!==1?'s':''} scheduled</strong> — work through them to keep your memory strong.`:''} ${totalNew>0?`<strong>${totalNew} unstarted</strong> — study these to start building memory traces.`:''}</span>
+    </div>`:'';
+
+    if(!sess.length){list.innerHTML=bannerHtml+`<div class="eday"><div class="ej">🌿</div><p>${S.subjects.length?'Nothing scheduled today.':'Add subjects to generate your schedule.'}</p></div>`;return;}
+    const MODE_LABEL={first:'First Look',practice:'Practice',review:'Spaced Review',test:'Self-Test'};
+    const MODE_CLASS={first:'mode-first',practice:'mode-practice',review:'mode-review',test:'mode-test'};
+    list.innerHTML=bannerHtml+sess.map(s2=>{
       const sub=S.subjects.find(s=>s.id===s2.subjectId);if(!sub)return'';
       const k=sk(s2);const sd=S.sessions[k]||{};const done=!!sd.completedAt;
       const hasNotes=!!(sd.notes&&sd.notes.trim());
-      const suggestions=suggestTopics(sub,s2.type,(S.prefs&&S.prefs.topicsPerSess)||3,s2.date);
+
+      // ── SMART SESSION TYPE ─────────────────────────────
+      const unrated=sub.topics.filter(t=>!t.lastStudied||t.conf===0).length;
+      const weak=sub.topics.filter(t=>t.conf>0&&t.conf<=2).length;
+      const strong=sub.topics.filter(t=>t.conf>=4).length;
+      const total=sub.topics.length;
+      let sessMode='review';
+      if(!total||unrated===total) sessMode='first';
+      else if(unrated>0||weak>total*0.35) sessMode='practice';
+      else if(strong>total*0.6) sessMode='test';
+      const STUDY_TIPS={
+        first:'📖 Read actively — after each section, close notes and write the key ideas from memory.',
+        practice:'✍️ Active recall — cover notes, write what you remember, then check. Focus on gaps.',
+        review:'🔄 Spaced retrieval — recall first, then verify. Don\'t re-read passively.',
+        test:'🧪 Self-test with no notes. Use past paper questions or quiz yourself aloud.'
+      };
+
+      // ── EXAM EMERGENCY BANNER ──────────────────────────
+      const examDate=new Date(sub.examDate);examDate.setHours(0,0,0,0);
+      const daysToExam=Math.ceil((examDate-today)/86400000);
+      const weakTopics=sub.topics.filter(t=>t.conf>0&&t.conf<=2);
+      const urgentBanner=(daysToExam<=7&&weakTopics.length)
+        ?`<div class="urgent-banner">🚨 ${daysToExam} day${daysToExam!==1?'s':''} to exam — ${weakTopics.length} weak topic${weakTopics.length!==1?'s':''}: <strong>${weakTopics.map(t=>esc(t.name)).join(', ')}</strong></div>`:'';
+
+      // ── DUE COUNT FOR THIS SUBJECT ────────────────────
+      const dueTodayTopics=sub.topics.filter(t=>{
+        if(!t.nextReview||!t.lastStudied) return false;
+        return new Date(t.nextReview+'T00:00:00')<=selDateObj;
+      });
+
+      const n=(S.prefs&&S.prefs.topicsPerSess)||3;
+      const suggestions=suggestTopics(sub,n,s2.date);
+
+      // ── SUGGESTED TOPICS HTML ─────────────────────────
       const suggHtml=sub.topics.length?`<div class="sugg-block">
-        <div class="sugg-label">Suggested topics <span>smart pick</span></div>
+        <div class="sugg-label">Smart picks <span>SM-2</span></div>
         <div class="sugg-rows">${suggestions.map(t=>{
           const isSel=(sd.topicIds||[]).includes(t.id);
-          const badge=t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:'<span class="cb5l cb0">Unrated</span>';
+          const badge=t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:'<span class="cb5l cb0">New</span>';
+          const modeLabel=`<span class="mode-badge ${MODE_CLASS[t._mode||'review']}">${MODE_LABEL[t._mode||'review']}</span>`;
+          const nxtRev=t.nextReview&&!isSel?`<div class="nxt-rev">Next review: ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>`:'';
           const diffPicker=isSel?`<div class="sugg-diff"><span class="sdiff-lbl">How hard?</span><div class="conf5" style="display:inline-flex;gap:3px">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="event.stopPropagation();setTopicDiff('${sub.id}','${t.id}',${l},'${k}')" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}</div><span class="sdiff-cur" style="color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'}">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span></div>`:'';
-          return `<div class="sugg-row${isSel?' sugg-sel':''}"><div class="sugg-top"><div style="flex:1"><div class="sugg-name">${esc(t.name)}</div><div class="sugg-reason">${suggReason(t,sub,s2.type)}</div></div>${badge}<button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel?'✓ Done':'Study'}</button></div>${diffPicker}</div>`;
+          return `<div class="sugg-row${isSel?' sugg-sel':''}"><div class="sugg-top"><div style="flex:1"><div class="sugg-name">${esc(t.name)}</div><div class="sugg-reason">${suggReason(t,sub)}${nxtRev?' · '+nxtRev:''}</div></div>${badge}${modeLabel}<button class="sib${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${isSel?'✓ Done':'Study'}</button></div>${diffPicker}</div>`;
         }).join('')}</div></div>`:'';
-      const chips=sub.topics.length?`<div class="tp-pick" style="--c:${sub.color}"><span class="tp-pl">All topics</span><div class="tchips">${sub.topics.map(t=>{const isSel=(sd.topicIds||[]).includes(t.id);return`<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}</button>`;}).join('')}</div></div>`:'';
+
+      // ── EXPAND SECTION: chips (with status dots) + diff rater ──
+      const chips=sub.topics.length?`<div class="tp-pick" style="--c:${sub.color}"><span class="tp-pl">All topics — <span style="color:var(--accent)">●</span> new &nbsp;<span style="color:var(--accent3)">●</span> due &nbsp;<span style="color:var(--danger)">●</span> overdue</span><div class="tchips">${sub.topics.map(t=>{
+        const isSel=(sd.topicIds||[]).includes(t.id);
+        const isNew=!t.lastStudied||t.conf===0;
+        const isDue=!isNew&&t.nextReview&&new Date(t.nextReview+'T00:00:00')<=selDateObj;
+        const daysSince=t.lastStudied?Math.ceil((selDateObj-new Date(t.lastStudied+'T00:00:00'))/86400000):999;
+        const interval=t.interval||getDefaultInterval(t.conf||1);
+        const isOverdue=isDue&&daysSince>interval;
+        const dot=isNew?'<span class="chip-dot chip-dot-new"></span>':isOverdue?'<span class="chip-dot chip-dot-overdue"></span>':isDue?'<span class="chip-dot chip-dot-due"></span>':'';
+        return`<button class="tchip${isSel?' on':''}" onclick="toggleTopic('${k}','${t.id}','${sub.id}')">${esc(t.name)}${dot}</button>`;
+      }).join('')}</div></div>`:'';
+
       const selectedTopics=(sd.topicIds||[]).map(tid=>sub.topics.find(t=>t.id===tid)).filter(Boolean);
-      const diffRateHtml=selectedTopics.length?`<div class="diff-rate-section"><span class="nlbl" style="display:block;margin-bottom:9px">Rate difficulty — how hard was each topic?</span>${selectedTopics.map(t=>`<div class="diff-rate-row"><span class="diff-tname">${esc(t.name)}</span><div class="conf5" style="display:inline-flex;gap:3px;align-items:center">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setTopicDiff('${sub.id}','${t.id}',${l},'${k}')" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}<span class="sdiff-cur" style="color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'};">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span></div></div>`).join('')}</div>`:'';
+      const diffRateHtml=selectedTopics.length?`<div class="diff-rate-section"><span class="nlbl" style="display:block;margin-bottom:9px">Rate difficulty — how hard was each topic? This trains the SM-2 scheduler.</span>${selectedTopics.map(t=>`<div class="diff-rate-row"><span class="diff-tname">${esc(t.name)}</span><div class="conf5" style="display:inline-flex;gap:3px;align-items:center">${[1,2,3,4,5].map(l=>`<button class="c5btn l${l}${t.conf===l?' on':''}" onclick="setTopicDiff('${sub.id}','${t.id}',${l},'${k}')" title="${CLABEL[l]}">${CSHORT[l]}</button>`).join('')}<span class="sdiff-cur" style="color:${t.conf>0?CCOLOR[t.conf]:'var(--muted)'};">${t.conf>0?CLABEL[t.conf]:'Not rated'}</span></div></div>`).join('')}</div>`:'';
+
       return `<div class="sess${done?' done':''}" id="sc2-${k}" style="--c:${sub.color}">
         <div class="sess-main">
           <div class="sck" onclick="toggleDone('${k}')">${done?'✓':''}</div>
           <div class="si">
             <div class="stit">${sub.emoji} ${esc(sub.name)}</div>
-            <div class="smeta"><span class="styp t-${s2.type==='first'?'fl':s2.type==='review'?'rv':'st'}">${TL[s2.type]}</span><span>${TIPS[s2.type]}</span></div>
+            <div class="smeta"><span class="styp ${MODE_CLASS[sessMode].replace('mode-','t-').replace('first','fl').replace('practice','rv').replace('review','rv').replace('test','st')}">${MODE_LABEL[sessMode]}</span><span>${daysToExam===1?'⚠️ Exam tomorrow!':daysToExam<=7?`${daysToExam}d to exam`:`${daysToExam}d left`}</span>${dueTodayTopics.length?`<span style="font-size:0.65rem;color:var(--accent3);font-weight:700">${dueTodayTopics.length} due</span>`:''}</div>
+            ${urgentBanner}
+            <div class="study-tip">${STUDY_TIPS[sessMode]}</div>
             ${suggHtml}
           </div>
           <div class="sa">
@@ -1304,7 +1575,32 @@ function bootApp(fbConfig) {
 
   window.toggleExp=function(k){const e=document.getElementById('exp-'+k);e.style.display=e.style.display==='block'?'none':'block';};
   window.toggleDone=function(k){const sd=S.sessions[k]||{};if(sd.completedAt)delete S.sessions[k];else{S.sessions[k]={...sd,completedAt:new Date().toISOString()};tk('Session complete ✓',true);}save();renderSessions();renderProgress();renderSubjects();};
-  window.toggleTopic=function(k,tid,sid){if(!S.sessions[k])S.sessions[k]={};const sd=S.sessions[k];if(!sd.topicIds)sd.topicIds=[];const i=sd.topicIds.indexOf(tid);if(i>-1)sd.topicIds.splice(i,1);else{sd.topicIds.push(tid);const sub=S.subjects.find(s=>s.id===sid);if(sub){const t=sub.topics.find(t=>t.id===tid);if(t)t.lastStudied=new Date().toISOString().split('T')[0];}}save();renderSessions();setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);};
+  window.toggleTopic=function(k,tid,sid){
+    if(!S.sessions[k])S.sessions[k]={};
+    const sd=S.sessions[k];
+    if(!sd.topicIds)sd.topicIds=[];
+    const i=sd.topicIds.indexOf(tid);
+    if(i>-1){
+      sd.topicIds.splice(i,1);
+    } else {
+      sd.topicIds.push(tid);
+      const sub=S.subjects.find(s=>s.id===sid);
+      if(sub){
+        const t=sub.topics.find(t=>t.id===tid);
+        if(t){
+          t.lastStudied=new Date().toISOString().split('T')[0];
+          // Ensure SM-2 fields are initialised on first encounter
+          if(!t.easeFactor) t.easeFactor=2.5;
+          if(!t.repetitions) t.repetitions=0;
+          if(t.interval===undefined||t.interval===null) t.interval=1;
+          if(!t.studyCount) t.studyCount=0;
+          t.studyCount++;
+        }
+      }
+    }
+    save();renderSessions();
+    setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);
+  };
   window.saveNotes=function(k){const v=document.getElementById('nt-'+k).value;if(!S.sessions[k])S.sessions[k]={};S.sessions[k].notes=v;save();tk('Notes saved ✓',true);renderSessions();setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);};
 
   // ── POMODORO ──────────────────────────────────────────
@@ -1355,12 +1651,41 @@ function bootApp(fbConfig) {
   });
 
   // ── PROGRESS ─────────────────────────────────────────
+  // Retention estimate: Ebbinghaus forgetting curve approximation
+  // R(t) = e^(-t / (stability × 1.5)) where stability = SM-2 interval
+  function topicRetention(t){
+    if(!t.lastStudied) return 0;
+    const today=new Date();today.setHours(0,0,0,0);
+    const daysSince=Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000));
+    if(daysSince===0) return 100;
+    const stability=Math.max(1,t.interval||getDefaultInterval(t.conf));
+    return Math.round(Math.max(0,Math.min(100,Math.exp(-daysSince/(stability*1.5))*100)));
+  }
   function renderProgress(){
     const grid=document.getElementById('pg');
     if(!S.subjects.length){grid.innerHTML='<div class="es"><div class="be">📊</div><p>Complete sessions to track progress here.</p></div>';return;}
     const today=new Date();today.setHours(0,0,0,0);
     const sorted=[...S.subjects].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
-    grid.innerHTML=sorted.map(sub=>{
+
+    // ── 7-DAY REVIEW FORECAST ─────────────────────────────
+    const forecastDays=Array.from({length:7},(_,i)=>{
+      const d=new Date(today);d.setDate(today.getDate()+i);
+      const ds=toLocalDate(d);
+      const due=S.subjects.reduce((sum,sub)=>sum+sub.topics.filter(t=>t.nextReview===ds).length,0);
+      const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
+      return{ds,lbl,day:d.getDate(),due};
+    });
+    const forecastHtml=`<div class="forecast-card">
+      <div class="stitle" style="margin-bottom:12px">7-day review forecast</div>
+      <div class="forecast-row">${forecastDays.map((f,i)=>`<div class="fc-day${f.due>0?' has-due':''}${f.due>=5?' overloaded':''}">
+        <div class="fc-day-lbl">${i===0?'Today':f.lbl}</div>
+        <div class="fc-day-num">${f.due||'–'}</div>
+        <div class="fc-day-sub" style="font-size:0.56rem;color:var(--muted)">${f.due?'reviews':''}</div>
+      </div>`).join('')}</div>
+      <div style="font-size:0.67rem;color:var(--muted);margin-top:9px">SM-2 schedules reviews based on how you rated each topic. Green = manageable load · Orange = busy day.</div>
+    </div>`;
+
+    grid.innerHTML=forecastHtml+sorted.map(sub=>{
       const schd=genSched(sub);const total=schd.length;
       const done=schd.filter(s=>S.sessions[sk(s)]?.completedAt).length;
       const pct=total?Math.round((done/total)*100):0;
@@ -1369,10 +1694,84 @@ function bootApp(fbConfig) {
       const unrated=sub.topics.filter(t=>t.conf===0);
       const dts=schd.filter(s=>S.sessions[sk(s)]?.completedAt).map(s=>s.date).sort();
       let streak=0;if(dts.length){const u=[...new Set(dts)];streak=1;for(let i=u.length-1;i>0;i--){if((new Date(u[i])-new Date(u[i-1]))/86400000===1)streak++;else break;}}
+
+      // ── RETENTION & MASTERY ──────────────────────────────
+      const studiedTopics=sub.topics.filter(t=>t.lastStudied);
+      const retentions=studiedTopics.map(topicRetention);
+      const avgRetention=retentions.length?Math.round(retentions.reduce((a,b)=>a+b,0)/retentions.length):0;
+      const coverage=sub.topics.length?Math.round(studiedTopics.length/sub.topics.length*100):0;
+      // Mastery = weighted combination: retention of studied × coverage × confidence
+      const ratedTopics=sub.topics.filter(t=>t.conf>0);
+      const avgConf=ratedTopics.length?ratedTopics.reduce((a,t)=>a+t.conf,0)/ratedTopics.length:0;
+      const masteryScore=Math.round((avgRetention/100)*(coverage/100)*(avgConf/5)*100);
+
+      // ── SM-2 OVERDUE COUNT ──────────────────────────────
+      const overdueTopics=sub.topics.filter(t=>{
+        if(!t.lastStudied) return false;
+        if(!t.nextReview) return true;
+        return new Date(t.nextReview+'T00:00:00')<=today;
+      });
+
+      // ── SMART INSIGHT ──────────────────────────────────
+      let insight='';
+      if(!sub.topics.length) insight='Add topics to this subject to start tracking mastery.';
+      else if(daysLeft<=7&&struggling.length) insight=`🚨 <strong>${daysLeft} days to exam.</strong> Prioritise these weak topics: <strong>${struggling.map(t=>esc(t.name)).slice(0,3).join(', ')}</strong>. Use active recall — no passive re-reading.`;
+      else if(overdueTopics.length>0) insight=`⏰ <strong>${overdueTopics.length} topic${overdueTopics.length!==1?'s':''} overdue</strong> for spaced review. Review now before the forgetting curve steepens further.`;
+      else if(avgRetention<50&&studiedTopics.length) insight=`📉 Average retention is <strong>${avgRetention}%</strong> — you're forgetting faster than you're reviewing. Increase review frequency for weaker topics.`;
+      else if(avgRetention>=80&&masteryScore>=60) insight=`✅ Strong retention at <strong>${avgRetention}%</strong>. Maintain spacing intervals — reviewing too early wastes study time.`;
+      else if(unrated.length>0) insight=`📝 <strong>${unrated.length} topic${unrated.length!==1?'s':''} not yet rated</strong>. Study them on the Schedule page and rate difficulty to activate SM-2 tracking.`;
+
+      // ── NEXT REVIEW DATE ──────────────────────────────
       const next=schd.find(s=>!S.sessions[sk(s)]?.completedAt&&new Date(s.date+'T00:00:00')>=today);
       const nextStr=next?new Date(next.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
-      const tbHtml=sub.topics.length?`<div class="tbd"><div class="tbd-t">Topic breakdown</div>${sub.topics.map(t=>{const cl=CCLASS[t.conf];const lbl=CLABEL[t.conf]||'Not rated';const lastStr=t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied';return`<div class="tbr"><div class="tbn">${esc(t.name)}</div><div class="lstu">${lastStr}</div><div class="conf-bar"><div class="conf-bar-fill" style="width:${t.conf>0?t.conf/5*100:0}%;background:${CCOLOR[t.conf]}"></div></div><span class="cb5l ${cl}">${lbl}</span></div>`;}).join('')}${struggling.length?`<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t=>esc(t.name)).join(', ')}</strong></div>`:''}${unrated.length?`<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t=>esc(t.name)).join(', ')}</div>`:''}</div>`:'';
-      return`<div class="pc" style="--c:${sub.color}"><div class="pch"><div><div class="pcn">${sub.emoji} ${esc(sub.name)}</div><div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div></div><div class="pcs"><div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Done</div></div><div class="stat"><div class="sv">${done}/${total}</div><div class="sl">Sessions</div></div><div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div><div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div></div></div><div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div><div style="font-size:0.73rem;color:var(--muted)">Next: <strong style="color:var(--text)">${nextStr}</strong></div>${tbHtml}</div>`;
+
+      // ── TOPIC BREAKDOWN ────────────────────────────────
+      const tbHtml=sub.topics.length?`<div class="tbd">
+        <div class="tbd-t">Topic breakdown — SM-2 intervals &amp; retention</div>
+        ${sub.topics.map(t=>{
+          const cl=CCLASS[t.conf];const lbl=CLABEL[t.conf]||'Not rated';
+          const lastStr=t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied';
+          const isOverdue=t.nextReview&&new Date(t.nextReview+'T00:00:00')<today;
+          const nxtStr=t.nextReview?`<span class="nxt-rev${isOverdue?' overdue':''}">Next: ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${isOverdue?' ⚠️':''}</span>`:'';
+          const ret=topicRetention(t);
+          const retColor=ret>=75?'var(--accent)':ret>=45?'var(--accent3)':'var(--danger)';
+          const efStr=t.easeFactor?`EF ${t.easeFactor.toFixed(1)}`:'';
+          const repStr=(t.repetitions!=null)&&t.repetitions>0?`${t.repetitions} rep${t.repetitions!==1?'s':''}`:'';
+          return`<div class="tbr">
+            <div class="tbn">${esc(t.name)}</div>
+            <div class="lstu">${lastStr}${t.lastStudied?` · ${nxtStr}`:''}${efStr?` · <span style="color:var(--muted);font-size:0.6rem">${efStr}</span>`:''}${repStr?` · <span style="color:var(--muted);font-size:0.6rem">${repStr}</span>`:''}</div>
+            <div class="conf-bar"><div class="conf-bar-fill" style="width:${t.conf>0?t.conf/5*100:0}%;background:${CCOLOR[t.conf]}"></div></div>
+            ${t.lastStudied?`<div class="ret-bar" title="Estimated retention: ${ret}%"><div class="ret-fill" style="width:${ret}%;background:${retColor}"></div></div>`:''}
+            <span class="cb5l ${cl}">${lbl}</span>
+          </div>`;
+        }).join('')}
+        ${struggling.length?`<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t=>esc(t.name)).join(', ')}</strong></div>`:''}
+        ${unrated.length?`<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t=>esc(t.name)).join(', ')}</div>`:''}
+      </div>`:'';
+
+      return`<div class="pc" style="--c:${sub.color}">
+        <div class="pch">
+          <div>
+            <div class="pcn">${sub.emoji} ${esc(sub.name)}</div>
+            <div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div>
+          </div>
+          <div class="pcs">
+            <div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Sessions</div></div>
+            <div class="stat"><div class="sv" style="color:${avgRetention>=70?'var(--accent)':avgRetention>=40?'var(--accent3)':'var(--danger)'}">${studiedTopics.length?avgRetention+'%':'—'}</div><div class="sl">Retention</div></div>
+            <div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div>
+            <div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div>
+          </div>
+        </div>
+        <div class="mastery-row">
+          <div class="mastery-stat"><div class="mastery-val" style="color:${masteryScore>=60?'var(--accent)':masteryScore>=30?'var(--accent3)':'var(--danger)'}">${masteryScore}%</div><div class="mastery-lbl">Mastery</div></div>
+          <div class="mastery-stat"><div class="mastery-val">${coverage}%</div><div class="mastery-lbl">Coverage</div></div>
+          <div class="mastery-stat"><div class="mastery-val" style="color:${overdueTopics.length?'var(--danger)':'var(--accent)'}">${overdueTopics.length}</div><div class="mastery-lbl">Due now</div></div>
+          <div class="mastery-stat"><div class="mastery-val">${nextStr}</div><div class="mastery-lbl">Next session</div></div>
+        </div>
+        <div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div>
+        ${insight?`<div class="insight-box">${insight}</div>`:''}
+        ${tbHtml}
+      </div>`;
     }).join('');
   }
 
