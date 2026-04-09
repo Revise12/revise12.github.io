@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Revise — Smart Study Planner</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#c8f564">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Revise">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -1838,6 +1843,15 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 window.esc=esc;
 let tT;
 window.tk=function(msg,ac=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(ac?' ac':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);};
+
+// ── PWA SERVICE WORKER ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg=>console.log('SW registered',reg.scope))
+      .catch(err=>console.warn('SW failed',err));
+  });
+}
 </script>
 </body>
 </html>
