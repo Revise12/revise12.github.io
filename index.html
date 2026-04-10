@@ -1132,8 +1132,8 @@ function bootApp(fbConfig) {
 
   // ── POMODORO ──────────────────────────────────────────
   const P={key:null,run:false,phase:'focus',round:1,rounds:4,left:25*60,total:25*60};
-  window.openPomo=function(k,name){P.key=k;document.getElementById('pomoTitle').textContent='🍅 '+name;document.getElementById('mnt').value=(S.sessions[k]||{}).notes||'';resetPomo();document.getElementById('pomoOvl').classList.add('open');};
-  window.closePomo=function(){if(P.run)togglePomo();document.getElementById('pomoOvl').classList.remove('open');P.key=null;};
+  window.openPomo=function(k,name){document.getElementById('editSubjOvl').classList.remove('open');P.key=k;document.getElementById('pomoTitle').textContent='🍅 '+name;document.getElementById('mnt').value=(S.sessions[k]||{}).notes||'';resetPomo();document.getElementById('pomoOvl').classList.add('open');};
+  window.closePomo=function(){if(P.run)togglePomo();document.getElementById('pomoOvl').classList.remove('open');document.getElementById('editSubjOvl').classList.remove('open');P.key=null;};
   const gf=()=>Math.max(1,parseInt(document.getElementById('pfoc').value)||25)*60;
   const gb=()=>Math.max(1,parseInt(document.getElementById('pbrk').value)||5)*60;
   function resetPomo(){P.phase='focus';P.round=1;P.left=gf();P.total=gf();updPomo();}
@@ -1160,6 +1160,7 @@ function bootApp(fbConfig) {
   // ── EDIT SUBJECT ──────────────────────────────────────
   let editSubjId=null;
   window.openEditSubj=function(sid){
+    document.getElementById('pomoOvl').classList.remove('open');
     editSubjId=sid;
     const sub=S.subjects.find(s=>s.id===sid);
     if(!sub)return;
@@ -1177,7 +1178,7 @@ function bootApp(fbConfig) {
     if(!sub)return;
     sub.name=document.getElementById('editSubjName').value||sub.name;
     sub.examDate=document.getElementById('editSubjExam').value||sub.examDate;
-    save();renderAll();closeEditSubj();tk('Subject updated ✓',true);
+    save();renderAll();window.closeEditSubj();tk('Subject updated ✓',true);
   };
 
   // ── SUBJECTS SIDEBAR ──────────────────────────────────
