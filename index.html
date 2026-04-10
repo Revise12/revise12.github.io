@@ -1092,7 +1092,7 @@ function bootApp(fbConfig) {
   let S = JSON.parse(localStorage.getItem('rv4')||'null') || { subjects:[], sessions:{}, ci:0 };
   let currentUser = null, firestoreUnsub = null, saveTimer = null, ignoreSnap = false;
 
-  function setSyncDot(state) { document.getElementById('syncDot').className = 'sync-dot ' + state; }
+  function setSyncDot(state) { const el = document.getElementById('syncDot'); if(el) { el.classList.remove('synced','syncing','error'); el.classList.add(state); } }
 
   function scheduleSave() {
     if (!currentUser || !db) { localStorage.setItem('rv4', JSON.stringify(S)); return; }
@@ -1681,7 +1681,7 @@ function bootApp(fbConfig) {
   window.resetPomo=function(){if(P.iv){clearInterval(P.iv);P.iv=null;}P.run=false;P.phase='focus';P.round=1;P.rounds=gr();P.total=gf();P.left=P.total;document.getElementById('pstbtn').textContent='Start';updPomo();};
   window.togglePomo=function(){if(P.run){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Resume';}else{P.run=true;document.getElementById('pstbtn').textContent='Pause';P.iv=setInterval(tickPomo,1000);}};
   function tickPomo(){P.left--;if(P.left<=0){if(P.phase==='focus'){tk(`Round ${P.round} done! 🎉`,true);if(P.round>=P.rounds){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Done! 🏆';return;}P.phase='break';P.total=gb();P.left=P.total;}else{P.round++;P.phase='focus';P.total=gf();P.left=P.total;tk(`Round ${P.round} starting!`);}}updPomo();}
-  function updPomo(){const m=Math.floor(P.left/60),s=P.left%60;document.getElementById('ptm').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pph').textContent=P.phase==='focus'?`Round ${P.round}/${P.rounds}`:'Break';const circ=2*Math.PI*36,ring=document.getElementById('rfl');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ*(1-P.left/P.total);ring.className='rfl'+(P.phase==='break'?' brk':'');document.getElementById('pdots').innerHTML=Array.from({length:P.rounds},(_,i)=>{const cl=i<P.round-1?'dn':i===P.round-1&&P.phase==='focus'?'cu':'';return`<div class="pdot ${cl}"></div>`;}).join('');}
+  function updPomo(){const m=Math.floor(P.left/60),s=P.left%60;document.getElementById('ptm').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pph').textContent=P.phase==='focus'?`Round ${P.round}/${P.rounds}`:'Break';const circ=2*Math.PI*36,ring=document.getElementById('rfl');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ*(1-P.left/P.total);ring.classList.remove('brk');if(P.phase==='break')ring.classList.add('brk');document.getElementById('pdots').innerHTML=Array.from({length:P.rounds},(_,i)=>{const cl=i<P.round-1?'dn':i===P.round-1&&P.phase==='focus'?'cu':'';return`<div class="pdot ${cl}"></div>`;}).join('');}
   window.saveModalNotes=function(){if(!P.key)return;if(!S.sessions[P.key])S.sessions[P.key]={};S.sessions[P.key].notes=document.getElementById('mnt').value;save();tk('Notes saved ✓',true);};
   document.getElementById('pomoOvl').addEventListener('click',e=>{if(e.target===document.getElementById('pomoOvl'))closePomo();});
 
@@ -1917,8 +1917,9 @@ function bootApp(fbConfig) {
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 window.esc=esc;
+// Toast notification - defined early so it's available during auth
 let tT;
-window.tk=function(msg,ac=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(ac?' ac':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);};
+window.tk=function(msg,ac=false){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');if(ac)t.classList.add('ac');else t.classList.remove('ac');clearTimeout(tT);tT=setTimeout(()=>{t.classList.remove('show','ac');},2600);};
 
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
