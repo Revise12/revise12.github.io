@@ -1123,15 +1123,11 @@ const FIREBASE_CONFIG = {
 
 // Landing page logic: show Sign In / New App options
 function showSignIn() {
-  // Sign in: load existing account data from localStorage
-  const obDone = localStorage.getItem('rv_ob_done');
-  if (obDone) {
-    document.getElementById('landingPage').classList.remove('visible');
-    document.getElementById('mainApp').style.display = 'block';
-    bootApp(FIREBASE_CONFIG);
-  } else {
-    alert('No existing account found. Please start a new app.');
-  }
+  // Sign in: show main app and let Firebase handle authentication
+  // The bootApp function will trigger Google Sign-In via onAuthStateChanged
+  document.getElementById('landingPage').classList.remove('visible');
+  document.getElementById('mainApp').style.display = 'block';
+  bootApp(FIREBASE_CONFIG);
 }
 
 function startNewApp() {
