@@ -1111,6 +1111,24 @@ window.finishOnboarding = function() {
 // ══════════════════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════════════════
+// Landing page logic: show Sign In / New App options (MUST be defined early)
+window.showSignIn = function() {
+  // Sign in: show main app and let Firebase handle authentication
+  // The bootApp function will trigger Google Sign-In via onAuthStateChanged
+  document.getElementById('landingPage').classList.remove('visible');
+  document.getElementById('mainApp').style.display = 'block';
+  bootApp(FIREBASE_CONFIG);
+};
+
+window.startNewApp = function() {
+  // New app: clear data and show onboarding
+  localStorage.removeItem('rv_ob_done');
+  localStorage.removeItem('rv4');
+  document.getElementById('landingPage').classList.remove('visible');
+  obRenderProgress();
+  document.getElementById('onboarding').classList.add('visible');
+};
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCWJpPdlTTiAhoDCZlTDXi6BC90XOJ4PbI",
   authDomain: "revise-dd7ba.firebaseapp.com",
@@ -1120,24 +1138,6 @@ const FIREBASE_CONFIG = {
   appId: "1:447646236694:web:792e58bbd481c031103537",
   measurementId: "G-GVGX16XEEC"
 };
-
-// Landing page logic: show Sign In / New App options
-function showSignIn() {
-  // Sign in: show main app and let Firebase handle authentication
-  // The bootApp function will trigger Google Sign-In via onAuthStateChanged
-  document.getElementById('landingPage').classList.remove('visible');
-  document.getElementById('mainApp').style.display = 'block';
-  bootApp(FIREBASE_CONFIG);
-}
-
-function startNewApp() {
-  // New app: clear data and show onboarding
-  localStorage.removeItem('rv_ob_done');
-  localStorage.removeItem('rv4');
-  document.getElementById('landingPage').classList.remove('visible');
-  obRenderProgress();
-  document.getElementById('onboarding').classList.add('visible');
-}
 
 // Initialize: check if user has completed onboarding
 const obDone = localStorage.getItem('rv_ob_done');
