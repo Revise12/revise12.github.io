@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revise</title>
+<title>Revise — Smart Study Planner</title>
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -22,6 +22,24 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
+
+/* ── LANDING PAGE ── */
+#landingPage{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
+#landingPage.visible{display:flex;}
+.landing-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px 40px;width:100%;max-width:500px;text-align:center;animation:fadeUp 0.4s ease;}
+.landing-logo{font-family:'Instrument Serif',serif;font-size:3rem;letter-spacing:-2px;margin-bottom:12px;}
+.landing-logo span{color:var(--accent);}
+.landing-heading{font-family:'Instrument Serif',serif;font-size:1.6rem;letter-spacing:-1px;margin-bottom:12px;line-height:1.2;}
+.landing-sub{font-size:0.9rem;color:var(--muted);line-height:1.6;margin-bottom:40px;}
+.landing-actions{display:flex;flex-direction:column;gap:12px;}
+.landing-btn{padding:14px 24px;border:none;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;}
+.landing-btn-primary{background:var(--accent);color:#0e0e0f;}
+.landing-btn-primary:hover{background:#d4f870;transform:translateY(-2px);}
+.landing-btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.landing-btn-secondary:hover{border-color:var(--accent);background:rgba(200,245,100,0.07);}
+.landing-divider{display:flex;align-items:center;gap:12px;margin:28px 0;}
+.landing-divider-line{flex:1;height:1px;background:var(--border);}
+.landing-divider-text{font-size:0.8rem;color:var(--muted);}
 
 /* ── ONBOARDING SHELL ── */
 #onboarding{display:none;min-height:100vh;display:none;align-items:center;justify-content:center;padding:24px;}
@@ -404,9 +422,29 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
+<!-- ══════════════════════════════
+     LANDING PAGE (Auth/Account Selection)
+══════════════════════════════ -->
+<div id="landingPage">
+  <div class="landing-card">
+    <div class="landing-logo">Revise<span>.</span></div>
+    <h1 class="landing-heading">Welcome Back</h1>
+    <p class="landing-sub">Continue your study journey or start fresh</p>
+    <div class="landing-actions">
+      <button class="landing-btn landing-btn-primary" onclick="showSignIn()">Sign In</button>
+      <div class="landing-divider">
+        <div class="landing-divider-line"></div>
+        <div class="landing-divider-text">or</div>
+        <div class="landing-divider-line"></div>
+      </div>
+      <button class="landing-btn landing-btn-secondary" onclick="startNewApp()">New App</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
      ONBOARDING
-══════════════════════════════════════ -->
+══════════════════════════════ -->
 <div id="onboarding">
   <div class="ob-card">
     <div class="ob-progress" id="obProgress"></div>
@@ -962,6 +1000,23 @@ function saveDateInputs() {
   });
 }
 
+function getExamEntriesForSubject(preset) {
+  if (Array.isArray(preset?.units) && preset.units.length) {
+    return preset.units.map(u => ({ ...u, synthetic: false }));
+  }
+
+  if (Array.isArray(preset?.topics) && preset.topics.length) {
+    return [{
+      id: 'full-subject',
+      name: 'Full subject',
+      topics: preset.topics,
+      synthetic: true,
+    }];
+  }
+
+  return [];
+}
+
 function renderExamDateList() {
   // Save any currently-typed dates before rebuilding HTML
   saveDateInputs();
@@ -974,13 +1029,13 @@ function renderExamDateList() {
     const preset = (CCEA[obLevel]||[]).find(x => x.name === name);
     if (!preset) return;
     if (!obUnitChecked[name]) {
-      obUnitChecked[name] = new Set((preset.units||[]).map(u => u.id));
+      obUnitChecked[name] = new Set(getExamEntriesForSubject(preset).map(entry => entry.id));
     }
   });
 
   list.innerHTML = [...obSelected].map(name => {
-    const preset = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚', units:[]};
-    const units = preset.units || [];
+    const preset = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚', units:[], topics:[]};
+    const units = getExamEntriesForSubject(preset);
     const unitRows = units.map(u => {
       const isChecked = (obUnitChecked[name]||new Set()).has(u.id);
       const savedDate = (obUnitDates[name]||{})[u.id] || '';
@@ -1024,15 +1079,15 @@ window.finishOnboarding = function() {
   const subjects = [];
   let colorIdx = 0;
   [...obSelected].forEach(name => {
-    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', units:[]};
+    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', units:[], topics:[]};
     const checkedUnits = obUnitChecked[name] || new Set();
-    (preset.units||[]).forEach(u => {
+    getExamEntriesForSubject(preset).forEach(u => {
       if (!checkedUnits.has(u.id)) return; // skip already-done units
       const examDate = (unitDateMap[name]||{})[u.id];
       if (!examDate) return; // skip undated (validation catches this)
       subjects.push({
         id: 'sub_'+Date.now()+'_'+colorIdx,
-        name: name + ' — ' + u.name,
+        name: u.synthetic ? name : name + ' — ' + u.name,
         examDate,
         color: COLORS[colorIdx % COLORS.length],
         emoji: preset.emoji,
@@ -1066,14 +1121,37 @@ const FIREBASE_CONFIG = {
   measurementId: "G-GVGX16XEEC"
 };
 
+// Landing page logic: show Sign In / New App options
+function showSignIn() {
+  // Sign in: load existing account data from localStorage
+  const obDone = localStorage.getItem('rv_ob_done');
+  if (obDone) {
+    document.getElementById('landingPage').classList.remove('visible');
+    document.getElementById('mainApp').style.display = 'block';
+    bootApp(FIREBASE_CONFIG);
+  } else {
+    alert('No existing account found. Please start a new app.');
+  }
+}
+
+function startNewApp() {
+  // New app: clear data and show onboarding
+  localStorage.removeItem('rv_ob_done');
+  localStorage.removeItem('rv4');
+  document.getElementById('landingPage').classList.remove('visible');
+  obRenderProgress();
+  document.getElementById('onboarding').classList.add('visible');
+}
+
+// Initialize: check if user has completed onboarding
 const obDone = localStorage.getItem('rv_ob_done');
 
 if (!obDone) {
-  obRenderProgress();
-  document.getElementById('onboarding').classList.add('visible');
+  // No account: show landing page
+  document.getElementById('landingPage').classList.add('visible');
 } else {
-  document.getElementById('mainApp').style.display = 'block';
-  bootApp(FIREBASE_CONFIG);
+  // Account exists: show landing page (user can sign in or start new)
+  document.getElementById('landingPage').classList.add('visible');
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1314,7 +1392,7 @@ function bootApp(fbConfig) {
     return dates.map((date,i)=>({date,subjectId:sub.id,type:sessTypeForCount(i),idx:i}));
   }
 
-  function subjectUrgencyScore(sub){
+  function subjectUrgencyScore(sub, allSubjects=[]){
     const today=new Date();today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
     const daysLeft=Math.max(1,Math.ceil((exam-today)/86400000));
@@ -1343,7 +1421,17 @@ function bootApp(fbConfig) {
     const weakCount=topics.filter(t=>t.conf>0&&t.conf<=2).length;
     const crisisMult=daysLeft<=14&&weakCount?1+weakCount*0.15:1;
 
-    return (timeScore+masteryGap+overdueScore)*crisisMult;
+    const baseScore=(timeScore+masteryGap+overdueScore)*crisisMult;
+
+    // ── 5. RECENCY PENALTY — prevent same subject from dominating ──
+    // Subjects selected recently should get penalized to ensure rotation
+    if(allSubjects.length>1){
+      const lastSelectedDays=sub._lastSelectedDays??999;
+      const recencyPenalty=lastSelectedDays<=1?0.3:lastSelectedDays<=2?0.5:lastSelectedDays<=3?0.7:1.0;
+      return baseScore*recencyPenalty;
+    }
+
+    return baseScore;
   }
 
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
@@ -1357,23 +1445,33 @@ function bootApp(fbConfig) {
     const numSubjects=S.subjects.length;
     const dsDate=new Date(ds+'T00:00:00');
 
+    // Track which subjects have been selected recently to enforce diversity
+    const selectedToday=all.map(s=>s.subjectId);
+    const subjectSelectCount={};
+    selectedToday.forEach(sid=>subjectSelectCount[sid]=(subjectSelectCount[sid]||0)+1);
+
     return all
       .map(s=>{
         const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
-        const urgency=subjectUrgencyScore(sub);
+        
+        // Calculate days since last selected (for recency penalty)
+        const lastSel=sub._lastSelectedDate?Math.floor((dsDate-new Date(sub._lastSelectedDate+'T00:00:00'))/86400000):999;
+        sub._lastSelectedDays=lastSel;
+        
+        const urgency=subjectUrgencyScore(sub,S.subjects);
         // Count SM-2 topics overdue as of this session date — adds short-term priority
         const overdueNow=(sub.topics||[]).filter(t=>
           t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
         ).length;
-        // Find rank in urgency-sorted list for rotation
-        const subRank=S.subjects
-          .map(x=>({id:x.id,u:subjectUrgencyScore(x)}))
-          .sort((a,b)=>b.u-a.u)
-          .findIndex(x=>x.id===s.subjectId);
-        // Rotate rank: ensures every subject eventually surfaces, preventing starvation
-        const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
-        // Score: urgency dominates, rotation prevents lock-out, overdue adds burst priority
-        const score=urgency*10+(numSubjects-rotatedRank)+overdueNow*5;
+        
+        // Diversity bonus: subjects NOT yet selected today get boost
+        const diversityBonus=subjectSelectCount[s.subjectId]===0?50:0;
+        
+        // Starvation prevention: if subject hasn't been selected in 3+ days, boost it
+        const starvationBoost=lastSel>=3?100:lastSel>=2?50:0;
+        
+        // Score: urgency is primary, but diversity and starvation prevention matter
+        const score=urgency*8+diversityBonus+starvationBoost+overdueNow*3;
         return{...s,_score:score};
       })
       .sort((a,b)=>b._score-a._score)
@@ -1396,14 +1494,12 @@ function bootApp(fbConfig) {
     const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
     const daysLeft=Math.max(1,Math.ceil((exam-sessionDate)/86400000));
 
-    const seed=date?date.split('-').reduce((a,v)=>a*31+parseInt(v),1):Date.now();
-    const seededRand=i=>{const x=Math.sin(seed*7+i*13)*99991;return x-Math.floor(x);};
-
     // Score every topic
     const scored = sub.topics.map((t,i)=>{
-      // Never-studied: high base priority, shuffled so user doesn't always see same order
+      // Never-studied: high base priority with freshness bonus
       if(!t.lastStudied||t.conf===0){
-        return{...t,score:300+seededRand(i)*8,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
+        const freshnessBonus=30;
+        return{...t,score:300+freshnessBonus,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
       }
 
       const daysSince=Math.max(0,Math.ceil((sessionDate-new Date(t.lastStudied+'T00:00:00'))/86400000));
@@ -1429,12 +1525,23 @@ function bootApp(fbConfig) {
 
       const core=(forgetting+confDeficit+efPenalty)*examUrgency*weakMult;
 
+      // ── RECENCY PENALTY: Topics studied recently should be deprioritized ──
+      // This prevents the same topics from appearing in consecutive sessions
+      // Session-aware adjustment: longer sessions get lighter penalties (allows deep work)
+      const sessionLength=S.prefs&&S.prefs.sessionLength||'normal';
+      const sessionLengthMult=sessionLength==='short'?1.0:sessionLength==='long'?0.6:0.8; // normal=0.8
+      let recencyPenalty=1.0;
+      if(daysSince===0) recencyPenalty=0.2*sessionLengthMult;  // Studied today: strong penalty (adjusted)
+      else if(daysSince===1) recencyPenalty=0.5*sessionLengthMult; // Studied yesterday: moderate penalty (adjusted)
+      else if(daysSince===2) recencyPenalty=0.8*sessionLengthMult; // Studied 2 days ago: light penalty (adjusted)
+
       // Per-topic recommended study mode
       let _mode='review';
       if(t.conf<=2) _mode='practice';
       else if(t.conf>=4&&overdueRatio>=0.85) _mode='test';
 
-      return{...t,score:core+seededRand(i)*0.4,_mode,_overdueDays:overdueDays,_daysSince:daysSince,_interval:interval,_overdueRatio:overdueRatio};
+      const finalScore=(core*recencyPenalty);
+      return{...t,score:finalScore,_mode,_overdueDays:overdueDays,_daysSince:daysSince,_interval:interval,_overdueRatio:overdueRatio};
     });
 
     const sorted=scored.slice().sort((a,b)=>b.score-a.score);
@@ -1633,7 +1740,23 @@ function bootApp(fbConfig) {
   }
 
   window.toggleExp=function(k){const e=document.getElementById('exp-'+k);e.style.display=e.style.display==='block'?'none':'block';};
-  window.toggleDone=function(k){const sd=S.sessions[k]||{};if(sd.completedAt)delete S.sessions[k];else{S.sessions[k]={...sd,completedAt:new Date().toISOString()};tk('Session complete ✓',true);}save();renderSessions();renderProgress();renderSubjects();};
+  window.toggleDone=function(k){
+    const sd=S.sessions[k]||{};
+    if(sd.completedAt){
+      delete S.sessions[k];
+    } else {
+      S.sessions[k]={...sd,completedAt:new Date().toISOString()};
+      // Track when subject was last selected (for diversity rotation)
+      const parts=k.split('_');
+      const subjectId=parts[0];
+      const sub=S.subjects.find(s=>s.id===subjectId);
+      if(sub){
+        sub._lastSelectedDate=new Date().toISOString().split('T')[0];
+      }
+      tk('Session complete ✓',true);
+    }
+    save();renderSessions();renderProgress();renderSubjects();
+  };
   window.toggleTopic=function(k,tid,sid){
     if(!S.sessions[k])S.sessions[k]={};
     const sd=S.sessions[k];
