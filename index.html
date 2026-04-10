@@ -1351,7 +1351,6 @@ function bootApp(fbConfig) {
   function sessForDate(ds){
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-    if(all.length<=limit)return all;
 
     const dayIndex=buildValidDates(365).indexOf(ds);
     const numSubjects=S.subjects.length;
