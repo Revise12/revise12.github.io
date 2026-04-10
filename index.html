@@ -1423,7 +1423,8 @@ function bootApp(fbConfig) {
     // Subjects selected recently should get penalized to ensure rotation
     if(allSubjects.length>1){
       const lastSelectedDays=sub._lastSelectedDays??999;
-      const recencyPenalty=lastSelectedDays<=1?0.3:lastSelectedDays<=2?0.5:lastSelectedDays<=3?0.7:1.0;
+      // Much stronger penalties to force rotation across days
+      const recencyPenalty=lastSelectedDays===0?0.05:lastSelectedDays===1?0.15:lastSelectedDays===2?0.4:lastSelectedDays===3?0.7:1.0;
       return baseScore*recencyPenalty;
     }
 
@@ -1463,8 +1464,8 @@ function bootApp(fbConfig) {
         // Diversity bonus: subjects NOT yet selected today get boost
         const diversityBonus=subjectSelectCount[s.subjectId]===0?50:0;
         
-        // Starvation prevention: if subject hasn't been selected in 3+ days, boost it
-        const starvationBoost=lastSel>=3?100:lastSel>=2?50:0;
+        // Starvation prevention: if subject hasn't been selected in 2+ days, boost it significantly
+        const starvationBoost=lastSel>=3?200:lastSel>=2?150:lastSel===0?0:50;
         
         // Score: urgency is primary, but diversity and starvation prevention matter
         const score=urgency*8+diversityBonus+starvationBoost+overdueNow*3;
