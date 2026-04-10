@@ -248,8 +248,8 @@ textarea{width:100%;min-height:80px;background:var(--bg);border:1px solid var(--
 textarea:focus{border-color:var(--accent);}
 
 /* Pomodoro modal */
-#pomoOvl{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;}
-#pomoOvl.open{display:flex;}
+#pomoOvl{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;}
+#pomoOvl.open{display:flex !important;}
 .pomo-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;width:100%;max-width:400px;text-align:center;}
 .pomo-title{font-size:1.2rem;font-weight:700;margin-bottom:20px;}
 #ptm{font-size:3rem;font-family:'DM Mono',monospace;font-weight:700;margin:20px 0;}
@@ -269,8 +269,8 @@ textarea:focus{border-color:var(--accent);}
 .pdot.cu{background:var(--accent2);animation:pulse 1s infinite;}
 
 /* Edit subject modal */
-#editSubjOvl{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;}
-#editSubjOvl.open{display:flex;}
+#editSubjOvl{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;}
+#editSubjOvl.open{display:flex !important;}
 .edit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;}
 .edit-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;}
 .edit-section{margin-bottom:16px;}
