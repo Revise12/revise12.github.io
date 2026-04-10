@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revise</title>
+<title>Revise — Smart Study Planner</title>
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -383,7 +383,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
 .toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:0.81rem;transform:translateY(60px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:10000;max-width:260px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
 .toast.show{transform:translateY(0);opacity:1;}.toast.ac{border-color:var(--accent);}
 
-@media(max-width:600px){
+/* ── THEME PICKER ── */
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:4px;}
+.theme-swatch{border-radius:10px;padding:12px 12px 10px;cursor:pointer;border:2px solid transparent;transition:all 0.18s;position:relative;}
+.theme-swatch:hover{transform:translateY(-2px);}
+.theme-swatch.sel{border-color:var(--text);}
+.theme-swatch.sel::after{content:'✓';position:absolute;top:6px;right:8px;font-size:0.7rem;font-weight:700;}
+.ts-dots{display:flex;gap:4px;margin-bottom:8px;}
+.ts-dot{width:14px;height:14px;border-radius:50%;}
+.ts-name{font-size:0.72rem;font-weight:700;}
   .ob-card{padding:24px 20px;}
   .subject-picker-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
   .edrow{flex-wrap:wrap;}.edrow input[type="date"]{width:100%;}
@@ -520,7 +528,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
     <!-- PREFERENCES -->
     <div id="page-prefs" class="page">
       <div class="stitle" style="margin-bottom:18px">Preferences</div>
-      <div style="display:grid;gap:14px;max-width:480px">
+      <div style="display:grid;gap:14px;max-width:520px">
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Theme</div>
+          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:14px">Choose a colour scheme. Applied instantly and saved across sessions.</div>
+          <div class="theme-grid" id="themePicker"></div>
+        </div>
 
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
           <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Sessions per day</div>
@@ -824,6 +838,43 @@ const CLABEL=['','Lost','Shaky','Getting it','Almost there','Nailed it'];
 const CCLASS=['cb0','cb1','cb2','cb3','cb4','cb5'];
 const CCOLOR=['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
 const CSHORT=['','1','2','3','4','5'];
+
+// ══════════════════════════════════════════════════════════
+// THEMING
+// ══════════════════════════════════════════════════════════
+const THEMES = {
+  dark:    { name:'Dark',    bg:'#0e0e0f', surface:'#161618', surface2:'#1e1e21', border:'#2a2a2e', accent:'#c8f564', accent2:'#64c8f5', accent3:'#f5a664', text:'#f0efe8', muted:'#7a7a82' },
+  oled:    { name:'OLED',    bg:'#000000', surface:'#0d0d0d', surface2:'#141414', border:'#232323', accent:'#c8f564', accent2:'#64c8f5', accent3:'#f5a664', text:'#f5f5f0', muted:'#6a6a72' },
+  slate:   { name:'Slate',   bg:'#0d1117', surface:'#161b22', surface2:'#1c2230', border:'#2d3748', accent:'#79c0ff', accent2:'#56d364', accent3:'#ffa657', text:'#e6edf3', muted:'#6e7681' },
+  forest:  { name:'Forest',  bg:'#0c1210', surface:'#141c18', surface2:'#1b2620', border:'#263328', accent:'#4ade80', accent2:'#34d399', accent3:'#fbbf24', text:'#ecfdf5', muted:'#6b7c71' },
+  ocean:   { name:'Ocean',   bg:'#090f1a', surface:'#111827', surface2:'#192132', border:'#243450', accent:'#38bdf8', accent2:'#818cf8', accent3:'#fb923c', text:'#e2f0ff', muted:'#64748b' },
+  midnight:{ name:'Midnight',bg:'#0f0a1e', surface:'#17102e', surface2:'#1f183d', border:'#2e2650', accent:'#a78bfa', accent2:'#f472b6', accent3:'#34d399', text:'#ede9fe', muted:'#7c6fa0' },
+  mocha:   { name:'Mocha',   bg:'#12100e', surface:'#1c1816', surface2:'#241f1b', border:'#3a3028', accent:'#f97316', accent2:'#fb923c', accent3:'#fbbf24', text:'#fef3e2', muted:'#897060' },
+  rose:    { name:'Rose',    bg:'#110d0f', surface:'#1c1418', surface2:'#251b21', border:'#3a2832', accent:'#f472b6', accent2:'#e879f9', accent3:'#fb7185', text:'#fce7f3', muted:'#8a6070' },
+};
+
+function applyTheme(id) {
+  const t = THEMES[id] || THEMES.dark;
+  const root = document.documentElement.style;
+  root.setProperty('--bg',       t.bg);
+  root.setProperty('--surface',  t.surface);
+  root.setProperty('--surface2', t.surface2);
+  root.setProperty('--border',   t.border);
+  root.setProperty('--accent',   t.accent);
+  root.setProperty('--accent2',  t.accent2);
+  root.setProperty('--accent3',  t.accent3);
+  root.setProperty('--text',     t.text);
+  root.setProperty('--muted',    t.muted);
+  localStorage.setItem('rv_theme', id);
+  // update picker selection if it's rendered
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('sel', el.dataset.theme === id);
+  });
+}
+window.applyTheme = applyTheme;
+
+// Apply saved theme immediately on load (before anything renders)
+applyTheme(localStorage.getItem('rv_theme') || 'dark');
 
 // ══════════════════════════════════════════════════════════
 // ONBOARDING STATE
@@ -1248,7 +1299,7 @@ function bootApp(fbConfig) {
     return types[Math.min(n,types.length-1)];
   }
 
-  // Generate session entries for a subject, spaced by SM-2 intervals rather than daily
+  // Generate one session entry per valid study date for a subject
   function genSched(sub){
     const today=new Date();today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
@@ -1260,40 +1311,7 @@ function bootApp(fbConfig) {
       const dt=new Date(today);dt.setDate(today.getDate()+i);
       if(studyDays.includes(dt.getDay()))dates.push(toLocalDate(dt));
     }
-
-    // Determine the minimum gap between sessions for this subject using SM-2 data.
-    // If the subject has topics with nextReview dates, use the soonest due date
-    // to decide when the subject next needs to appear.
-    // Subjects with no SM-2 data yet (all unstarted) appear every day.
-    const topics=sub.topics||[];
-    const hasAnyReview=topics.some(t=>t.nextReview);
-
-    if(!hasAnyReview){
-      // No SM-2 data yet — schedule every study day (old behaviour)
-      return dates.map((date,i)=>({date,subjectId:sub.id,type:sessTypeForCount(i),idx:i}));
-    }
-
-    // Build a set of dates where this subject has at least one topic due or overdue
-    const dueDates=new Set();
-    topics.forEach(t=>{
-      if(!t.nextReview) return;
-      const nr=new Date(t.nextReview+'T00:00:00');
-      // Find the first valid study day on or after nextReview
-      for(let i=0;i<totalDays;i++){
-        const dt=new Date(today);dt.setDate(today.getDate()+i);
-        if(dt<nr) continue;
-        if(studyDays.includes(dt.getDay())){dueDates.add(toLocalDate(dt));break;}
-      }
-    });
-
-    // Always include today if there's anything unstarted or overdue
-    const hasUnstarted=topics.some(t=>!t.lastStudied||t.conf===0);
-    const hasOverdue=topics.some(t=>t.nextReview&&new Date(t.nextReview+'T00:00:00')<=today);
-    if(hasUnstarted||hasOverdue) dueDates.add(dates[0]||toLocalDate(today));
-
-    // Return sessions only on due dates, sorted
-    const sorted=[...dueDates].filter(d=>dates.includes(d)).sort();
-    return sorted.map((date,i)=>({date,subjectId:sub.id,type:sessTypeForCount(i),idx:i}));
+    return dates.map((date,i)=>({date,subjectId:sub.id,type:sessTypeForCount(i),idx:i}));
   }
 
   function subjectUrgencyScore(sub){
@@ -1364,26 +1382,28 @@ function bootApp(fbConfig) {
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
   // ── TOPIC SUGGESTIONS — SM-2 + Interleaving ──────────
+  // Scientific basis:
+  //  • Forgetting curve (Ebbinghaus 1885) — retrieval urgency from SM-2 overdueRatio
+  //  • Confidence deficit weighting — low conf = higher repetition need
+  //  • Ease factor penalty (SM-2) — intrinsically hard topics need shorter intervals
+  //  • Exam proximity multiplier (Cepeda et al. 2006) — spike urgency near test date
+  //  • Interleaved selection (Kornell & Bjork 2008; Rohrer & Taylor 2007) — mixing
+  //    topics of different difficulty tiers improves long-term retention vs blocked study
   function suggestTopics(sub, n=3, date='') {
     if(!sub.topics.length) return [];
     const today=new Date(); today.setHours(0,0,0,0);
-    const todayStr=toLocalDate(today);
     const sessionDate=date?new Date(date+'T00:00:00'):today;
     const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
     const daysLeft=Math.max(1,Math.ceil((exam-sessionDate)/86400000));
 
-    // Seed includes minutes so suggestions can change as user works through topics
-    const seed=date?date.split('-').reduce((a,v)=>a*31+parseInt(v),1)+Math.floor(Date.now()/60000):Date.now();
+    const seed=date?date.split('-').reduce((a,v)=>a*31+parseInt(v),1):Date.now();
     const seededRand=i=>{const x=Math.sin(seed*7+i*13)*99991;return x-Math.floor(x);};
 
+    // Score every topic
     const scored = sub.topics.map((t,i)=>{
-      // Topics studied TODAY already get a heavy penalty — don't keep recommending them
-      const studiedToday = t.lastStudied === todayStr;
-
-      // Never-studied or unrated: high base priority unless already done today
-      if(!t.lastStudied || t.conf===0){
-        const base = studiedToday ? -500 : 300;
-        return{...t,score:base+seededRand(i)*8,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
+      // Never-studied: high base priority, shuffled so user doesn't always see same order
+      if(!t.lastStudied||t.conf===0){
+        return{...t,score:300+seededRand(i)*8,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
       }
 
       const daysSince=Math.max(0,Math.ceil((sessionDate-new Date(t.lastStudied+'T00:00:00'))/86400000));
@@ -1391,24 +1411,23 @@ function bootApp(fbConfig) {
       const overdueRatio=interval>0?daysSince/interval:daysSince;
       const overdueDays=Math.max(0,daysSince-interval);
 
-      // 1. Forgetting curve score (0–60)
+      // 1. Forgetting curve score (0–60): plateaus to prevent over-dominating
+      //    overdueRatio=1 means right on schedule; >1 = overdue
       const forgetting=Math.min(60, overdueRatio*30);
 
-      // 2. Confidence deficit (0–40)
+      // 2. Confidence deficit (0–40): weak topics need more exposures
       const confDeficit=(5-t.conf)*8;
 
-      // 3. Ease factor penalty (0–14)
+      // 3. Ease factor penalty (0–14): low EF = student finds it intrinsically hard
       const ef=t.easeFactor||2.5;
       const efPenalty=Math.max(0,(2.5-ef)*14);
 
-      // 4. Exam proximity multiplier
+      // 4. Exam proximity multiplier — spikes urgency in final stretch
       const examUrgency=daysLeft<=3?5.0:daysLeft<=7?3.0:daysLeft<=14?1.8:daysLeft<=30?1.3:1.0;
+      // Extra weight for weak topics as exam looms (retrieval practice effect)
       const weakMult=t.conf<=2?1.9:t.conf===3?1.2:1.0;
 
-      let core=(forgetting+confDeficit+efPenalty)*examUrgency*weakMult;
-
-      // Heavy penalty for anything studied today — push to bottom unless exam is imminent
-      if(studiedToday) core = daysLeft<=3 ? core*0.3 : -200;
+      const core=(forgetting+confDeficit+efPenalty)*examUrgency*weakMult;
 
       // Per-topic recommended study mode
       let _mode='review';
@@ -1422,16 +1441,21 @@ function bootApp(fbConfig) {
     if(sorted.length<=n) return sorted;
 
     // ── INTERLEAVED SELECTION ──────────────────────────────
+    // Cap any single confidence tier at 60% of suggestions, then fill from top scores.
+    // This ensures the session mixes urgent/weak topics with more stable ones — mimicking
+    // the beneficial difficulty of interleaved practice in the research literature.
     const maxFromTier=Math.max(1,Math.ceil(n*0.6));
     const tierCount={new:0,low:0,mid:0,high:0};
     const getTier=t=>(!t.lastStudied||!t.conf)?'new':t.conf<=2?'low':t.conf<=3?'mid':'high';
 
     const selected=[];
+    // Pass 1: best-scoring while respecting tier cap
     for(const t of sorted){
       if(selected.length>=n) break;
       const tier=getTier(t);
       if(tierCount[tier]<maxFromTier){selected.push(t);tierCount[tier]++;}
     }
+    // Pass 2: fill any remaining slots from the uncapped top of the list
     for(const t of sorted){
       if(selected.length>=n) break;
       if(!selected.includes(t)) selected.push(t);
@@ -1439,16 +1463,11 @@ function bootApp(fbConfig) {
     return selected.slice(0,n);
   }
 
-  // Per-topic reason string
+  // Per-topic reason string — more precise with SM-2 data
   function suggReason(t,sub){
     const today=new Date();today.setHours(0,0,0,0);
-    const todayStr=toLocalDate(today);
     const daysLeft=Math.max(0,Math.ceil((new Date(sub.examDate)-today)/86400000));
     if(!t.lastStudied||t.conf===0) return'New topic — first exposure builds the memory trace';
-    if(t.lastStudied===todayStr){
-      const next=t.nextReview?`Next review: ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'';
-      return`✓ Studied today${next?' — '+next:''}`;
-    }
     const daysSince=t._daysSince??Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000));
     const interval=t._interval??getDefaultInterval(t.conf);
     const overdueRatio=t._overdueRatio??daysSince/Math.max(1,interval);
@@ -1628,14 +1647,13 @@ function bootApp(fbConfig) {
       if(sub){
         const t=sub.topics.find(t=>t.id===tid);
         if(t){
-          const today=new Date().toISOString().split('T')[0];
-          t.lastStudied=today;
+          t.lastStudied=new Date().toISOString().split('T')[0];
+          // Ensure SM-2 fields are initialised on first encounter
+          if(!t.easeFactor) t.easeFactor=2.5;
+          if(!t.repetitions) t.repetitions=0;
+          if(t.interval===undefined||t.interval===null) t.interval=1;
           if(!t.studyCount) t.studyCount=0;
           t.studyCount++;
-          // Run SM-2 to set nextReview. Use conf-based quality if rated, else neutral (3).
-          // This ensures the topic won't resurface tomorrow if it was just studied.
-          const q=t.conf>0?confToQuality(t.conf):3;
-          sm2Update(t,q);
         }
       }
     }
@@ -1826,14 +1844,27 @@ function bootApp(fbConfig) {
     set('pref-topicsPerSess',p.topicsPerSess);
     set('pref-focusLen',p.focusLen);
     set('pref-breakLen',p.breakLen);
-    // sync pomodoro inputs to prefs
     document.getElementById('pfoc').value=p.focusLen;
     document.getElementById('pbrk').value=p.breakLen;
-    // render study day toggles
     document.querySelectorAll('.day-tog').forEach(btn=>{
       const day=parseInt(btn.dataset.day);
       btn.classList.toggle('on',p.studyDays.includes(day));
     });
+    // ── Theme picker ──
+    const currentTheme=localStorage.getItem('rv_theme')||'dark';
+    const picker=document.getElementById('themePicker');
+    if(picker){
+      picker.innerHTML=Object.entries(THEMES).map(([id,t])=>`
+        <div class="theme-swatch${id===currentTheme?' sel':''}" data-theme="${id}" onclick="applyTheme('${id}')"
+          style="background:${t.bg};color:${t.text};border-color:${id===currentTheme?t.text:'transparent'}">
+          <div class="ts-dots">
+            <div class="ts-dot" style="background:${t.accent}"></div>
+            <div class="ts-dot" style="background:${t.accent2}"></div>
+            <div class="ts-dot" style="background:${t.surface2};border:1px solid ${t.border}"></div>
+          </div>
+          <div class="ts-name" style="color:${t.text}">${t.name}</div>
+        </div>`).join('');
+    }
   }
   window.toggleStudyDay=function(day){
     const p=getPrefs();
