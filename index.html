@@ -1089,10 +1089,10 @@ function bootApp(fbConfig) {
     } catch(e) { console.warn('Firebase init failed:', e); }
   }
 
-  let S = JSON.parse(localStorage.getItem('rv4')||'null') || { subjects:[], sessions:{}, ci:0 };
+  let S = JSON.parse(localStorage.getItem('rv4')||'null') || { subjects:[], sessions:{}, ci:0, lastSelectedDates:{} };
   let currentUser = null, firestoreUnsub = null, saveTimer = null, ignoreSnap = false;
 
-  function setSyncDot(state) { const el = document.getElementById('syncDot'); if(el) { el.classList.remove('synced','syncing','error'); el.classList.add(state); } }
+  function setSyncDot(state) { const el = document.getElementById('syncDot'); if(el && state) { el.classList.remove('synced','syncing','error'); el.classList.add(state); } }
 
   function scheduleSave() {
     if (!currentUser || !db) { localStorage.setItem('rv4', JSON.stringify(S)); return; }
@@ -1374,7 +1374,7 @@ function bootApp(fbConfig) {
         const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
         // Score: urgency dominates, rotation prevents lock-out, overdue adds burst priority
         // ── RECENCY PENALTY: Prevent same subjects from appearing on consecutive days ──
-        const lastSelectedDate=sub._lastSelectedDate;
+        const lastSelectedDate=(S.lastSelectedDates||{})[sub.id];
         const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
         let recencyPenalty=1.0;
         if(lastSel===0) recencyPenalty=0.05;  // Selected today: 95% penalty
@@ -1642,7 +1642,7 @@ function bootApp(fbConfig) {
   }
 
   window.toggleExp=function(k){const e=document.getElementById('exp-'+k);e.style.display=e.style.display==='block'?'none':'block';};
-  window.toggleDone=function(k){const sd=S.sessions[k]||{};if(sd.completedAt){delete S.sessions[k];}else{const parts=k.split('_');const subjectId=parts[0];const date=parts[1];const sub=S.subjects.find(s=>s.id===subjectId);if(sub)sub._lastSelectedDate=date;S.sessions[k]={...sd,completedAt:new Date().toISOString()};tk('Session complete ✓',true);}save();renderSessions();renderProgress();renderSubjects();};
+  window.toggleDone=function(k){const sd=S.sessions[k]||{};if(sd.completedAt){delete S.sessions[k];}else{const parts=k.split('_');const subjectId=parts[0];const date=parts[1];S.lastSelectedDates=S.lastSelectedDates||{};S.lastSelectedDates[subjectId]=date;S.sessions[k]={...sd,completedAt:new Date().toISOString()};tk('Session complete ✓',true);}save();renderSessions();renderProgress();renderSubjects();};
   window.toggleTopic=function(k,tid,sid){
     if(!S.sessions[k])S.sessions[k]={};
     const sd=S.sessions[k];
