@@ -116,307 +116,222 @@ textarea.cfg:focus{border-color:var(--accent);}
 .btn-p{background:var(--accent);color:#0e0e0f;}
 .btn-p:hover{background:#d4f870;transform:translateY(-1px);}
 .btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.btn-g:hover{color:var(--text);border-color:var(--muted);}
-.btn-d{background:transparent;color:var(--danger);border:1px solid var(--border);padding:4px 10px;font-size:0.66rem;}
-.btn-d:hover{border-color:var(--danger);background:rgba(245,100,100,0.08);}
-.btn-sm{padding:6px 12px;font-size:0.68rem;}
+.btn-g:hover{border-color:var(--accent);color:var(--accent);}
+.btn-sm{padding:7px 12px;font-size:0.7rem;}
 
 /* ── MAIN APP ── */
-.app{max-width:940px;margin:0 auto;padding:32px 20px 100px;}
-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:38px;gap:16px;flex-wrap:wrap;}
-.logo{font-family:'Instrument Serif',serif;font-size:2.9rem;line-height:1;letter-spacing:-2px;}
-.logo span{color:var(--accent);}
-.tagline{font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;font-weight:500;}
-.auth-area{display:flex;align-items:center;gap:10px;}
-.auth-btn{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 15px;cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;}
-.auth-btn:hover{border-color:var(--accent);}
-.auth-btn img{width:18px;height:18px;border-radius:50%;}
-.auth-label{font-size:0.76rem;font-weight:600;color:var(--text);}
-.auth-sub{font-size:0.64rem;color:var(--muted);}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background 0.3s;}
-.sync-dot.syncing{background:var(--accent3);animation:pulse 1s infinite;}
-.sync-dot.synced{background:var(--accent);}
-.sync-dot.err{background:var(--danger);}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#mainApp{display:none;min-height:100vh;display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr auto;}
+#mainApp.visible{display:grid;}
 
-.tabs{display:flex;gap:4px;background:var(--surface);padding:4px;border-radius:var(--r);border:1px solid var(--border);margin-bottom:26px;}
-.tab{flex:1;padding:10px 6px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.76rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.2s;}
-.tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 8px rgba(0,0,0,0.4);}
-.tab:hover:not(.active){color:var(--text);}
-.day-tog{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
-.day-tog.on{background:rgba(200,245,100,0.1);border-color:var(--accent);color:var(--accent);}
-.page{display:none;}.page.active{display:block;}
-.stitle{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:13px;font-weight:600;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;}
-.fg{display:flex;flex-direction:column;gap:7px;}
-.fg label{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;}
-input[type="text"],input[type="date"],input[type="number"],textarea:not(.cfg){background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;width:100%;}
-textarea:not(.cfg){resize:vertical;min-height:70px;line-height:1.5;}
-input:focus,textarea:not(.cfg):focus{border-color:var(--accent);}
-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
-.swatches{display:flex;gap:7px;flex-wrap:wrap;}
-.sw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;}
-.sw:hover{transform:scale(1.15);}
-.sw.on{border-color:var(--text);transform:scale(1.1);}
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);}
+.hdr-left{display:flex;align-items:center;gap:16px;}
+.hdr-logo{font-family:'Instrument Serif',serif;font-size:1.4rem;letter-spacing:-1px;font-weight:700;}
+.hdr-logo span{color:var(--accent);}
+.hdr-nav{display:flex;gap:2px;}
+.tab{padding:8px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;border-bottom:2px solid transparent;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+#authBtn{background:transparent;border:none;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.8rem;padding:6px 12px;border-radius:8px;transition:all 0.15s;}
+#authBtn:hover{background:var(--surface2);}
+#authContent{display:flex;align-items:center;gap:8px;}
+#authContent img{width:24px;height:24px;border-radius:50%;}
+.auth-label{font-weight:700;font-size:0.8rem;}
+.auth-sub{display:none;}
+#syncDot{width:8px;height:8px;border-radius:50%;background:transparent;transition:background 0.3s;}
+#syncDot.syncing{background:var(--accent2);animation:pulse 1s infinite;}
+#syncDot.synced{background:var(--accent);}
+#syncDot.err{background:var(--danger);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
-.sg{display:grid;gap:9px;}
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
-.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
-.sc-h{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none;}
-.sc-dot{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.95rem;}
-.sc-info{flex:1;min-width:0;}
-.sc-name{font-size:0.92rem;font-weight:700;margin-bottom:3px;}
-.sc-meta{font-size:0.71rem;color:var(--muted);display:flex;gap:11px;flex-wrap:wrap;}
-.dbadge{font-family:'DM Mono',monospace;font-size:0.68rem;padding:3px 8px;border-radius:20px;font-weight:500;flex-shrink:0;}
-.du{background:rgba(245,100,100,0.15);color:var(--danger);}
-.ds{background:rgba(245,166,100,0.15);color:var(--accent3);}
-.do{background:rgba(200,245,100,0.15);color:var(--accent);}
-.dp{background:rgba(100,200,245,0.15);color:var(--accent2);}
-.chev{color:var(--muted);font-size:0.72rem;transition:transform 0.2s;flex-shrink:0;margin-left:4px;}
-.sc.open .chev{transform:rotate(180deg);}
-.tp{border-top:1px solid var(--border);padding:14px 18px 18px;display:none;}
-.sc.open .tp{display:block;}
-.tlist{display:grid;gap:6px;margin-bottom:12px;}
-.trow{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:9px 12px;flex-wrap:wrap;}
-.trow-name{font-size:0.83rem;font-weight:600;flex:1;min-width:120px;}
-.conf5{display:flex;gap:3px;align-items:center;}
-.c5btn{padding:5px 0;width:36px;border-radius:6px;font-size:0.58rem;font-weight:700;cursor:pointer;border:1px solid var(--border);transition:all 0.15s;text-align:center;font-family:'Syne',sans-serif;line-height:1.3;background:var(--surface);color:var(--muted);}
-.c5btn:hover{border-color:var(--muted);color:var(--text);}
-.c5btn.on{border-color:transparent;}
-.l1{}.l2{}.l3{}.l4{}.l5{}
-.l1:hover,.l1.on{background:rgba(220,50,50,0.25);color:#ff6b6b;border-color:rgba(220,50,50,0.5);}
-.l2:hover,.l2.on{background:rgba(245,130,60,0.25);color:#f5923c;border-color:rgba(245,130,60,0.5);}
-.l3:hover,.l3.on{background:rgba(245,200,60,0.25);color:#e8c040;border-color:rgba(245,200,60,0.5);}
-.l4:hover,.l4.on{background:rgba(140,220,80,0.25);color:#8edc50;border-color:rgba(140,220,80,0.5);}
-.l5:hover,.l5.on{background:rgba(80,220,120,0.25);color:#50dc78;border-color:rgba(80,220,120,0.5);}
-.l1.on{box-shadow:0 0 0 2px rgba(220,50,50,0.3);}
-.l2.on{box-shadow:0 0 0 2px rgba(245,130,60,0.3);}
-.l3.on{box-shadow:0 0 0 2px rgba(245,200,60,0.3);}
-.l4.on{box-shadow:0 0 0 2px rgba(140,220,80,0.3);}
-.l5.on{box-shadow:0 0 0 2px rgba(80,220,120,0.3);}
-.add-tr{display:flex;gap:8px;}.add-tr input{flex:1;}
+/* Main content */
+.main{overflow-y:auto;padding:20px;}
+.page{display:none;}
+.page.active{display:block;}
 
-.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
-.dlabel{font-family:'Instrument Serif',serif;font-size:1.3rem;letter-spacing:-0.5px;}
-.dnav{display:flex;gap:6px;}
-.dnav button{background:var(--surface);border:1px solid var(--border);color:var(--text);height:31px;padding:0 10px;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;}
-.dnav button:hover{border-color:var(--accent);color:var(--accent);}
-.wstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px;}
-.wd{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.15s;}
-.wd:hover{border-color:var(--muted);}
-.wd.sel{border-color:var(--accent);background:rgba(200,245,100,0.07);}
-.wd.tod .wdn{color:var(--accent);font-weight:700;}
-.wdl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;font-weight:600;}
-.wdn{font-family:'DM Mono',monospace;font-size:0.9rem;}
-.wdd{display:flex;justify-content:center;gap:2px;margin-top:4px;min-height:5px;}
-.wdot{width:5px;height:5px;border-radius:50%;}
-.slist{display:grid;gap:9px;}
-.eday{background:var(--surface);border:1px dashed var(--border);border-radius:var(--r);padding:34px;text-align:center;color:var(--muted);}
-.eday .ej{font-size:1.7rem;margin-bottom:9px;}
-.eday p{font-size:0.82rem;}
+/* ── SCHEDULE PAGE ── */
+.day-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:20px;}
+.day-btn{padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--muted);cursor:pointer;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;white-space:nowrap;transition:all 0.15s;}
+.day-btn:hover{border-color:var(--accent);}
+.day-btn.sel{background:var(--accent);color:#0e0e0f;border-color:var(--accent);}
+.day-btn.today{border-color:var(--accent2);}
 
-.sess{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;}
-.sess::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
-.sess.done{opacity:0.5;}.sess.done .stit{text-decoration:line-through;}
-.sess-main{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;}
-.sck{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;background:transparent;color:transparent;font-size:0.78rem;margin-top:2px;}
-.sck:hover{border-color:var(--accent);}
+/* Sessions */
+#slist{display:grid;gap:16px;}
+.due-banner{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.due-banner-stat{display:flex;align-items:center;gap:6px;}
+.due-banner-num{font-size:1.2rem;font-weight:700;color:var(--accent);}
+.due-banner-num.warn{color:var(--danger);}
+.due-banner-lbl{font-size:0.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.due-banner-div{width:1px;height:20px;background:var(--border);}
+.due-banner-msg{font-size:0.8rem;color:var(--muted);line-height:1.4;flex:1;}
+.due-banner-msg strong{color:var(--text);}
+.eday{text-align:center;padding:40px 20px;color:var(--muted);}
+.ej{font-size:3rem;margin-bottom:12px;}
+
+.sess{background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.2s;--c:#666;}
+.sess.done{opacity:0.5;}
+.sess-main{display:flex;align-items:flex-start;gap:12px;padding:14px;}
+.sck{width:20px;height:20px;border:2px solid var(--border);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;color:var(--accent);transition:all 0.15s;flex-shrink:0;margin-top:2px;}
 .sess.done .sck{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
 .si{flex:1;min-width:0;}
-.stit{font-size:0.88rem;font-weight:700;margin-bottom:5px;}
-.smeta{font-size:0.71rem;color:var(--muted);display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:6px;}
-.styp{font-family:'DM Mono',monospace;font-size:0.62rem;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.07em;}
-.t-fl{background:rgba(200,245,100,0.1);color:var(--accent);}
-.t-rv{background:rgba(100,200,245,0.1);color:var(--accent2);}
-.t-st{background:rgba(245,166,100,0.1);color:var(--accent3);}
-.sugg-block{background:var(--surface2);border-radius:9px;padding:11px 13px;margin-bottom:2px;}
-.sugg-label{font-size:0.63rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
-.sugg-label span{background:var(--accent);color:#0e0e0f;border-radius:4px;padding:1px 6px;font-size:0.6rem;}
-.sugg-rows{display:grid;gap:5px;}
-.sugg-row{display:flex;align-items:center;gap:9px;padding:6px 8px;background:var(--surface);border-radius:7px;border:1px solid var(--border);}
-.sugg-row.sugg-sel{flex-direction:column;align-items:stretch;border-color:var(--accent);background:rgba(200,245,100,0.04);}
-.sugg-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
-.sugg-diff{display:flex;align-items:center;gap:7px;padding:7px 2px 2px;margin-top:2px;flex-wrap:wrap;}
-.sdiff-lbl{font-size:0.61rem;color:var(--muted);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;white-space:nowrap;flex-shrink:0;}
-.sdiff-cur{font-size:0.65rem;font-weight:700;margin-left:3px;}
-.diff-rate-section{background:var(--surface2);border-radius:9px;padding:11px 13px;margin-bottom:12px;}
-.diff-rate-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.diff-rate-row:last-child{border-bottom:none;padding-bottom:0;}
-.diff-tname{font-size:0.8rem;font-weight:600;flex:1;min-width:100px;}
+.stit{font-size:0.95rem;font-weight:700;margin-bottom:4px;}
+.smeta{display:flex;gap:8px;flex-wrap:wrap;font-size:0.75rem;color:var(--muted);margin-bottom:8px;}
+.styp{font-weight:700;padding:2px 8px;border-radius:6px;background:var(--surface);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.05em;}
+.styp.t-fl{background:rgba(200,245,100,0.15);color:var(--accent);}
+.styp.t-rv{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.styp.t-st{background:rgba(245,166,100,0.15);color:var(--accent3);}
+.study-tip{font-size:0.8rem;color:var(--muted);line-height:1.5;margin:10px 0;padding:10px;background:var(--bg);border-left:2px solid var(--border);border-radius:4px;}
+.urgent-banner{background:rgba(245,100,100,0.15);border-left:3px solid var(--danger);padding:10px;margin:10px 0;font-size:0.8rem;color:var(--text);}
 
-/* ── MODE / STATUS BADGES ── */
-.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;flex-shrink:0;}
-.mode-first{background:rgba(200,245,100,0.13);color:var(--accent);}
-.mode-practice{background:rgba(245,100,100,0.13);color:var(--danger);}
-.mode-review{background:rgba(100,200,245,0.13);color:var(--accent2);}
-.mode-test{background:rgba(245,166,100,0.13);color:var(--accent3);}
+.sugg-block{margin:12px 0;}
+.sugg-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;display:flex;gap:6px;align-items:center;}
+.sugg-label span{background:var(--surface);padding:2px 6px;border-radius:4px;font-size:0.65rem;color:var(--accent);}
+.sugg-rows{display:grid;gap:10px;}
+.sugg-row{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;transition:all 0.15s;cursor:pointer;}
+.sugg-row:hover{border-color:var(--accent);}
+.sugg-row.sugg-sel{background:rgba(200,245,100,0.08);border-color:var(--accent);}
+.sugg-top{display:flex;align-items:flex-start;gap:10px;}
+.sugg-name{font-size:0.85rem;font-weight:700;margin-bottom:3px;}
+.sugg-reason{font-size:0.75rem;color:var(--muted);line-height:1.4;}
+.nxt-rev{font-size:0.75rem;color:var(--accent2);}
+.nxt-rev.overdue{color:var(--danger);}
+.mode-badge{font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.03em;background:var(--surface);}
+.mode-first{background:rgba(200,245,100,0.15);color:var(--accent);}
+.mode-practice{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.mode-review{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.mode-test{background:rgba(245,166,100,0.15);color:var(--accent3);}
+.sib{background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:700;transition:all 0.15s;}
+.sib:hover{border-color:var(--accent);color:var(--accent);}
+.sib.on{background:var(--accent);color:#0e0e0f;border-color:var(--accent);}
+.sa{display:flex;gap:6px;}
 
-/* ── URGENT BANNER & STUDY TIP ── */
-.urgent-banner{background:rgba(245,100,100,0.07);border:1px solid rgba(245,100,100,0.22);border-radius:8px;padding:8px 12px;font-size:0.77rem;color:var(--danger);margin:5px 0 8px;line-height:1.5;}
-.study-tip{font-size:0.72rem;color:var(--muted);line-height:1.55;margin:2px 0 9px;padding:7px 11px;background:var(--surface2);border-radius:7px;border-left:2px solid var(--border);}
-.nxt-rev{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+.sugg-diff{background:var(--surface);border-radius:8px;padding:10px;margin-top:8px;font-size:0.75rem;}
+.sdiff-lbl{display:block;margin-bottom:6px;color:var(--muted);font-weight:700;}
+.sdiff-cur{font-size:0.8rem;margin-left:8px;font-weight:700;}
 
-/* ── DUE-TODAY BANNER ── */
-.due-banner{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.18);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.due-banner-stat{display:flex;flex-direction:column;align-items:center;min-width:44px;}
-.due-banner-num{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:500;line-height:1;color:var(--accent);}
-.due-banner-num.warn{color:var(--danger);}
-.due-banner-lbl{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:2px;}
-.due-banner-div{width:1px;height:30px;background:var(--border);}
-.due-banner-msg{font-size:0.79rem;color:var(--muted);flex:1;line-height:1.5;}
-
-/* ── CHIP STATUS DOTS ── */
-.chip-dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:4px;vertical-align:middle;flex-shrink:0;}
-.chip-dot-new{background:var(--accent);box-shadow:0 0 4px var(--accent);}
-.chip-dot-due{background:var(--accent3);}
+.sess-exp{display:none;padding:14px;border-top:1px solid var(--border);background:var(--bg);}
+.sess-exp.open{display:block;}
+.tp-pick{margin:12px 0;padding:12px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--c);}
+.tp-pl{font-size:0.8rem;font-weight:700;color:var(--muted);}
+.tchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.tchip{background:var(--bg);border:1px solid var(--border);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:0.75rem;font-weight:700;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
+.tchip:hover{border-color:var(--accent);}
+.tchip.on{background:var(--accent);color:#0e0e0f;border-color:var(--accent);}
+.chip-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+.chip-dot-new{background:var(--accent);}
+.chip-dot-due{background:var(--accent2);}
 .chip-dot-overdue{background:var(--danger);}
 
-/* ── PROGRESS: SM-2 HEALTH ── */
-.health-bar-w{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin:8px 0 4px;}
-.health-bar{height:100%;border-radius:4px;transition:width 0.5s ease;}
-.forecast-row{display:flex;gap:4px;margin-top:10px;}
-.fc-day{flex:1;background:var(--surface2);border-radius:7px;padding:7px 4px;text-align:center;min-width:0;}
-.fc-day-lbl{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
-.fc-day-num{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;line-height:1.2;margin:2px 0;}
-.fc-day-sub{font-size:0.56rem;color:var(--muted);}
-.fc-day.has-due .fc-day-num{color:var(--accent);}
-.fc-day.overloaded .fc-day-num{color:var(--accent3);}
-.ef-chip{font-family:'DM Mono',monospace;font-size:0.65rem;padding:2px 7px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);}
-.retention-pct{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;line-height:1;}
+.diff-rate-section{background:var(--surface2);padding:12px;border-radius:10px;margin:12px 0;}
+.nlbl{font-size:0.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+.diff-rate-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.diff-rate-row:last-child{border-bottom:none;}
+.diff-tname{font-size:0.8rem;font-weight:700;flex:1;}
+.conf5{display:flex;gap:3px;}
+.c5btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:0.7rem;font-weight:700;transition:all 0.15s;}
+.c5btn:hover{border-color:var(--accent);}
+.c5btn.on{background:var(--accent);border-color:var(--accent);color:#0e0e0f;}
+.c5btn.l1{color:var(--danger);}
+.c5btn.l1.on{background:var(--danger);}
+.c5btn.l2{color:#ff8c42;}
+.c5btn.l2.on{background:#ff8c42;}
+.c5btn.l3{color:var(--accent3);}
+.c5btn.l3.on{background:var(--accent3);}
+.c5btn.l4{color:var(--accent2);}
+.c5btn.l4.on{background:var(--accent2);}
+.c5btn.l5{color:var(--accent);}
+.c5btn.l5.on{background:var(--accent);}
 
-/* ── MASTERY ROW ── */
-.mastery-row{display:flex;gap:10px;flex-wrap:wrap;background:var(--surface2);border-radius:9px;padding:11px 14px;margin:10px 0;}
-.mastery-stat{display:flex;flex-direction:column;align-items:center;flex:1;min-width:50px;}
-.mastery-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;line-height:1.1;color:var(--text);}
-.mastery-lbl{font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px;}
+textarea{width:100%;min-height:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.8rem;resize:vertical;outline:none;}
+textarea:focus{border-color:var(--accent);}
 
-/* ── RETENTION BAR ── */
-.ret-bar{width:60px;height:4px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
-.ret-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+/* Pomodoro modal */
+#pomoOvl{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;}
+#pomoOvl.open{display:flex;}
+.pomo-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;width:100%;max-width:400px;text-align:center;}
+.pomo-title{font-size:1.2rem;font-weight:700;margin-bottom:20px;}
+#ptm{font-size:3rem;font-family:'DM Mono',monospace;font-weight:700;margin:20px 0;}
+#pph{font-size:0.9rem;color:var(--muted);margin-bottom:20px;}
+.pomo-ring{width:120px;height:120px;margin:20px auto;position:relative;}
+.rfl{width:100%;height:100%;border-radius:50%;border:4px solid var(--accent2);stroke-dasharray:0;stroke-dashoffset:0;fill:none;transform:rotate(-90deg);transition:stroke-dashoffset 0.3s linear;}
+.rfl.brk{border-color:var(--accent3);}
+.pomo-btns{display:flex;gap:10px;justify-content:center;margin-top:20px;}
+.pomo-btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;transition:all 0.15s;}
+.pomo-btn-primary{background:var(--accent);color:#0e0e0f;}
+.pomo-btn-primary:hover{background:#d4f870;}
+.pomo-btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.pomo-btn-secondary:hover{border-color:var(--accent);}
+#pdots{display:flex;gap:6px;justify-content:center;margin-top:16px;}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.pdot.dn{background:var(--accent);}
+.pdot.cu{background:var(--accent2);animation:pulse 1s infinite;}
 
-/* ── INSIGHT BOX ── */
-.insight-box{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.16);border-radius:8px;padding:10px 13px;font-size:0.79rem;color:var(--text);line-height:1.55;margin:10px 0;}
-.nxt-rev.overdue{color:var(--danger)!important;}
+/* Edit subject modal */
+#editSubjOvl{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;}
+#editSubjOvl.open{display:flex;}
+.edit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;}
+.edit-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;}
+.edit-section{margin-bottom:16px;}
+.edit-label{font-size:0.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;display:block;}
+.edit-input{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;outline:none;}
+.edit-input:focus{border-color:var(--accent);}
+.edit-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 
-/* ── FORECAST ── */
-.forecast-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;}
+/* Progress page */
+.prog-grid{display:grid;gap:16px;}
+.subj-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:4px solid var(--c);}
+.subj-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.subj-card-title{font-size:0.95rem;font-weight:700;}
+.subj-card-exam{font-size:0.75rem;color:var(--muted);}
+.subj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat{background:var(--bg);padding:8px;border-radius:8px;text-align:center;}
+.stat-num{font-size:1.1rem;font-weight:700;color:var(--accent);}
+.stat-lbl{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.topic-list{display:grid;gap:8px;max-height:200px;overflow-y:auto;}
+.topic-item{background:var(--bg);padding:10px;border-radius:8px;font-size:0.8rem;display:flex;justify-content:space-between;align-items:center;}
+.lstu{font-size:0.7rem;color:var(--muted);margin-top:4px;}
+.conf-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin:6px 0;overflow:hidden;}
+.conf-bar-fill{height:100%;background:var(--accent);transition:width 0.3s;}
+.ret-bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin:4px 0;overflow:hidden;}
+.ret-fill{height:100%;background:var(--accent2);}
+.cb5l{font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.03em;display:inline-block;}
+.cb0{background:rgba(200,245,100,0.15);color:var(--accent);}
+.cb1{background:rgba(245,100,100,0.15);color:var(--danger);}
+.cb2{background:rgba(255,140,66,0.15);color:#ff8c42;}
+.cb3{background:rgba(245,166,100,0.15);color:var(--accent3);}
+.cb4{background:rgba(100,200,245,0.15);color:var(--accent2);}
+.cb5{background:rgba(200,245,100,0.15);color:var(--accent);}
 
-/* ── SCHEDULE ENHANCEMENTS ── */
-.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;flex-shrink:0;}
-.mode-first{background:rgba(200,245,100,0.13);color:var(--accent);}
-.mode-practice{background:rgba(245,100,100,0.13);color:var(--danger);}
-.mode-review{background:rgba(100,200,245,0.13);color:var(--accent2);}
-.mode-test{background:rgba(245,166,100,0.13);color:var(--accent3);}
-.urgent-banner{background:rgba(245,100,100,0.08);border:1px solid rgba(245,100,100,0.2);border-radius:8px;padding:8px 11px;font-size:0.76rem;color:var(--danger);margin:5px 0 6px;line-height:1.5;}
-.study-tip{font-size:0.72rem;color:var(--muted);margin:4px 0 8px;line-height:1.55;background:var(--surface2);border-radius:7px;padding:7px 10px;border-left:2px solid var(--border);}
-.nxt-rev{font-size:0.61rem;color:var(--muted);margin-left:4px;}
-.nxt-rev.overdue{color:var(--danger);}
-.due-pill{font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(245,100,100,0.13);color:var(--danger);border:1px solid rgba(245,100,100,0.2);white-space:nowrap;}
-.due-pill-ok{background:rgba(200,245,100,0.1);color:var(--accent);border-color:rgba(200,245,100,0.2);}
+/* Preferences */
+.pref-section{margin-bottom:24px;}
+.pref-title{font-size:0.95rem;font-weight:700;margin-bottom:12px;color:var(--text);}
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.pref-row:last-child{border-bottom:none;}
+.pref-label{font-size:0.85rem;}
+.pref-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.8rem;outline:none;}
+.pref-input:focus{border-color:var(--accent);}
+.pref-select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.8rem;outline:none;cursor:pointer;}
+.pref-select:focus{border-color:var(--accent);}
+.pref-select option{background:var(--surface);color:var(--text);}
 
-/* ── PROGRESS ENHANCEMENTS ── */
-.ret-bar{width:56px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;flex-shrink:0;}
-.ret-fill{height:100%;border-radius:2px;transition:width 0.4s;}
-.mastery-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
-.mastery-stat{flex:1;text-align:center;}
-.mastery-val{font-family:'DM Mono',monospace;font-size:1.2rem;line-height:1;margin-bottom:2px;}
-.mastery-lbl{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
-.insight-box{background:rgba(200,245,100,0.05);border:1px solid rgba(200,245,100,0.12);border-radius:8px;padding:9px 12px;font-size:0.75rem;color:var(--muted);margin-top:8px;line-height:1.55;}
-.insight-box strong{color:var(--accent);}
-.urgent-banner{background:rgba(245,100,100,0.1);border:1px solid rgba(245,100,100,0.3);border-radius:8px;padding:9px 13px;font-size:0.78rem;color:var(--danger);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
-.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;border-radius:4px;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;flex-shrink:0;}
-.mode-first{background:rgba(100,200,245,0.15);color:var(--accent2);}
-.mode-practice{background:rgba(245,166,100,0.15);color:var(--accent3);}
-.mode-review{background:rgba(200,245,100,0.12);color:var(--accent);}
-.mode-test{background:rgba(160,100,245,0.15);color:#c89cf5;}
-.nxt-rev{font-size:0.63rem;color:var(--muted);margin-top:2px;}
-.mastery-ring{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;}
-.study-tip{background:var(--surface2);border-radius:7px;padding:7px 11px;font-size:0.73rem;color:var(--muted);margin-bottom:10px;line-height:1.5;border-left:2px solid var(--accent);}
-.sugg-name{flex:1;font-size:0.82rem;font-weight:600;}
-.sugg-reason{font-size:0.68rem;color:var(--muted);}
-.cb5l{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;}
-.cb0{background:var(--surface2);color:var(--muted);}
-.cb1{background:rgba(220,50,50,0.2);color:#e05555;}.cb2{background:rgba(245,130,60,0.2);color:#f5823c;}
-.cb3{background:rgba(245,200,60,0.2);color:#e8c040;}.cb4{background:rgba(140,220,80,0.2);color:#8edc50;}
-.cb5{background:rgba(80,220,120,0.2);color:#50dc78;}
-.sa{display:flex;gap:5px;flex-shrink:0;}
-.sib{background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);cursor:pointer;padding:5px 8px;font-size:0.76rem;transition:all 0.15s;}
-.sib:hover,.sib.on{border-color:var(--accent);color:var(--accent);background:rgba(200,245,100,0.07);}
-.sess-exp{border-top:1px solid var(--border);padding:14px 16px;display:none;}
-.tp-pick{margin-bottom:12px;}
-.tp-pl{font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px;}
-.tchips{display:flex;gap:5px;flex-wrap:wrap;}
-.tchip{padding:4px 10px;border-radius:20px;font-size:0.71rem;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all 0.15s;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;}
-.tchip:hover{border-color:var(--muted);color:var(--text);}
-.tchip.on{border-color:var(--c,var(--accent));color:var(--c,var(--accent));background:rgba(200,245,100,0.06);}
-.nlbl{font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px;}
+/* Toast */
+#toast{position:fixed;bottom:20px;left:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:0.8rem;color:var(--text);opacity:0;transition:opacity 0.3s;z-index:999;max-width:300px;}
+#toast.show{opacity:1;}
+#toast.ac{background:var(--accent);color:#0e0e0f;border-color:var(--accent);}
 
-.pg{display:grid;gap:12px;}
-.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden;}
-.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--accent));}
-.pch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:11px;}
-.pcn{font-size:0.96rem;font-weight:700;margin-bottom:3px;}
-.pcs{display:flex;gap:15px;flex-wrap:wrap;}
-.sv{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:500;line-height:1;margin-bottom:3px;}
-.sl{font-size:0.61rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
-.pbar-w{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-bottom:12px;}
-.pbar{height:100%;border-radius:4px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);}
-.tbd{margin-top:14px;border-top:1px solid var(--border);padding-top:12px;}
-.tbd-t{font-size:0.63rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px;}
-.tbr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.tbn{font-size:0.81rem;flex:1;}
-.lstu{font-size:0.67rem;color:var(--muted);}
-.conf-bar{width:80px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;flex-shrink:0;}
-.conf-bar-fill{height:100%;border-radius:3px;transition:width 0.4s;}
-.struggle-box{background:rgba(245,100,100,0.07);border:1px solid rgba(245,100,100,0.18);border-radius:8px;padding:9px 12px;font-size:0.77rem;color:var(--danger);margin-top:8px;}
-
-.ovl{position:fixed;inset:0;background:rgba(0,0,0,0.74);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
-.ovl.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;animation:mIn 0.22s ease;}
-@keyframes mIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-.mt{font-family:'Instrument Serif',serif;font-size:1.4rem;letter-spacing:-0.5px;}
-.mcl{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.mcl:hover{color:var(--text);border-color:var(--muted);}
-.pbox{background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:13px;}
-.prw{position:relative;width:86px;height:86px;margin:0 auto 10px;}
-.prw svg{transform:rotate(-90deg);}
-.rbg{fill:none;stroke:var(--border);stroke-width:6;}
-.rfl{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.5s;}
-.rfl.brk{stroke:var(--accent2);}
-.rinn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ptm{font-family:'DM Mono',monospace;font-size:1.25rem;line-height:1;}
-.pph{font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px;font-weight:600;}
-.pctl{display:flex;gap:7px;justify-content:center;margin:10px 0;}
-.pset{display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap;}
-.pset label{font-size:0.63rem;color:var(--muted);letter-spacing:0.07em;text-transform:uppercase;font-weight:600;}
-.pset input{width:50px;padding:6px 7px;font-size:0.8rem;text-align:center;}
-.pdots{display:flex;gap:4px;justify-content:center;margin-top:9px;}
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all 0.3s;}
-.pdot.dn{background:var(--accent);}.pdot.cu{background:var(--accent);box-shadow:0 0 5px var(--accent);}
-
-.es{text-align:center;padding:48px 20px;color:var(--muted);}
-.es .be{font-size:2.6rem;margin-bottom:13px;}
-.es p{font-size:0.83rem;line-height:1.6;max-width:300px;margin:0 auto;}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 17px;font-size:0.81rem;transform:translateY(60px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:10000;max-width:260px;box-shadow:0 8px 28px rgba(0,0,0,0.5);}
-.toast.show{transform:translateY(0);opacity:1;}.toast.ac{border-color:var(--accent);}
-
-/* ── THEME PICKER ── */
-.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:4px;}
-.theme-swatch{border-radius:10px;padding:12px 12px 10px;cursor:pointer;border:2px solid transparent;transition:all 0.18s;position:relative;}
-.theme-swatch:hover{transform:translateY(-2px);}
-.theme-swatch.sel{border-color:var(--text);}
-.theme-swatch.sel::after{content:'✓';position:absolute;top:6px;right:8px;font-size:0.7rem;font-weight:700;}
-.ts-dots{display:flex;gap:4px;margin-bottom:8px;}
-.ts-dot{width:14px;height:14px;border-radius:50%;}
-.ts-name{font-size:0.72rem;font-weight:700;}
-  .ob-card{padding:24px 20px;}
-  .subject-picker-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
-  .edrow{flex-wrap:wrap;}.edrow input[type="date"]{width:100%;}
-  .logo{font-size:2.2rem;}
-  .tab{font-size:0.67rem;padding:8px 4px;}
-  .conf5{flex-wrap:wrap;gap:4px;}
-  .auth-sub{display:none;}
+/* Responsive */
+@media(max-width:768px){
+  .hdr{flex-direction:column;gap:10px;align-items:flex-start;}
+  .hdr-nav{flex-wrap:wrap;}
+  .day-strip{gap:6px;}
+  .day-btn{padding:8px 12px;font-size:0.7rem;}
+  .sess-main{flex-direction:column;}
+  .sa{width:100%;justify-content:flex-end;}
+  .subj-stats{grid-template-columns:repeat(2,1fr);}
+  .pomo-card{max-width:90vw;}
+  .edit-card{max-width:90vw;}
 }
 </style>
 </head>
@@ -455,658 +370,129 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:
       <div class="ob-heading">Let's get you set up.</div>
       <p class="ob-sub">We'll build your personalised revision plan in 3 quick steps — picking your qualification level, subjects, and exam dates. Takes about 2 minutes.</p>
       <div class="ob-actions">
-        <button class="btn btn-p" onclick="obNext()">Get started →</button>
-      </div>
+        <button class="btn btn-p" onclick="obNext()">Get started →</button></div>
     </div>
 
-    <!-- STEP 1: Level -->
+    <!-- STEP 1: Level + Board -->
     <div class="ob-step" id="ob1">
-      <div class="ob-heading">What level are you studying?</div>
-      <p class="ob-sub">Choose your qualification and exam board.</p>
-      <div class="big-choice" style="margin-bottom:24px">
-        <div class="big-btn" id="lvlGCSE" onclick="pickLevel('GCSE')">
-          <div class="bb-title">GCSE</div>
-          <div class="bb-sub">CCEA · Northern Ireland</div>
-        </div>
-        <div class="big-btn" id="lvlALevel" onclick="pickLevel('A-Level')">
-          <div class="bb-title">A-Level</div>
-          <div class="bb-sub">CCEA · Northern Ireland</div>
-        </div>
-      </div>
+      <div class="ob-heading">What are you studying?</div>
+      <p class="ob-sub">We'll tailor your schedule based on your qualification level.</p>
+      <div class="big-choice" id="levelChoice"></div>
       <div class="ob-actions">
-        <button class="btn btn-g" onclick="obBack()">← Back</button>
-        <button class="btn btn-p" onclick="obNext()">Next →</button>
-      </div>
+        <button class="btn btn-g" onclick="obPrev()">← Back</button>
+        <button class="btn btn-p" onclick="obNext()" id="nextBtn1" disabled>Next →</button></div>
     </div>
 
     <!-- STEP 2: Subjects -->
     <div class="ob-step" id="ob2">
-      <div class="ob-heading">Which subjects are you taking?</div>
-      <p class="ob-sub">Select all that apply. We'll pre-load the official CCEA topics for each one.</p>
-      <div class="subject-picker-grid" id="subjectPicker"></div>
+      <div class="ob-heading">Pick your subjects</div>
+      <p class="ob-sub">Select all the subjects you're studying. You can add more later.</p>
+      <div class="subject-picker-grid" id="subjectGrid"></div>
       <div class="ob-actions">
-        <button class="btn btn-g" onclick="obBack()">← Back</button>
-        <button class="btn btn-p" onclick="obNext()">Next →</button>
-      </div>
+        <button class="btn btn-g" onclick="obPrev()">← Back</button>
+        <button class="btn btn-p" onclick="obNext()" id="nextBtn2" disabled>Next →</button></div>
     </div>
 
-    <!-- STEP 3: Units & Exam Dates -->
+    <!-- STEP 3: Exam Dates -->
     <div class="ob-step" id="ob3">
-      <div class="ob-heading">Which units are you still sitting?</div>
-      <p class="ob-sub">Tick the units you haven't done yet and set a date for each. Untick any you've already completed — they won't be scheduled.</p>
+      <div class="ob-heading">When are your exams?</div>
+      <p class="ob-sub">Set exam dates for each subject. We'll create your study schedule from here.</p>
       <div class="exam-date-list" id="examDateList"></div>
       <div class="ob-actions">
-        <button class="btn btn-g" onclick="obBack()">← Back</button>
-        <button class="btn btn-p" onclick="obNext()">Next →</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: Launch -->
-    <div class="ob-step" id="ob4">
-      <div class="ob-heading">You're all set! 🎉</div>
-      <p class="ob-sub">Your personalised revision plan is ready. Your progress syncs automatically to your Google account across all devices.</p>
-      <div class="ob-actions">
-        <button class="btn btn-g" onclick="obBack()">← Back</button>
-        <button class="btn btn-p" onclick="finishOnboarding()">Launch Revise →</button>
-      </div>
+        <button class="btn btn-g" onclick="obPrev()">← Back</button>
+        <button class="btn btn-p" onclick="obFinish()" id="nextBtn3" disabled>Create schedule →</button></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ══════════════════════════════
      MAIN APP
-══════════════════════════════════════ -->
-<div id="mainApp" style="display:none">
-  <div class="app">
-    <header>
-      <div>
-        <div class="tagline">Evidence-based exam prep</div>
-        <div class="logo">Re<span>vise</span></div>
-      </div>
-      <div class="auth-area">
-        <div class="sync-dot" id="syncDot"></div>
-        <div class="auth-btn" id="authBtn" onclick="handleAuthClick()">
-          <span id="authContent"><span class="auth-label">Sign in with Google</span></span>
-        </div>
-      </div>
-    </header>
-
-    <nav class="tabs">
-      <button class="tab active" onclick="showPage('subjects',this)">Subjects</button>
-      <button class="tab" onclick="showPage('schedule',this)">Schedule</button>
-      <button class="tab" onclick="showPage('progress',this)">Progress</button>
-      <button class="tab" onclick="showPage('prefs',this)">Preferences</button>
-    </nav>
-
-    <!-- SUBJECTS -->
-    <div id="page-subjects" class="page active">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;flex-wrap:wrap;gap:8px">
-        <div class="stitle" style="margin:0">Your subjects</div>
-        <button class="btn btn-g btn-sm" onclick="addCustomSubject()">+ Add custom subject</button>
-      </div>
-      <div class="sg" id="sg">
-        <div class="es"><div class="be">📚</div><p>Loading your subjects…</p></div>
+══════════════════════════════ -->
+<div id="mainApp">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo">Re<span>vise</span></div>
+      <div class="hdr-nav">
+        <button class="tab active" onclick="showPage('schedule',this)">Schedule</button>
+        <button class="tab" onclick="showPage('progress',this)">Progress</button>
+        <button class="tab" onclick="showPage('prefs',this)">Settings</button>
       </div>
     </div>
+    <div class="hdr-right">
+      <div id="syncDot"></div>
+      <button id="authBtn" onclick="handleAuthClick()">
+        <div id="authContent"><span class="auth-label">Sign in with Google</span></div>
+      </button>
+    </div>
+  </div>
 
-    <!-- SCHEDULE -->
-    <div id="page-schedule" class="page">
-      <div class="sh">
-        <div><div class="stitle">Daily sessions</div><div class="dlabel" id="dlabel">Today</div></div>
-        <div class="dnav">
-          <button onclick="changeDay(-1)">←</button>
-          <button onclick="goToday()">Today</button>
-          <button onclick="changeDay(1)">→</button>
-        </div>
-      </div>
-      <div class="wstrip" id="wstrip"></div>
-      <div class="slist" id="slist"></div>
+  <!-- Main content -->
+  <div class="main">
+    <!-- Schedule page -->
+    <div class="page active" id="page-schedule">
+      <div class="day-strip" id="dayStrip"></div>
+      <div id="slist"></div>
     </div>
 
-    <!-- PREFERENCES -->
-    <div id="page-prefs" class="page">
-      <div class="stitle" style="margin-bottom:18px">Preferences</div>
-      <div style="display:grid;gap:14px;max-width:520px">
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Theme</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:14px">Choose a colour scheme. Applied instantly and saved across sessions.</div>
-          <div class="theme-grid" id="themePicker"></div>
-        </div>
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Sessions per day</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Max number of study sessions shown on any single day.</div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <input type="range" id="pref-sessPerDay" min="1" max="12" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
-            <span id="pref-sessPerDay-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:20px;text-align:right"></span>
-          </div>
-        </div>
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Topics suggested per session</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">How many smart-pick topic suggestions appear on each session card.</div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <input type="range" id="pref-topicsPerSess" min="1" max="8" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
-            <span id="pref-topicsPerSess-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:20px;text-align:right"></span>
-          </div>
-        </div>
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Default focus length (minutes)</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Default Pomodoro focus timer length when you open a session.</div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <input type="range" id="pref-focusLen" min="5" max="60" step="5" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
-            <span id="pref-focusLen-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:28px;text-align:right"></span>
-          </div>
-        </div>
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Default break length (minutes)</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:12px">Default Pomodoro break timer length.</div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <input type="range" id="pref-breakLen" min="1" max="20" step="1" style="flex:1;accent-color:var(--accent)" oninput="prefsChanged()">
-            <span id="pref-breakLen-val" style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent);min-width:28px;text-align:right"></span>
-          </div>
-        </div>
-
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Study days</div>
-          <div style="font-size:0.79rem;color:var(--muted);margin-bottom:14px">Sessions will only be scheduled on the days you select. At least one day must be chosen.</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="pref-studyDays">
-            <button class="day-tog" data-day="1" onclick="toggleStudyDay(1)">Mon</button>
-            <button class="day-tog" data-day="2" onclick="toggleStudyDay(2)">Tue</button>
-            <button class="day-tog" data-day="3" onclick="toggleStudyDay(3)">Wed</button>
-            <button class="day-tog" data-day="4" onclick="toggleStudyDay(4)">Thu</button>
-            <button class="day-tog" data-day="5" onclick="toggleStudyDay(5)">Fri</button>
-            <button class="day-tog" data-day="6" onclick="toggleStudyDay(6)">Sat</button>
-            <button class="day-tog" data-day="0" onclick="toggleStudyDay(0)">Sun</button>
-          </div>
-        </div>
-
-        <button class="btn btn-p" onclick="savePrefs()" style="margin-top:4px">Save preferences</button>
-      </div>
+    <!-- Progress page -->
+    <div class="page" id="page-progress">
+      <div class="prog-grid" id="progGrid"></div>
     </div>
 
-    <!-- PROGRESS -->
-    <div id="page-progress" class="page">
-      <div class="stitle">Progress &amp; topic confidence</div>
-      <div class="pg" id="pg">
-        <div class="es"><div class="be">📊</div><p>Complete sessions to track progress here.</p></div>
+    <!-- Preferences page -->
+    <div class="page" id="page-prefs">
+      <div id="prefsContent"></div>
+    </div>
+  </div>
+
+  <!-- Pomodoro modal -->
+  <div id="pomoOvl">
+    <div class="pomo-card">
+      <div class="pomo-title" id="pomoTitle">🍅 Focus</div>
+      <svg class="pomo-ring" viewBox="0 0 100 100">
+        <circle class="rfl" cx="50" cy="50" r="36" id="rfl"></circle>
+      </svg>
+      <div id="ptm">25:00</div>
+      <div id="pph">Round 1/4</div>
+      <div class="pomo-btns">
+        <button class="pomo-btn pomo-btn-primary" onclick="togglePomo()">Start</button>
+        <button class="pomo-btn pomo-btn-secondary" onclick="closePomo()">Close</button>
+      </div>
+      <div id="pdots"></div>
+      <label class="nlbl" style="display:block;margin-top:16px;margin-bottom:8px">Session Notes</label>
+      <textarea id="mnt" placeholder="What did you focus on?"></textarea>
+      <button class="btn btn-g btn-sm" style="margin-top:10px;width:100%" onclick="saveModalNotes()">Save Notes</button>
+    </div>
+  </div>
+
+  <!-- Edit subject modal -->
+  <div id="editSubjOvl">
+    <div class="edit-card">
+      <div class="edit-title">Edit Subject</div>
+      <div class="edit-section">
+        <label class="edit-label">Subject Name</label>
+        <input class="edit-input" type="text" id="editSubjName" placeholder="e.g., Biology">
+      </div>
+      <div class="edit-section">
+        <label class="edit-label">Exam Date</label>
+        <input class="edit-input" type="date" id="editSubjExam">
+      </div>
+      <div class="edit-actions">
+        <button class="btn btn-g" onclick="closeEditSubj()">Cancel</button>
+        <button class="btn btn-p" onclick="saveEditSubj()">Save</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- POMODORO MODAL -->
-<div class="ovl" id="pomoOvl">
-  <div class="modal">
-    <div class="mh"><div class="mt" id="pomoTitle">Focus Session</div><button class="mcl" onclick="closePomo()">✕</button></div>
-    <div class="pbox">
-      <div style="text-align:center">
-        <div class="prw">
-          <svg width="86" height="86" viewBox="0 0 86 86">
-            <circle class="rbg" cx="43" cy="43" r="36"/>
-            <circle class="rfl" id="rfl" cx="43" cy="43" r="36"/>
-          </svg>
-          <div class="rinn"><div class="ptm" id="ptm">25:00</div><div class="pph" id="pph">Focus</div></div>
-        </div>
-        <div class="pdots" id="pdots"></div>
-      </div>
-      <div class="pctl"><button class="btn btn-p" id="pstbtn" onclick="togglePomo()">Start</button><button class="btn btn-g" onclick="resetPomo()">Reset</button></div>
-      <div class="pset">
-        <label>Focus (min)</label><input type="number" id="pfoc" value="25" min="1" max="60" onchange="resetPomo()">
-        <label>Break (min)</label><input type="number" id="pbrk" value="5" min="1" max="30" onchange="resetPomo()">
-        <label>Rounds</label><input type="number" id="prnd" value="4" min="1" max="8" onchange="resetPomo()">
-      </div>
-    </div>
-    <label class="nlbl">Session Notes</label>
-    <textarea id="mnt" placeholder="What did you cover? Any struggles?"></textarea>
-    <button class="btn btn-g btn-sm" style="margin-top:8px" onclick="saveModalNotes()">Save Notes</button>
-  </div>
-</div>
-
-<div class="ovl" id="editSubjOvl">
-  <div class="modal">
-    <div class="mh"><div class="mt">&#x270F;&#xFE0F; Edit Subject</div><button class="mcl" onclick="closeEditSubj()">&#x2715;</button></div>
-    <div style="display:grid;gap:14px;margin-top:4px">
-      <div>
-        <label class="nlbl">Subject name</label>
-        <input type="text" id="esName" maxlength="100" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;outline:none;">
-      </div>
-      <div>
-        <label class="nlbl">Exam date</label>
-        <input type="date" id="esDate" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;outline:none;">
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:18px">
-      <button class="btn btn-p" style="flex:1" onclick="saveEditSubj()">Save changes</button>
-      <button class="btn btn-g" onclick="closeEditSubj()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<!-- Toast -->
+<div id="toast"></div>
 
 <script type="module">
-import { initializeApp }        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, onSnapshot, setDoc }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-// ══════════════════════════════════════════════════════════
-// CCEA CURRICULUM DATABASE
-// ══════════════════════════════════════════════════════════
-const CCEA = {
-  GCSE: [
-    { name:'Mathematics',         emoji:'📐',
-      units:[
-        {id:'u1', name:'Unit 1: Session 1 (Calculator)', topics:['Number','Ratio, Proportion & Rates of Change','Algebra','Geometry & Measures']},
-        {id:'u2', name:'Unit 1: Session 2 (Non-Calculator + Calculator)', topics:['Probability','Statistics','Further Number','Further Algebra','Further Geometry']},
-      ]},
-        { name:'Further Mathematics', emoji:'🔢',
-      units:[
-        {id:'u1', name:'Unit 1: Pure Mathematics (Compulsory)', topics:['Algebra (Polynomials, Factor Theorem, Partial Fractions)','Coordinate Geometry (Lines, Circles, Parabolas)','Sequences & Series (Arithmetic, Geometric, Binomial)','Trigonometry (Identities, Equations, Radians)','Calculus: Differentiation (Rules, Optimisation, Tangents/Normals)','Calculus: Integration (Definite/Indefinite, Area under Curve)','Logarithms & Exponentials','Matrices (2×2, Determinant, Inverse, Transformations)','Numerical Methods (Iteration, Trapezium Rule)']},
-        {id:'u2', name:'Unit 2: Mechanics', topics:['Kinematics (Motion in a Straight Line, Projectiles)','Forces (Newton\'s laws, Connected Particles, Friction)','Moments & Equilibrium','Work, Energy & Power','Impulse & Momentum']},
-        {id:'u3', name:'Unit 3: Statistics', topics:['Data Representation (Histograms, Cumulative Frequency, Box Plots)','Measures of Central Tendency & Spread','Probability (Laws, Conditional, Tree Diagrams)','Discrete & Continuous Distributions (Binomial, Normal)','Hypothesis Testing','Correlation & Regression']},
-        {id:'u4', name:'Unit 4: Discrete & Decision Mathematics', topics:['Logic & Algorithms','Graph Theory (Networks, Shortest Path, Spanning Trees)','Linear Programming','Critical Path Analysis','Recurrence Relations','Coding Theory']},
-      ]},
-    { name:'Biology',             emoji:'🔬',
-      units:[
-        {id:'u1', name:'Unit 1: Cells, Living Processes & Biodiversity', topics:['Cell Structure & Organisation','Biological Molecules','Enzymes & Digestion','Photosynthesis & Respiration','Ecosystems & Biodiversity']},
-        {id:'u2', name:'Unit 2: Body Systems, Genetics & Health', topics:['Osmosis & Plant Transport','The Circulatory System','Reproduction & Fertility','Genetics & DNA','Variation & Natural Selection','Health & Disease']},
-        {id:'u3', name:'Unit 3: Practical Skills', topics:['Practical Techniques','Planning Experiments','Data Analysis','Evaluating Methods']},
-      ]},
-        { name:'Chemistry', emoji:'⚗️',
-      units:[
-        {id:'u1', name:'Unit 1: Structures, Trends, Chemical Reactions, Quantitative Chemistry & Analysis', topics:['1.1 Atomic Structure','1.2 Bonding','1.3 Structures','1.4 Nanoparticles','1.5 Symbols, Formulae & Equations','1.6 The Periodic Table','1.7 Quantitative Chemistry','1.8 Acids, Bases & Salts','1.9 Chemical Analysis','1.10 Solubility']},
-        {id:'u2', name:'Unit 2: Further Chemical Reactions, Rates, Equilibrium, Calculations & Organic Chemistry', topics:['2.1 Metals & the Reactivity Series (Reactions with Air, Water & Acids, Displacement, Extraction of Metals)','2.2 Redox, Rusting & Iron (OIL RIG, Rusting Conditions & Prevention, Extracting Metals)','2.3 Rates of Reaction (Collision Theory, Effect of Temperature/Concentration/Surface Area/Catalysts)','2.4 Equilibrium (Reversible Reactions, Le Chatelier\'s Principle, Industrial Processes)','2.5 Organic Chemistry (Alkanes, Alkenes, Alcohols, Carboxylic Acids, Polymers, Crude Oil & Cracking)','2.6 Electrochemistry (Electrolysis, Half-Equations, Industrial Applications)']},
-        {id:'u3', name:'Unit 3: Practical Skills', topics:['Prescribed Practicals (C1–C9)','Booklet A: Practical Assessment','Booklet B: Written Practical Exam','Planning Experiments','Data Analysis & Evaluation']},
-      ]},
-        { name:'Physics', emoji:'⚡',
-      units:[
-        {id:'u1', name:'Unit 1: Motion, Force, Density & Kinetic Theory, Energy, and Atomic & Nuclear Physics', topics:['1.1 Motion (Distance-Time Graphs, Speed, Velocity, Acceleration, Equations of Motion, Vectors & Scalars)','1.2 Force & Moments (Newton\'s Laws, Friction, Pressure, Moments, Centre of Gravity, Stability)','1.3 Density & Kinetic Theory (States of Matter, Particle Model, Density Calculations)','1.4 Energy (Work Done, Power, KE & GPE, Efficiency, Renewable & Non-Renewable Resources)','1.5 Atomic & Nuclear Physics (Atomic Structure, Radioactive Decay Types, Half-Life, Background Radiation, Fission & Fusion)']},
-        {id:'u2', name:'Unit 2: Waves, Light, Electricity, Magnetism, Electromagnetism & Space Physics', topics:['2.1 Waves (Transverse & Longitudinal, Wave Speed Equation, Sound, Ultrasound, Seismic Waves)','2.2 Light & Optics (Reflection, Refraction, Converging Lenses, Total Internal Reflection, EM Spectrum Uses & Dangers)','2.3 Electricity (Circuit Components, Ohm\'s Law, IV Graphs, Series & Parallel Circuits, Domestic Electricity, Power)','2.4 Magnetism & Electromagnetism (Magnetic Fields, Motor Effect, Induced EMF, Generators, Transformers)','2.5 Space Physics (Solar System, Life Cycle of Stars, The Universe, Red-Shift, Big Bang Theory)']},
-        {id:'u3', name:'Unit 3: Practical Skills', topics:['Prescribed Practicals (P1–P9)','Booklet A: Practical Assessment (2 set practicals carried out in lab)','Booklet B: Written Practical Exam (planning, analysis & evaluation questions)','Data Analysis, Graph Interpretation & Evaluation']},
-      ]},
-        { name:'English Literature', emoji:'📖',
-      units:[
-        {id:'u1', name:'Unit 1: The Study of Prose (1hr 45min)', topics:['Section A: Set Modern Novel (e.g. Lord of the Flies / Of Mice and Men / others — depends on school)','Section B: Unseen 19th Century Prose Extract','Analysing Character, Theme & Setting','Exploring Language, Structure & Form','Historical & Cultural Context']},
-        {id:'u2', name:'Unit 2: The Study of Drama & Poetry (2hrs)', topics:['Section A: Set Modern Drama (e.g. An Inspector Calls / Dancing at Lughnasa / All My Sons / others)','Section B: Poetry Anthology (CCEA prescribed poems)','Comparing Poems','Dramatic Techniques & Stagecraft','Poetic Form, Structure & Language']},
-        {id:'u3', name:'Unit 3: The Study of Shakespeare (External Written Exam — 20%)', topics:['Set Shakespeare Text (chosen by school — e.g. Macbeth, Romeo & Juliet, A Midsummer Night\'s Dream, or others)','Character & Motivation Analysis','Themes, Context & Social/Historical Background','Dramatic Techniques & Stagecraft','Extended analytical response to an unseen question (open book exam)']},
-      ]},
-        { name:'Religious Studies', emoji:'🕊️',
-      units:[
-        {id:'u1', name:'Unit 1: The Christian Church (Catholic & Protestant)', topics:['The Nature & Purpose of the Church','Key Leadership Roles in the Church','Christian Worship (Catholic & Protestant)','Sacraments & Ordinances','Role of the Church in Contemporary Society']},
-        {id:'u2a', name:'Unit 2A: The Christian Church — Catholic Focus', topics:['Catholic Church Structure & Leadership','Catholic Worship & Sacraments','Catholic Social Teaching','Mary & the Saints','Role of the Catholic Church Today']},
-        {id:'u2b', name:'Unit 2B: The Christian Church — Protestant Focus', topics:['Protestant Church Structure & Leadership','Protestant Worship & Ordinances','Protestant Social Action','Reformation & Key Figures','Role of the Protestant Church Today']},
-        {id:'u3', name:'Unit 3: The Revelation of God & the Christian Church', topics:['The Identity of Jesus','The Teaching of Jesus','Miracles of Jesus','The Death & Resurrection of Jesus','The Christian Church & Sacraments']},
-        {id:'u4', name:'Unit 4: Christianity — Gospel of Matthew', topics:['The Identity of Jesus (Matthew)','Jesus the Teacher (Sermon on the Mount)','The Kingdom of God','The Death & Resurrection of Jesus (Matthew)','Christian Discipleship']},
-        {id:'u5', name:'Unit 5: Christianity — Gospel of Mark', topics:['The Identity of Jesus (Mark)','Jesus the Miracle Worker','The Kingdom of God (Mark)','The Death & Resurrection of Jesus (Mark)','The Role & Nature of Christian Discipleship']},
-        {id:'u6', name:'Unit 6: An Introduction to Christian Ethics', topics:['Matters of Life & Death (Abortion, Euthanasia)','Personal Relationships & Family Life','Prejudice & Discrimination','Crime & Punishment','World Poverty','Peace & Conflict']},
-        {id:'u7', name:'Unit 7: An Introduction to Philosophy of Religion', topics:['The Existence of God (Cosmological, Teleological, Ontological Arguments)','The Nature of God','Religious Experience','The Problem of Evil & Suffering','Life After Death']},
-        {id:'u8', name:'Unit 8: Islam', topics:['The Nature & Attributes of Allah','The Life & Significance of Muhammad','The Qur\'an as a Source of Authority','The Five Pillars of Islam','Worship & the Mosque']},
-        {id:'u9', name:'Unit 9: Judaism', topics:['The Nature of God in Judaism','The Torah & Jewish Scriptures','Jewish Worship & Festivals','The Synagogue & Jewish Community','Jewish Ethics & Contemporary Issues']},
-      ]},
-        { name:'French', emoji:'🇫🇷',
-      units:[
-        {id:'u1', name:'Unit 1: Listening', topics:['Context 1 topics: Identity, lifestyle & culture (family, relationships, social media, technology, free time, hobbies, customs & festivals)','Context 2 topics: Local, national & global issues (environment, health & wellbeing, travel, holidays, social & global issues)','Context 3 topics: Education & employment (school life, studies, work experience, future career plans)','Identifying main points, details & opinions from spoken French','Foundation & Higher Tier listening tasks']},
-        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-Play 1 (set by CCEA — based on one of the three contexts)','Role-Play 2 (set by CCEA — based on one of the three contexts)','Conversation Topic 1 (pre-released annually in September — from one context)','Conversation Topic 2 (unprepared — from a different context)','Grammar accuracy & spontaneous communication skills']},
-        {id:'u3', name:'Unit 3: Reading', topics:['Context 1 topics: Identity, lifestyle & culture','Context 2 topics: Local, national & global issues','Context 3 topics: Education & employment','Comprehension questions in English & in French','Translation from French into English']},
-        {id:'u4', name:'Unit 4: Writing', topics:['Short structured tasks (sentences & short paragraphs based on stimulus)','Translation from English into French','Extended writing task (5 paragraphs covering given bullet points)','All three contexts may be tested','Grammar accuracy, range of vocabulary & tenses']},
-      ]},
-        { name:'Technology & Design', emoji:'🔧',
-      units:[
-        {id:'u1', name:'Unit 1: Technology & Design Core Content (Written Exam)', topics:['Designing (Design Process, Communication, Drawing Techniques, CAD)','Manufacturing (Materials, Processes, Tolerances, Quality Control)','Electronic Control Systems (Components, Circuit Design, Logic Gates)','Mechanical Control Systems (Levers, Gears, Pulleys, Cams)','Pneumatic Systems & Control','Computer Control (Flowcharts, Sensors, Feedback)']},
-        {id:'u2a', name:'Unit 2 Option A: Electronic & Microelectronic Control Systems (Written Exam)', topics:['Microelectronic Systems (PICs, Microcontrollers)','Input Transducers & Sensors','Output Transducers (Motors, Buzzers, LEDs)','Signal Processing & Amplification','System Design & Testing','PCB Design & Manufacture']},
-        {id:'u2b', name:'Unit 2 Option B: Mechanical & Pneumatic Control Systems (Written Exam)', topics:['Mechanisms (Gears, Pulleys, Cams, Cranks)','Pneumatic Components & Systems','Structural Analysis','Material Properties & Selection','Systems Integration','Mathematical Calculations for Mechanisms']},
-        {id:'u2c', name:'Unit 2 Option C: Product Design (Written Exam)', topics:['Product Design Process & Innovation','Materials (Properties, Uses, Selection)','Manufacturing Processes for Product Design','Ergonomics & Anthropometrics','Social Responsibility & Sustainability','Market Influences & Product Analysis']},
-        {id:'u3', name:'Unit 3: Design & Manufacturing Project (Controlled Assessment — 40hrs)', topics:['Identifying & Researching a Problem (Brief & Specification)','Generating & Developing Design Ideas','Modelling & Prototyping','Manufacturing a Working Solution','Testing & Evaluation','Design Portfolio Presentation']},
-      ]},
-        { name:'Digital Technology', emoji:'💻',
-      units:[
-        {id:'u1', name:'Unit 1: Digital Technology — Compulsory Core (Written Exam)', topics:['Digital Data (Binary, Data Types, Compression, Encryption)','Software (OS, Applications, Programming Paradigms)','Database Applications (Relational Databases, SQL, Queries)','Spreadsheet Applications (Functions, Macros, Data Modelling)','Computer Hardware (CPU, Memory, Storage, Input/Output)','Network Technologies (Topologies, Protocols, Internet, Wi-Fi)','Cyberspace, Network Security & Data Transfer','Cloud Computing','Ethical, Legal & Environmental Impact of Digital Technology','Digital Applications (Web, Mobile, Emerging Tech)']},
-        {id:'u2', name:'Unit 2: Digital Authoring Concepts — Route A (Written Exam)', topics:['Designing Solutions (User Requirements, Wireframes, Storyboards)','Digital Development Considerations (Accessibility, Usability, Testing)','Multimedia Applications (Images, Audio, Video, Animation)','Multimedia Authoring (HTML/CSS, Software Tools)','Database Development (Entity-Relationship, Normalisation, Forms)','Significance of Testing & Test Plans','Evaluation of Digitally Authored Systems']},
-        {id:'u3', name:'Unit 3: Digital Authoring Practice — Route A (Controlled Assessment)', topics:['Interpreting a Client Brief','Designing a Multimedia or Database Solution','Building & Testing the Solution','Evaluating the Finished Product']},
-        {id:'u4', name:'Unit 4: Digital Development Concepts — Route B (Written Exam)', topics:['Object-Oriented Programming Concepts (Classes, Objects, Inheritance)','Data Structures (Arrays, Lists, Stacks, Queues)','Algorithms & Computational Thinking','File Handling & Data Persistence','User Interface Design for Applications','Testing & Debugging Programs']},
-        {id:'u5', name:'Unit 5: Digital Development Practice — Route B (Controlled Assessment)', topics:['Interpreting a Programming Brief','Designing an Object-Oriented Solution','Implementing & Testing the Program','Evaluating the Solution']},
-      ]},
-    { name:'Double Award Science',emoji:'🧪',
-      units:[
-        {id:'b1', name:'Biology Unit B1: Cells, Living Processes & Biodiversity', topics:['Cell Biology','Enzymes','Photosynthesis & Respiration','Ecosystems']},
-        {id:'b2', name:'Biology Unit B2: Body Systems, Genetics & Health', topics:['Osmosis','Circulatory System','Genetics','Health & Disease']},
-        {id:'c1', name:'Chemistry Unit C1: Structures, Reactions & Analysis', topics:['Atomic Structure','Bonding','Acids & Salts','Quantitative Chemistry']},
-        {id:'c2', name:'Chemistry Unit C2: Further Chemistry & Organic', topics:['Rates','Energetics','Electrochemistry','Organic Chemistry']},
-        {id:'p1', name:'Physics Unit P1: Motion, Energy & Radioactivity', topics:['Forces','Energy','Density','Radioactivity']},
-        {id:'p2', name:'Physics Unit P2: Waves, Electricity & Space', topics:['Waves','Electricity','Magnetism','Space Physics']},
-        {id:'u7', name:'Unit 7: Practical Skills', topics:['Biology Practicals','Chemistry Practicals','Physics Practicals']},
-      ]},
-    { name:'English Language',    emoji:'✍️',
-      units:[
-        {id:'u1', name:'Unit 1: Communication (Reading & Writing)', topics:['Reading for Meaning','Analysing Language & Structure','Writing for Purpose & Audience','Descriptive & Narrative Writing']},
-        {id:'u2', name:'Unit 2: Personal & Imaginative Communication', topics:['Transactional Writing','Speaking & Listening']},
-      ]},
-    { name:'History',             emoji:'🏛️',
-      units:[
-        {id:'u1', name:'Unit 1: International Relations (Written)', topics:['Causes of WWI','Paris Peace Conference','League of Nations','Road to WWII']},
-        {id:'u2', name:'Unit 2: Depth Study (Written)', topics:['Germany 1918–1945','USA 1920–1973','Ireland 1900–1993 — depends on school choice']},
-        {id:'u3', name:'Unit 3: Historical Investigation (Coursework)', topics:['Source Analysis','Historical Enquiry','Presenting Evidence','Evaluation']},
-      ]},
-    { name:'Geography',           emoji:'🌍',
-      units:[
-        {id:'u1', name:'Unit 1: Physical Geography (Written)', topics:['Rivers & Flooding','Coasts','Ecosystems','Atmosphere & Climate Change']},
-        {id:'u2', name:'Unit 2: Human Geography (Written)', topics:['Population','Urbanisation','Development','Tourism']},
-        {id:'u3', name:'Unit 3: Fieldwork Investigation (Coursework)', topics:['Fieldwork Planning','Data Collection','Analysis & Conclusions']},
-      ]},
-    { name:'Business Studies',    emoji:'💼',
-      units:[
-        {id:'u1', name:'Unit 1: Setting Up a Business (Written)', topics:['Business Ownership','Market Research','Marketing Mix','Finance Basics','Business Location']},
-        {id:'u2', name:'Unit 2: Growing as a Business (Written)', topics:['Business Growth','Human Resources','Operations Management','Financial Planning','Business & Economy']},
-      ]},
-    { name:'ICT',                    emoji:'🖥️',
-      units:[
-        {id:'u1', name:'Unit 1: ICT in Context (Written)', topics:['ICT Systems','Networks','Data & Information','Social & Legal Issues']},
-        {id:'u2', name:'Unit 2: Handling Data (Written)', topics:['Databases','Spreadsheets','Data Modelling']},
-        {id:'u3', name:'Unit 3: Coursework', topics:['Practical Task','Documentation','Testing & Evaluation']},
-      ]},
-    { name:'Spanish',             emoji:'🇪🇸',
-      units:[
-        {id:'u1', name:'Unit 1: Listening', topics:['Identity & Culture','Local Area & the Wider World','School & Future Plans','Travel & Tourism']},
-        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-play Scenarios','Photo Card Discussion','General Conversation']},
-        {id:'u3', name:'Unit 3: Reading', topics:['Reading Comprehension','Vocabulary in Context','Inferring Meaning']},
-        {id:'u4', name:'Unit 4: Writing', topics:['Structured Writing Tasks','Translation into Spanish','Extended Writing']},
-      ]},
-    { name:'Irish',               emoji:'🇮🇪',
-      units:[
-        {id:'u1', name:'Unit 1: Listening (Aural)', topics:['Spoken Irish Comprehension','Everyday Contexts']},
-        {id:'u2', name:'Unit 2: Speaking (Oral)', topics:['Role-play','Conversation','Prepared Topics']},
-        {id:'u3', name:'Unit 3: Reading', topics:['Reading Comprehension','Vocabulary']},
-        {id:'u4', name:'Unit 4: Writing', topics:['Structured Writing','Extended Pieces']},
-      ]},
-    { name:'Music',               emoji:'🎵',
-      units:[
-        {id:'u1', name:'Unit 1: Performing', topics:['Solo Performance','Ensemble Performance','Technical Control','Expression']},
-        {id:'u2', name:'Unit 2: Composing', topics:['Composition Portfolio','Use of Notation','Creative Techniques']},
-        {id:'u3', name:'Unit 3: Listening & Appraising (Written)', topics:['Set Works','Aural Analysis','Music Theory','Historical Context']},
-      ]},
-    { name:'Art & Design',        emoji:'🎨',
-      units:[
-        {id:'u1', name:'Unit 1: Portfolio of Work (Coursework)', topics:['Drawing & Painting','3D Work','Printmaking/Photography','Critical Studies','Development Work']},
-        {id:'u2', name:'Unit 2: Externally Set Task', topics:['Preparation Period','Final Piece (10-hour exam)']},
-      ]},
-    { name:'Physical Education',  emoji:'🏃',
-      units:[
-        {id:'u1', name:'Unit 1: Knowledge & Understanding (Written)', topics:['Physical Activity & Health','Anatomy & Physiology','Skill Acquisition','Biomechanics','Psychology in Sport']},
-        {id:'u2', name:'Unit 2: Practical Performance', topics:['Performance in Sport/Activity','Coaching/Leadership Role','Official Role']},
-      ]},
-    { name:'Home Economics',      emoji:'🍽️',
-      units:[
-        {id:'u1', name:'Unit 1: Written Paper', topics:['Nutrition & Dietary Needs','Food Science & Technology','Consumer Studies']},
-        {id:'u2', name:'Unit 2: Practical & Coursework', topics:['Practical Skills','Textile Technology','Family & Child Studies','Investigative Study']},
-      ]},
-  ],
-  'A-Level': [
-    { name:'Mathematics',         emoji:'📐', topics:['Pure 1: Algebra & Functions','Pure 1: Coordinate Geometry','Pure 1: Sequences & Series','Pure 1: Trigonometry','Pure 1: Exponentials & Logarithms','Pure 1: Differentiation','Pure 1: Integration','Pure 2: Further Algebra','Pure 2: Further Calculus','Pure 2: Differential Equations','Statistics: Data Representation','Statistics: Probability','Statistics: Distributions','Mechanics: Kinematics','Mechanics: Forces & Newton\'s Laws','Mechanics: Moments'] },
-    { name:'Further Mathematics', emoji:'🔢', topics:['Complex Numbers','Matrices','Further Vectors','Proof','Further Calculus','Polar Coordinates','Hyperbolic Functions','Further Statistics','Decision Mathematics'] },
-    { name:'Biology',             emoji:'🔬', topics:['AS1: Cell Biology & Biochemistry','AS1: DNA, Genes & Protein Synthesis','AS1: Enzymes','AS2: Organisms & the Environment','AS2: Osmosis & Cell Transport','AS2: Photosynthesis & Respiration','A2 1: Physiology & Ecosystems','A2 1: Homeostasis & Control','A2 2: Genetics, Evolution & Biodiversity','A2 2: Biotechnology','Practical Skills'] },
-    { name:'Chemistry',           emoji:'⚗️', topics:['AS1: Atomic Structure & Bonding','AS1: Periodic Table & Trends','AS1: Organic Chemistry Intro','AS2: Energetics & Equilibria','AS2: Electrochemistry','AS2: Rates of Reaction','A2 1: Further Organic Chemistry','A2 1: Transition Metals','A2 2: Analytical Techniques','A2 2: Synoptic Chemistry','Practical Skills'] },
-    { name:'Physics',             emoji:'⚡', topics:['AS1: Forces & Energy','AS1: Waves','AS1: Electricity','AS2: Circular Motion & Oscillations','AS2: Thermal Physics','AS2: Medical Physics Intro','A2 1: Deformation of Solids','A2 1: Capacitors & AC Circuits','A2 2: Magnetic Fields','A2 2: Nuclear Physics','A2 2: Particle Physics','Practical Skills'] },
-    { name:'English Literature',  emoji:'📖', topics:['AS Poetry','AS Prose','AS Drama','A2 Comparative Study','A2 Shakespeare','A2 Unseen Texts','Internal Assessment (coursework)'] },
-    { name:'History',             emoji:'🏛️', topics:['Germany 1918–1945','The British Empire','Ireland in the 20th Century','USA Civil Rights & Society','Historical Investigation','Synoptic Element'] },
-    { name:'Geography',           emoji:'🌍', topics:['Physical Environments: Rivers','Physical Environments: Coasts','Ecosystems','Population & Urbanisation','Development & Global Issues','AS Fieldwork','A2 Independent Investigation'] },
-    { name:'Business Studies',    emoji:'💼', topics:['Business Objectives & Strategy','Marketing Planning','Financial Planning & Analysis','Human Resource Management','Operations & Supply Chain','The Global Business Environment','Business Decision Making'] },
-    { name:'Economics',           emoji:'📊', topics:['Microeconomics: Markets & Price','Microeconomics: Market Failure','Macroeconomics: National Economy','Macroeconomics: Economic Policy','International Trade','Development Economics','Behavioural Economics'] },
-    { name:'Psychology',          emoji:'🧠', topics:['Research Methods','Social Psychology','Cognitive Psychology','Biological Psychology','Developmental Psychology','Psychopathology','Individual Differences'] },
-    { name:'Religious Studies',   emoji:'🕊️', topics:['Philosophy of Religion','Ethics','New Testament Studies','Old Testament Studies','World Religions','Systematic Theology'] },
-    { name:'Politics',            emoji:'🗳️', topics:['Northern Ireland Politics','UK Government & Parliament','Political Parties & Elections','Rights & Liberties','Comparative Politics','International Relations'] },
-    { name:'ICT / Digital Technology', emoji:'💻', topics:['Systems Analysis & Design','Databases','Networks & Communication','Programming','Software Development','Digital Society & Ethics'] },
-    { name:'Art & Design',        emoji:'🎨', topics:['Personal Investigation','Externally Set Assignment','Critical & Contextual Studies','Practical Portfolio'] },
-    { name:'Music',               emoji:'🎵', topics:['Performing','Composing','Listening & Analysis','Music History','Set Works'] },
-    { name:'French',              emoji:'🇫🇷', topics:['Social Issues & Trends','Political & Artistic Culture','Grammar & Writing','Listening & Reading','Speaking (oral)','Translation'] },
-    { name:'Spanish',             emoji:'🇪🇸', topics:['Social Issues & Trends','Political & Artistic Culture','Grammar & Writing','Listening & Reading','Speaking (oral)','Translation'] },
-    { name:'Irish',               emoji:'🇮🇪', topics:['Oral Irish','Written Irish','Aural Comprehension','Literature & Culture','Translation'] },
-    { name:'Physical Education',  emoji:'🏃', topics:['Anatomy & Physiology','Skill Acquisition & Performance','Psychology of Sport','Biomechanics','Contemporary Issues','Practical Performance'] },
-    { name:'Home Economics',      emoji:'🍽️', topics:['Human Nutrition & Dietetics','Food Science & Technology','Consumer Studies','Textiles','Research & Investigative Study'] },
-  ]
-};
-
-const COLORS=['#c8f564','#64c8f5','#f5a664','#f564a0','#a064f5','#64f5c8','#f5e664','#f56464','#64a0f5','#c864f5'];
-const CLABEL=['','Lost','Shaky','Getting it','Almost there','Nailed it'];
-const CCLASS=['cb0','cb1','cb2','cb3','cb4','cb5'];
-const CCOLOR=['#7a7a82','#e05555','#f5823c','#e8c040','#8edc50','#50dc78'];
-const CSHORT=['','1','2','3','4','5'];
-
-// ══════════════════════════════════════════════════════════
-// THEMING
-// ══════════════════════════════════════════════════════════
-const THEMES = {
-  dark:    { name:'Dark',    bg:'#0e0e0f', surface:'#161618', surface2:'#1e1e21', border:'#2a2a2e', accent:'#c8f564', accent2:'#64c8f5', accent3:'#f5a664', text:'#f0efe8', muted:'#7a7a82' },
-  oled:    { name:'OLED',    bg:'#000000', surface:'#0d0d0d', surface2:'#141414', border:'#232323', accent:'#c8f564', accent2:'#64c8f5', accent3:'#f5a664', text:'#f5f5f0', muted:'#6a6a72' },
-  slate:   { name:'Slate',   bg:'#0d1117', surface:'#161b22', surface2:'#1c2230', border:'#2d3748', accent:'#79c0ff', accent2:'#56d364', accent3:'#ffa657', text:'#e6edf3', muted:'#6e7681' },
-  forest:  { name:'Forest',  bg:'#0c1210', surface:'#141c18', surface2:'#1b2620', border:'#263328', accent:'#4ade80', accent2:'#34d399', accent3:'#fbbf24', text:'#ecfdf5', muted:'#6b7c71' },
-  ocean:   { name:'Ocean',   bg:'#090f1a', surface:'#111827', surface2:'#192132', border:'#243450', accent:'#38bdf8', accent2:'#818cf8', accent3:'#fb923c', text:'#e2f0ff', muted:'#64748b' },
-  midnight:{ name:'Midnight',bg:'#0f0a1e', surface:'#17102e', surface2:'#1f183d', border:'#2e2650', accent:'#a78bfa', accent2:'#f472b6', accent3:'#34d399', text:'#ede9fe', muted:'#7c6fa0' },
-  mocha:   { name:'Mocha',   bg:'#12100e', surface:'#1c1816', surface2:'#241f1b', border:'#3a3028', accent:'#f97316', accent2:'#fb923c', accent3:'#fbbf24', text:'#fef3e2', muted:'#897060' },
-  rose:    { name:'Rose',    bg:'#110d0f', surface:'#1c1418', surface2:'#251b21', border:'#3a2832', accent:'#f472b6', accent2:'#e879f9', accent3:'#fb7185', text:'#fce7f3', muted:'#8a6070' },
-};
-
-function applyTheme(id) {
-  const t = THEMES[id] || THEMES.dark;
-  const root = document.documentElement.style;
-  root.setProperty('--bg',       t.bg);
-  root.setProperty('--surface',  t.surface);
-  root.setProperty('--surface2', t.surface2);
-  root.setProperty('--border',   t.border);
-  root.setProperty('--accent',   t.accent);
-  root.setProperty('--accent2',  t.accent2);
-  root.setProperty('--accent3',  t.accent3);
-  root.setProperty('--text',     t.text);
-  root.setProperty('--muted',    t.muted);
-  localStorage.setItem('rv_theme', id);
-  // update picker selection if it's rendered
-  document.querySelectorAll('.theme-swatch').forEach(el => {
-    el.classList.toggle('sel', el.dataset.theme === id);
-  });
-}
-window.applyTheme = applyTheme;
-
-// Apply saved theme immediately on load (before anything renders)
-applyTheme(localStorage.getItem('rv_theme') || 'dark');
-
-// ══════════════════════════════════════════════════════════
-// ONBOARDING STATE
-// ══════════════════════════════════════════════════════════
-let obStep = 0;
-let obLevel = '';
-let obSelected = new Set();
-const OB_STEPS = 5; // 0–4
-
-function obRenderProgress() {
-  const p = document.getElementById('obProgress');
-  p.innerHTML = Array.from({length: OB_STEPS}, (_,i) =>
-    `<div class="ob-pip${i < obStep ? ' done' : i === obStep ? ' active' : ''}"></div>`
-  ).join('');
-}
-
-window.obNext = function() {
-  if (obStep === 1 && !obLevel) return tk('Please choose a level');
-  if (obStep === 2 && obSelected.size === 0) return tk('Pick at least one subject');
-  if (obStep === 3) {
-    // Check every ticked unit has a date
-    const inputs = document.querySelectorAll('#examDateList input[type="date"]');
-    const today = new Date(); today.setHours(0,0,0,0);
-    let hasAny = false;
-    for (const inp of inputs) {
-      hasAny = true;
-      if (!inp.value) {
-        const unitLabel = inp.closest('.unit-row')?.querySelector('.unit-label')?.textContent || 'a unit';
-        return tk(`Enter an exam date for: ${unitLabel.split(':')[0]}`);
-      }
-      if (new Date(inp.value) <= today) {
-        return tk('All exam dates must be in the future');
-      }
-    }
-    if (!hasAny) return tk('Tick at least one unit you still need to sit');
-  }
-  obStep++; obGo();
-};
-
-window.obBack = function() { obStep = Math.max(0, obStep - 1); obGo(); };
-
-function obGo() {
-  document.querySelectorAll('.ob-step').forEach((el,i) => el.classList.toggle('active', i === obStep));
-  obRenderProgress();
-  if (obStep === 2) renderSubjectPicker();
-  if (obStep === 3) renderExamDateList();
-}
-
-window.pickLevel = function(level) {
-  obLevel = level;
-  document.getElementById('lvlGCSE').classList.toggle('sel', level === 'GCSE');
-  document.getElementById('lvlALevel').classList.toggle('sel', level === 'A-Level');
-};
-
-function renderSubjectPicker() {
-  const grid = document.getElementById('subjectPicker');
-  const subjects = CCEA[obLevel] || [];
-  grid.innerHTML = subjects.map(s => {
-    const isSel = obSelected.has(s.name);
-    return `<div class="sp-item${isSel?' sel':''}" onclick="toggleSubjectPick('${esc(s.name)}')">
-      <span class="sp-emoji">${s.emoji}</span>
-      <span class="sp-name">${esc(s.name)}</span>
-      <span class="sp-check">${isSel?'✓':''}</span>
-    </div>`;
-  }).join('');
-}
-
-window.toggleSubjectPick = function(name) {
-  if (obSelected.has(name)) obSelected.delete(name);
-  else obSelected.add(name);
-  renderSubjectPicker();
-};
-
-// Track which units are ticked (subjectName -> Set of unitIds)
-let obUnitChecked = {};
-// Track entered exam dates (subjectName -> unitId -> dateString)
-let obUnitDates = {};
-
-function saveDateInputs() {
-  document.querySelectorAll('#examDateList input[type="date"]').forEach(inp => {
-    const sn = inp.dataset.subject, uid = inp.dataset.unit;
-    if (!sn || !uid) return;
-    if (!obUnitDates[sn]) obUnitDates[sn] = {};
-    obUnitDates[sn][uid] = inp.value;
-  });
-}
-
-function getExamEntriesForSubject(preset) {
-  if (Array.isArray(preset?.units) && preset.units.length) {
-    return preset.units.map(u => ({ ...u, synthetic: false }));
-  }
-
-  if (Array.isArray(preset?.topics) && preset.topics.length) {
-    return [{
-      id: 'full-subject',
-      name: 'Full subject',
-      topics: preset.topics,
-      synthetic: true,
-    }];
-  }
-
-  return [];
-}
-
-function renderExamDateList() {
-  // Save any currently-typed dates before rebuilding HTML
-  saveDateInputs();
-
-  const list = document.getElementById('examDateList');
-  const today = new Date().toISOString().split('T')[0];
-
-  // Init unit check state — all units checked by default on first render
-  [...obSelected].forEach(name => {
-    const preset = (CCEA[obLevel]||[]).find(x => x.name === name);
-    if (!preset) return;
-    if (!obUnitChecked[name]) {
-      obUnitChecked[name] = new Set(getExamEntriesForSubject(preset).map(entry => entry.id));
-    }
-  });
-
-  list.innerHTML = [...obSelected].map(name => {
-    const preset = (CCEA[obLevel]||[]).find(x => x.name === name) || {emoji:'📚', units:[], topics:[]};
-    const units = getExamEntriesForSubject(preset);
-    const unitRows = units.map(u => {
-      const isChecked = (obUnitChecked[name]||new Set()).has(u.id);
-      const savedDate = (obUnitDates[name]||{})[u.id] || '';
-      return `<div class="unit-row${!isChecked?' done-unit':''}">
-        <div class="unit-toggle${isChecked?' checked':''}" onclick="toggleUnit('${esc(name)}','${u.id}')">${isChecked?'✓':''}</div>
-        <div class="unit-label">${esc(u.name)}</div>
-        <div class="unit-date-wrap">
-          ${isChecked
-            ? `<input type="date" min="${today}"
-                data-subject="${esc(name)}" data-unit="${u.id}"
-                value="${savedDate}"
-                placeholder="Exam date">`
-            : `<span class="unit-done-badge">Already done</span>`
-          }
-        </div>
-      </div>`;
-    }).join('');
-    return `<div class="subj-unit-block">
-      <div class="subj-unit-header">
-        <span class="subj-unit-emoji">${preset.emoji}</span>
-        <span class="subj-unit-name">${esc(name)}</span>
-      </div>
-      <div class="unit-rows">${unitRows}</div>
-    </div>`;
-  }).join('');
-}
-
-window.toggleUnit = function(subjectName, unitId) {
-  if (!obUnitChecked[subjectName]) obUnitChecked[subjectName] = new Set();
-  if (obUnitChecked[subjectName].has(unitId)) obUnitChecked[subjectName].delete(unitId);
-  else obUnitChecked[subjectName].add(unitId);
-  renderExamDateList();
-};
-
-window.finishOnboarding = function() {
-  // Save any dates currently visible in the DOM, then use obUnitDates as source of truth
-  saveDateInputs();
-  const unitDateMap = obUnitDates;
-
-  // Build one subject entry per unit that has been ticked & given a date
-  const subjects = [];
-  let colorIdx = 0;
-  [...obSelected].forEach(name => {
-    const preset = (CCEA[obLevel]||[]).find(s => s.name === name) || {emoji:'📚', units:[], topics:[]};
-    const checkedUnits = obUnitChecked[name] || new Set();
-    getExamEntriesForSubject(preset).forEach(u => {
-      if (!checkedUnits.has(u.id)) return; // skip already-done units
-      const examDate = (unitDateMap[name]||{})[u.id];
-      if (!examDate) return; // skip undated (validation catches this)
-      subjects.push({
-        id: 'sub_'+Date.now()+'_'+colorIdx,
-        name: u.synthetic ? name : name + ' — ' + u.name,
-        examDate,
-        color: COLORS[colorIdx % COLORS.length],
-        emoji: preset.emoji,
-        level: obLevel,
-        parentSubject: name,
-        topics: (u.topics||[]).map((t,j) => ({id:'t_'+Date.now()+'_'+colorIdx+'_'+j, name:t, conf:0, lastStudied:null}))
-      });
-      colorIdx++;
-    });
-  });
-
-  const newState = { subjects, sessions:{}, ci: colorIdx % COLORS.length };
-  localStorage.setItem('rv4', JSON.stringify(newState));
-  localStorage.setItem('rv_ob_done', '1');
-
-  document.getElementById('onboarding').classList.remove('visible');
-  document.getElementById('mainApp').style.display = 'block';
-  bootApp(FIREBASE_CONFIG);
-};
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
 // ══════════════════════════════════════════════════════════
 // BOOT
@@ -1214,180 +600,140 @@ function bootApp(fbConfig) {
     else signInWithPopup(auth, new GoogleAuthProvider()).catch(e => tk('Sign-in failed'));
   };
 
-  // ── SM-2 SPACED REPETITION ENGINE ────────────────────
-  // Based on the SM-2 algorithm (SuperMemo 2), the gold standard for spaced repetition.
-  // Each topic tracks: interval (days), easeFactor (≥1.3), repetitions, nextReview.
-  // Reference: Wozniak, P.A. (1990). "Optimization of learning"
-  function sm2Update(topic, quality) {
-    // quality: 0=complete fail, 1=recalled wrong, 3=hard pass, 4=correct+hesitation, 5=perfect
-    if (!topic.easeFactor) topic.easeFactor = 2.5;
-    if (!topic.repetitions) topic.repetitions = 0;
-    if (!topic.interval) topic.interval = 0;
-    if (quality < 3) {
-      // Failed — reset to short interval (but keep EF for now, it updates below)
-      topic.repetitions = 0;
-      topic.interval = 1;
-    } else {
-      // Passed — graduated interval increase
-      if (topic.repetitions === 0) topic.interval = 1;
-      else if (topic.repetitions === 1) topic.interval = 6;
-      else topic.interval = Math.max(1, Math.round(topic.interval * topic.easeFactor));
-      topic.repetitions++;
+  const COLORS=['#c8f564','#64c8f5','#f5a664','#f564c8','#64f5c8'];
+  const CCLASS=['cb0','cb1','cb2','cb3','cb4','cb5'];
+  const CLABEL=['New','Struggling','Weak','OK','Strong','Mastered'];
+  const CSHORT=['?','1','2','3','4','5'];
+  const CCOLOR=['#aaa','#f56464','#ff8c42','#f5a664','#64c8f5','#c8f564'];
+
+  function toLocalDate(d){const s=d.toISOString().split('T')[0];return s;}
+  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+  let tT;
+  window.tk=function(msg,ac=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(ac?' ac':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);};
+
+  // ── ONBOARDING ──────────────────────────────────────────
+  const SUBJECTS_PRESET={
+    'GCSE':{
+      'English Language':{emoji:'📖',topics:['Paper 1: Reading','Paper 2: Writing','Speaking & Listening']},
+      'English Literature':{emoji:'📚',topics:['Poetry Anthology','Prose Texts','Drama Texts']},
+      'Mathematics':{emoji:'🔢',topics:['Number','Algebra','Geometry','Statistics','Probability']},
+      'Biology':{emoji:'🧬',topics:['Cell Biology','Organisation','Infection & Response','Bioenergetics','Homeostasis','Inheritance','Ecology']},
+      'Chemistry':{emoji:'⚗️',topics:['Atomic Structure','Bonding','Stoichiometry','Energetics','Kinetics','Equilibrium','Redox','Thermodynamics']},
+      'Physics':{emoji:'⚛️',topics:['Energy','Waves','Electricity','Magnetism','Forces','Motion','Thermodynamics']},
+      'History':{emoji:'🏛️',topics:['Medieval Period','Early Modern','Industrial Revolution','20th Century','Modern Era']},
+      'Geography':{emoji:'🌍',topics:['Physical Geography','Human Geography','Geographical Skills']},
+      'French':{emoji:'🇫🇷',topics:['Speaking','Listening','Reading','Writing']},
+      'Spanish':{emoji:'🇪🇸',topics:['Speaking','Listening','Reading','Writing']},
+      'German':{emoji:'🇩🇪',topics:['Speaking','Listening','Reading','Writing']},
+      'Religious Studies':{emoji:'✝️',topics:['Christianity','Islam','Judaism','Buddhism','Ethics']},
+      'Computer Science':{emoji:'💻',topics:['Programming','Data Representation','Networks','Cyber Security','Algorithms']},
+      'Art & Design':{emoji:'🎨',topics:['Drawing','Painting','Sculpture','Photography','Textiles']},
+      'Music':{emoji:'🎵',topics:['Performance','Composition','Listening','Music Technology']},
+      'PE':{emoji:'⚽',topics:['Anatomy','Physiology','Sports Psychology','Coaching']},
+      'Business':{emoji:'💼',topics:['Enterprise','Marketing','Operations','Finance','People Management']},
+    },
+    'A-Level':{
+      'English Language':{emoji:'📖',topics:['Phonology','Morphology','Syntax','Semantics','Pragmatics','Discourse']},
+      'English Literature':{emoji:'📚',topics:['Poetry','Prose','Drama','Critical Theory']},
+      'Mathematics':{emoji:'🔢',topics:['Pure Mathematics','Statistics','Mechanics']},
+      'Further Mathematics':{emoji:'🔢',topics:['Complex Numbers','Matrices','Vectors','Differential Equations']},
+      'Biology':{emoji:'🧬',topics:['Cells','Biochemistry','Genetics','Evolution','Ecology','Physiology']},
+      'Chemistry':{emoji:'⚗️',topics:['Physical Chemistry','Organic Chemistry','Inorganic Chemistry','Analytical Chemistry']},
+      'Physics':{emoji:'⚛️',topics:['Mechanics','Waves','Thermodynamics','Electricity','Magnetism','Nuclear Physics']},
+      'History':{emoji:'🏛️',topics:['British History','European History','World History','Historiography']},
+      'Geography':{emoji:'🌍',topics:['Physical Systems','Human Systems','Global Challenges','Geographical Methods']},
+      'French':{emoji:'🇫🇷',topics:['Grammar','Vocabulary','Culture','Literature']},
+      'Spanish':{emoji:'🇪🇸',topics:['Grammar','Vocabulary','Culture','Literature']},
+      'German':{emoji:'🇩🇪',topics:['Grammar','Vocabulary','Culture','Literature']},
+      'Religious Studies':{emoji:'✝️',topics:['Philosophy of Religion','Ethics','Comparative Religion']},
+      'Computer Science':{emoji:'💻',topics:['Algorithms','Programming','Data Structures','Networks','Security']},
+      'Psychology':{emoji:'🧠',topics:['Cognition','Development','Behaviour','Research Methods']},
+      'Sociology':{emoji:'👥',topics:['Culture','Socialisation','Institutions','Social Inequality']},
+      'Economics':{emoji:'💰',topics:['Microeconomics','Macroeconomics','International Economics','Development']},
+      'Business':{emoji:'💼',topics:['Strategy','Marketing','Finance','Operations','HR']},
+      'Law':{emoji:'⚖️',topics:['Criminal Law','Civil Law','Constitutional Law','Jurisprudence']},
+      'Art & Design':{emoji:'🎨',topics:['Fine Art','Graphic Design','Photography','3D Design']},
+      'Music':{emoji:'🎵',topics:['Performance','Composition','Music Technology','Analysis']},
+      'PE':{emoji:'⚽',topics:['Exercise Physiology','Biomechanics','Sports Psychology','Coaching']},
     }
-    // EF update (SM-2 formula, floored at 1.3 to prevent degenerate intervals)
-    topic.easeFactor = Math.max(1.3, topic.easeFactor + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-    // Set the next review date
-    const nxt = new Date(); nxt.setDate(nxt.getDate() + topic.interval);
-    topic.nextReview = nxt.toISOString().split('T')[0];
+  };
+
+  let obLevel='',obSubjects=[],obExamDates={};
+
+  function obRenderProgress(){
+    const steps=4;
+    const current=parseInt(document.querySelector('.ob-step.active')?.id.slice(2)||'0');
+    document.getElementById('obProgress').innerHTML=Array.from({length:steps},(_,i)=>`<div class="ob-pip${i<current?'done':i===current?'active':''}"></div>`).join('');
   }
 
-  // Map user's 1-5 confidence rating to SM-2 quality scale (0-5)
-  // 1=Lost→0, 2=Shaky→1, 3=Getting it→3, 4=Almost there→4, 5=Nailed it→5
-  function confToQuality(conf) { return [0,0,1,3,4,5][conf] ?? 0; }
-
-  // Best-guess interval for a topic with no SM-2 history yet (based on conf alone)
-  function getDefaultInterval(conf) { return [0,1,2,5,12,21][conf] ?? 1; }
-
-  // ── SUBJECTS ──────────────────────────────────────────
-  window.addCustomSubject = function() {
-    const name = prompt('Subject name:'); if (!name) return;
-    const date = prompt('Exam date (YYYY-MM-DD):'); if (!date) return;
-    const today = new Date(); today.setHours(0,0,0,0);
-    if (new Date(date) <= today) return tk('Date must be in the future');
-    S.subjects.push({ id:''+Date.now(), name:name.trim(), examDate:date, color:COLORS[S.ci%COLORS.length], emoji:'📚', topics:[] });
-    S.ci = (S.ci+1)%COLORS.length;
-    save(); renderSubjects(); tk('Subject added ✓', true);
-  };
-
-  window.rmSubject = function(id) {
-    if (!confirm('Remove this subject?')) return;
-    S.subjects = S.subjects.filter(s=>s.id!==id);
-    Object.keys(S.sessions).filter(k=>k.startsWith(id+'_')).forEach(k=>delete S.sessions[k]);
-    save(); renderSubjects(); renderProgress();
-  };
-
-  window.toggleCard = function(id) { document.getElementById('sc-'+id)?.classList.toggle('open'); };
-
-  window.addTopic = function(sid) {
-    const inp = document.getElementById('ti-'+sid); const n = inp.value.trim(); if(!n)return;
-    const sub = S.subjects.find(s=>s.id===sid); if(!sub)return;
-    sub.topics.push({id:''+Date.now(),name:n,conf:0,lastStudied:null});
-    save(); inp.value=''; renderSubjects();
-    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
-  };
-
-  window.rmTopic = function(sid,tid) {
-    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
-    sub.topics=sub.topics.filter(t=>t.id!==tid);
-    save(); renderSubjects();
-    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
-  };
-
-  window.setConf = function(sid,tid,level) {
-    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
-    const t=sub.topics.find(t=>t.id===tid); if(!t)return;
-    t.conf=(t.conf===level)?0:level;
-    save(); renderSubjects(); renderProgress();
-    setTimeout(()=>document.getElementById('sc-'+sid)?.classList.add('open'),8);
-  };
-
-  window.setTopicDiff = function(sid,tid,level,k) {
-    const sub=S.subjects.find(s=>s.id===sid); if(!sub)return;
-    const t=sub.topics.find(t=>t.id===tid); if(!t)return;
-    t.conf=(t.conf===level)?0:level;
-    // Run SM-2 when a rating is set (not when toggled off)
-    if(t.conf>0) sm2Update(t, confToQuality(t.conf));
-    save(); renderSessions(); renderProgress();
-    if(k) setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);
-  };
-
-  function renderSubjects() {
-    const grid = document.getElementById('sg');
-    if (!S.subjects.length) { grid.innerHTML='<div class="es"><div class="be">📚</div><p>No subjects yet. Use "Add custom subject" to add one.</p></div>'; return; }
-    const today=new Date(); today.setHours(0,0,0,0);
-    const sorted=[...S.subjects].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
-    grid.innerHTML=sorted.map(sub=>{
-      const exam=new Date(sub.examDate);
-      const days=Math.ceil((exam-today)/86400000);
-      const bc=days<=7?'du':days<=14?'ds':days<=30?'do':'dp';
-      const schd=genSched(sub);
-      const done=schd.filter(s=>S.sessions[sk(s)]?.completedAt).length;
-      const examStr=exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-      const rated=sub.topics.filter(t=>t.conf>0);
-      const avg=rated.length?Math.round(rated.reduce((a,t)=>a+t.conf,0)/rated.length*10)/10:0;
-
-      const topicsHtml=sub.topics.length
-        ?sub.topics.map(t=>`<div class="trow">
-          <div class="trow-name">${esc(t.name)}</div>
-          ${t.conf>0?`<span class="cb5l ${CCLASS[t.conf]}">${CLABEL[t.conf]}</span>`:`<span class="cb5l cb0" style="opacity:0.5">Unrated</span>`}
-          <button class="btn btn-d" style="padding:3px 7px;font-size:0.58rem" onclick="rmTopic('${sub.id}','${t.id}')">✕</button>
-        </div>`).join('')
-        :'<div style="font-size:0.79rem;color:var(--muted);padding:3px 0 7px">No topics yet.</div>';
-
-      return `<div class="sc" id="sc-${sub.id}" style="--c:${sub.color}">
-        <div class="sc-h" onclick="toggleCard('${sub.id}')">
-          <div class="sc-dot" style="background:${sub.color}1a;color:${sub.color}">${sub.emoji}</div>
-          <div class="sc-info">
-            <div class="sc-name">${esc(sub.name)}${sub.level?` <span style="font-size:0.6rem;color:var(--muted);font-weight:400">${sub.level}</span>`:''}</div>
-            <div class="sc-meta">
-              <span>📅 ${examStr}</span>
-              <span>📋 ${done}/${schd.length}</span>
-              <span>🏷 ${sub.topics.length} topics</span>
-              ${avg>0?`<span style="color:${CCOLOR[Math.round(avg)]}">avg ${avg}/5</span>`:''}
-            </div>
-          </div>
-          <span class="dbadge ${bc}">${days===1?'1 day':days+' days'}</span>
-          <button class="btn btn-g btn-sm" onclick="event.stopPropagation();openEditSubj('${sub.id}')">Edit</button>
-          <button class="btn btn-d btn-sm" onclick="event.stopPropagation();rmSubject('${sub.id}')">Remove</button>
-          <span class="chev">▾</span>
-        </div>
-        <div class="tp">
-          <div class="stitle" style="margin-bottom:9px">Topics <span style="font-size:0.62rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">— rate difficulty on the Schedule page after studying</span></div>
-          <div class="tlist">${topicsHtml}</div>
-          <div class="add-tr">
-            <input type="text" id="ti-${sub.id}" placeholder="Add a topic" maxlength="80" onkeydown="if(event.key==='Enter')addTopic('${sub.id}')">
-            <button class="btn btn-p btn-sm" onclick="addTopic('${sub.id}')">+ Topic</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+  function obShowStep(n){
+    document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('ob'+n).classList.add('active');
+    obRenderProgress();
   }
 
-  // ── SCHEDULE GEN ──────────────────────────────────────
-  const toLocalDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  // Build the list of all valid study dates from today up to a horizon
-  function buildValidDates(horizon=365){
-    const today=new Date();today.setHours(0,0,0,0);
-    const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
-    const dates=[];
-    for(let i=0;i<horizon;i++){
-      const dt=new Date(today);dt.setDate(today.getDate()+i);
-      if(studyDays.includes(dt.getDay()))dates.push(toLocalDate(dt));
+  window.obNext=function(){
+    const current=parseInt(document.querySelector('.ob-step.active').id.slice(2));
+    if(current===0){obShowStep(1);return;}
+    if(current===1){
+      if(!obLevel){tk('Please select a qualification level');return;}
+      const grid=document.getElementById('levelChoice');
+      grid.innerHTML=Object.keys(SUBJECTS_PRESET[obLevel]).map(name=>`<div class="big-btn${obSubjects.includes(name)?' sel':''}" onclick="obSelectSubject('${name}')">${SUBJECTS_PRESET[obLevel][name].emoji} <div class="bb-title">${name}</div></div>`).join('');
+      obShowStep(2);return;
     }
-    return dates;
-  }
-
-  // For a subject, determine the session type based on how many completed sessions it has
-  function sessTypeForCount(n){
-    const types=['first','review','review','test','review','test','review','test','review','test'];
-    return types[Math.min(n,types.length-1)];
-  }
-
-  // Generate one session entry per valid study date for a subject
-  function genSched(sub){
-    const today=new Date();today.setHours(0,0,0,0);
-    const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
-    if(exam<=today)return[];
-    const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
-    const dates=[];
-    const totalDays=Math.ceil((exam-today)/86400000);
-    for(let i=0;i<totalDays;i++){
-      const dt=new Date(today);dt.setDate(today.getDate()+i);
-      if(studyDays.includes(dt.getDay()))dates.push(toLocalDate(dt));
+    if(current===2){
+      if(!obSubjects.length){tk('Please select at least one subject');return;}
+      const list=document.getElementById('examDateList');
+      list.innerHTML=obSubjects.map(name=>`<div class="subj-unit-block"><div class="subj-unit-header"><span class="subj-unit-emoji">${SUBJECTS_PRESET[obLevel][name].emoji}</span><span class="subj-unit-name">${name}</span></div><div class="unit-rows"><div class="unit-row"><label class="unit-label">${name} Exam</label><div class="unit-date-wrap"><input type="date" id="exam-${name}" value="${obExamDates[name]||''}" onchange="obExamDates['${name}']=this.value"></div></div></div></div>`).join('');
+      obShowStep(3);return;
     }
-    return dates.map((date,i)=>({date,subjectId:sub.id,type:sessTypeForCount(i),idx:i}));
-  }
+  };
 
+  window.obPrev=function(){
+    const current=parseInt(document.querySelector('.ob-step.active').id.slice(2));
+    obShowStep(Math.max(0,current-1));
+  };
+
+  window.obSelectLevel=function(lv){obLevel=lv;document.querySelectorAll('.big-btn').forEach(b=>b.classList.toggle('sel',b.textContent.includes(lv)));document.getElementById('nextBtn1').disabled=!obLevel;};
+
+  window.obSelectSubject=function(name){
+    const idx=obSubjects.indexOf(name);
+    if(idx>-1)obSubjects.splice(idx,1);
+    else obSubjects.push(name);
+    const grid=document.getElementById('levelChoice');
+    grid.innerHTML=Object.keys(SUBJECTS_PRESET[obLevel]).map(n=>`<div class="big-btn${obSubjects.includes(n)?' sel':''}" onclick="obSelectSubject('${n}')">${SUBJECTS_PRESET[obLevel][n].emoji} <div class="bb-title">${n}</div></div>`).join('');
+    document.getElementById('nextBtn2').disabled=!obSubjects.length;
+  };
+
+  window.obFinish=function(){
+    if(!obSubjects.every(s=>obExamDates[s])){tk('Please set exam dates for all subjects');return;}
+    const subjects=[];let colorIdx=0;
+    obSubjects.forEach(name=>{
+      const preset=SUBJECTS_PRESET[obLevel][name];
+      const examDate=obExamDates[name];
+      subjects.push({
+        id:'s_'+Date.now()+'_'+colorIdx,
+        name,
+        examDate,
+        color: COLORS[colorIdx % COLORS.length],
+        emoji: preset.emoji,
+        level: obLevel,
+        parentSubject: name,
+        topics: (preset.topics||[]).map((t,j) => ({id:'t_'+Date.now()+'_'+colorIdx+'_'+j, name:t, conf:0, lastStudied:null}))
+      });
+      colorIdx++;
+    });
+
+    const newState = { subjects, sessions:{}, ci: colorIdx % COLORS.length };
+    localStorage.setItem('rv4', JSON.stringify(newState));
+    localStorage.setItem('rv_ob_done', '1');
+
+    document.getElementById('onboarding').classList.remove('visible');
+    document.getElementById('mainApp').style.display = 'block';
+    bootApp(FIREBASE_CONFIG);
+  };
+
+  // ── SUBJECT URGENCY SCORING ──────────────────────────────
   function subjectUrgencyScore(sub, allSubjects=[]){
     const today=new Date();today.setHours(0,0,0,0);
     const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
@@ -1434,94 +780,80 @@ function bootApp(fbConfig) {
   function allSess(){return S.subjects.flatMap(s=>genSched(s));}
 
   function sessForDate(ds){
-    const all=allSess().filter(s=>s.date===ds);
-    const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-    // ALWAYS apply scoring and filtering for diversity, even if under limit
-    // This ensures subjects rotate properly across days
-
     const dsDate=new Date(ds+'T00:00:00');
-
-    // Track which subjects have been selected recently to enforce diversity
-    const selectedToday=all.map(s=>s.subjectId);
-    const subjectSelectCount={};
-    selectedToday.forEach(sid=>subjectSelectCount[sid]=(subjectSelectCount[sid]||0)+1);
-
-    return all
-      .map(s=>{
-        const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
-        
-        // Calculate days since last selected (for recency penalty)
-        // Use persisted lastSelectedDate if available, otherwise fall back to _lastSelectedDate
-        const lastSelectedDate=sub.lastSelectedDate||sub._lastSelectedDate;
-        const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
-        sub._lastSelectedDays=lastSel;
-        
-        const urgency=subjectUrgencyScore(sub,S.subjects);
-        // Count SM-2 topics overdue as of this session date — adds short-term priority
-        const overdueNow=(sub.topics||[]).filter(t=>
-          t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
-        ).length;
-        
-        // Diversity bonus: subjects NOT yet selected today get boost
-        const diversityBonus=subjectSelectCount[s.subjectId]===0?50:0;
-        
-        // Starvation prevention: if subject hasn't been selected in 2+ days, boost it significantly
-        const starvationBoost=lastSel>=3?200:lastSel>=2?150:lastSel===0?0:50;
-        
-        // Score: urgency is primary, but diversity and starvation prevention matter
-        const score=urgency*8+diversityBonus+starvationBoost+overdueNow*3;
-        return{...s,_score:score};
-      })
-      .sort((a,b)=>b._score-a._score)
-      .slice(0,limit);
+    const limit=(S.prefs&&S.prefs.sessPerDay)||6;
+    
+    // DYNAMIC SESSION SELECTION: Instead of using pre-generated schedule,
+    // select subjects for this day based on recency penalties and urgency
+    const validSubjects=S.subjects.filter(sub=>{
+      const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
+      return exam>dsDate; // Only include subjects with exams after this date
+    });
+    
+    if(!validSubjects.length) return [];
+    
+    // Score each subject for this specific date
+    const scored=validSubjects.map(sub=>{
+      // Calculate days since last selected (for recency penalty)
+      const lastSelectedDate=sub.lastSelectedDate||sub._lastSelectedDate;
+      const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
+      sub._lastSelectedDays=lastSel;
+      
+      const urgency=subjectUrgencyScore(sub,S.subjects);
+      
+      // Count SM-2 topics overdue as of this session date
+      const overdueNow=(sub.topics||[]).filter(t=>
+        t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
+      ).length;
+      
+      // Starvation prevention: if subject hasn't been selected in 2+ days, boost it significantly
+      const starvationBoost=lastSel>=3?200:lastSel>=2?150:lastSel===0?0:50;
+      
+      // Score: urgency is primary, but starvation prevention ensures rotation
+      const score=urgency*8+starvationBoost+overdueNow*3;
+      
+      return{subjectId:sub.id,_score:score,date:ds,type:'study',idx:0};
+    })
+    .sort((a,b)=>b._score-a._score)
+    .slice(0,limit);
+    
+    return scored;
   }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
   // ── TOPIC SUGGESTIONS — SM-2 + Interleaving ──────────
   // Scientific basis:
-  //  • Forgetting curve (Ebbinghaus 1885) — retrieval urgency from SM-2 overdueRatio
-  //  • Confidence deficit weighting — low conf = higher repetition need
-  //  • Ease factor penalty (SM-2) — intrinsically hard topics need shorter intervals
-  //  • Exam proximity multiplier (Cepeda et al. 2006) — spike urgency near test date
-  //  • Interleaved selection (Kornell & Bjork 2008; Rohrer & Taylor 2007) — mixing
-  //    topics of different difficulty tiers improves long-term retention vs blocked study
-  function suggestTopics(sub, n=3, date='') {
-    if(!sub.topics.length) return [];
-    const today=new Date(); today.setHours(0,0,0,0);
-    const sessionDate=date?new Date(date+'T00:00:00'):today;
-    const exam=new Date(sub.examDate); exam.setHours(0,0,0,0);
-    const daysLeft=Math.max(1,Math.ceil((exam-sessionDate)/86400000));
+  // - Ebbinghaus (1885): Forgetting curve — optimal review timing follows exponential decay
+  // - Cepeda et al. (2006): Spacing effect — retention improves when reviews are spaced
+  // - Karpicke & Roediger (2008): Retrieval practice — testing beats re-studying
+  // - Kornell & Bjork (2008): Interleaving — mixing topics improves transfer
+  // - Bjork & Bjork (1992): Desirable difficulty — moderate challenge optimizes learning
 
-    // Score every topic
-    const scored = sub.topics.map((t,i)=>{
-      // Never-studied: high base priority with freshness bonus
-      if(!t.lastStudied||t.conf===0){
-        const freshnessBonus=30;
-        return{...t,score:300+freshnessBonus,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
-      }
+  function getDefaultInterval(conf){
+    const intervals={0:1,1:1,2:3,3:7,4:14,5:30};
+    return intervals[conf]||1;
+  }
 
-      const daysSince=Math.max(0,Math.ceil((sessionDate-new Date(t.lastStudied+'T00:00:00'))/86400000));
+  function suggestTopics(sub,n,sessionDate){
+    const selDateObj=new Date(sessionDate+'T00:00:00');
+    const today=new Date();today.setHours(0,0,0,0);
+
+    // ── TIER 1: New topics — first exposure ──
+    const newTopics=(sub.topics||[]).filter(t=>!t.lastStudied||t.conf===0).map(t=>{
+      const freshnessBonus=30;
+      return{...t,score:300+freshnessBonus,_mode:'first',_overdueDays:null,_daysSince:null,_interval:null,_overdueRatio:0};
+    });
+
+    // ── TIER 2: Overdue topics — SM-2 scheduling ──
+    const reviewTopics=(sub.topics||[]).filter(t=>t.lastStudied&&t.conf>0).map(t=>{
+      const daysSince=Math.max(0,Math.ceil((selDateObj-new Date(t.lastStudied+'T00:00:00'))/86400000));
       const interval=t.interval||getDefaultInterval(t.conf);
       const overdueRatio=interval>0?daysSince/interval:daysSince;
-      const overdueDays=Math.max(0,daysSince-interval);
-
-      // 1. Forgetting curve score (0–60): plateaus to prevent over-dominating
-      //    overdueRatio=1 means right on schedule; >1 = overdue
-      const forgetting=Math.min(60, overdueRatio*30);
-
-      // 2. Confidence deficit (0–40): weak topics need more exposures
-      const confDeficit=(5-t.conf)*8;
-
-      // 3. Ease factor penalty (0–14): low EF = student finds it intrinsically hard
-      const ef=t.easeFactor||2.5;
-      const efPenalty=Math.max(0,(2.5-ef)*14);
-
-      // 4. Exam proximity multiplier — spikes urgency in final stretch
-      const examUrgency=daysLeft<=3?5.0:daysLeft<=7?3.0:daysLeft<=14?1.8:daysLeft<=30?1.3:1.0;
-      // Extra weight for weak topics as exam looms (retrieval practice effect)
+      const forgetting=Math.max(0,overdueRatio*100);
+      const confDeficit=(5-t.conf)*20;
+      const efPenalty=t.easeFactor&&t.easeFactor<2.5?(2.5-t.easeFactor)*50:0;
       const weakMult=t.conf<=2?1.9:t.conf===3?1.2:1.0;
-
-      const core=(forgetting+confDeficit+efPenalty)*examUrgency*weakMult;
+      const core=(forgetting+confDeficit+efPenalty)*weakMult;
 
       // ── RECENCY PENALTY: Topics studied recently should be deprioritized ──
       // This prevents the same topics from appearing in consecutive sessions
@@ -1536,88 +868,70 @@ function bootApp(fbConfig) {
       // Per-topic recommended study mode
       let _mode='review';
       if(t.conf<=2) _mode='practice';
-      else if(t.conf>=4&&overdueRatio>=0.85) _mode='test';
+      else if(t.conf===4) _mode='test';
 
-      const finalScore=(core*recencyPenalty);
-      return{...t,score:finalScore,_mode,_overdueDays:overdueDays,_daysSince:daysSince,_interval:interval,_overdueRatio:overdueRatio};
+      return{...t,score:core*recencyPenalty,_mode,_overdueDays:Math.max(0,daysSince-interval),_daysSince:daysSince,_interval:interval,_overdueRatio:overdueRatio};
     });
 
-    const sorted=scored.slice().sort((a,b)=>b.score-a.score);
-    if(sorted.length<=n) return sorted;
-
-    // ── INTERLEAVED SELECTION ──────────────────────────────
-    // Cap any single confidence tier at 60% of suggestions, then fill from top scores.
-    // This ensures the session mixes urgent/weak topics with more stable ones — mimicking
-    // the beneficial difficulty of interleaved practice in the research literature.
-    const maxFromTier=Math.max(1,Math.ceil(n*0.6));
-    const tierCount={new:0,low:0,mid:0,high:0};
+    // ── INTERLEAVING: Mix weak/medium/strong for optimal learning ──
     const getTier=t=>(!t.lastStudied||!t.conf)?'new':t.conf<=2?'low':t.conf<=3?'mid':'high';
-
     const selected=[];
-    // Pass 1: best-scoring while respecting tier cap
-    for(const t of sorted){
-      if(selected.length>=n) break;
-      const tier=getTier(t);
-      if(tierCount[tier]<maxFromTier){selected.push(t);tierCount[tier]++;}
-    }
-    // Pass 2: fill any remaining slots from the uncapped top of the list
-    for(const t of sorted){
-      if(selected.length>=n) break;
-      if(!selected.includes(t)) selected.push(t);
-    }
-    return selected.slice(0,n);
+    const tiers={new:newTopics,low:reviewTopics.filter(t=>t.conf<=2),mid:reviewTopics.filter(t=>t.conf===3),high:reviewTopics.filter(t=>t.conf>=4)};
+
+    // Priority: new (50%) > low (30%) > mid (15%) > high (5%)
+    const targets={new:Math.ceil(n*0.5),low:Math.ceil(n*0.3),mid:Math.ceil(n*0.15),high:Math.ceil(n*0.05)};
+    ['new','low','mid','high'].forEach(tier=>{
+      const available=tiers[tier].sort((a,b)=>b.score-a.score);
+      const take=Math.min(targets[tier],available.length);
+      selected.push(...available.slice(0,take));
+    });
+
+    return selected.slice(0,n).sort((a,b)=>b.score-a.score);
   }
 
-  // Per-topic reason string — more precise with SM-2 data
   function suggReason(t,sub){
-    const today=new Date();today.setHours(0,0,0,0);
-    const daysLeft=Math.max(0,Math.ceil((new Date(sub.examDate)-today)/86400000));
-    if(!t.lastStudied||t.conf===0) return'New topic — first exposure builds the memory trace';
-    const daysSince=t._daysSince??Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000));
+    if(!t.lastStudied||t.conf===0) return 'New topic — first exposure builds the memory trace';
+    const daysSince=t._daysSince??Math.max(0,Math.ceil((new Date()-new Date(t.lastStudied+'T00:00:00'))/86400000));
     const interval=t._interval??getDefaultInterval(t.conf);
     const overdueRatio=t._overdueRatio??daysSince/Math.max(1,interval);
-    const overdueDays=t._overdueDays??Math.max(0,daysSince-interval);
-    if(daysLeft<=3&&t.conf<=4) return`🚨 Exam in ${daysLeft} day${daysLeft!==1?'s':''} — retrieve everything now`;
-    if(daysLeft<=7&&t.conf<=2) return`⚠️ Exam soon & low confidence — urgent practice`;
-    if(t.conf===1) return'Struggling — short daily sessions until this clicks';
-    if(t.conf===2) return'Shaky — active recall practice, not re-reading';
-    if(overdueDays>14) return`Overdue by ${overdueDays} days — forgetting curve is steep`;
-    if(overdueDays>3) return`${overdueDays} days overdue — retrieval now before memory fades`;
-    if(overdueDays>0) return`Just overdue — perfect time for retrieval practice`;
-    if(overdueRatio>=0.85) return`Due for review — hit it at the optimal spacing interval`;
-    if(t.conf>=5&&t.easeFactor>=2.6) return'Solid — self-test to confirm long-term retention';
-    if(t.conf>=4) return'Good — spaced retrieval to maintain strong memory';
-    return'On schedule — regular review preventing forgetting';
+    if(overdueRatio>1.5) return `🔴 ${Math.floor((daysSince-interval))} days overdue — forgetting is active`;
+    if(overdueRatio>1) return `🟡 Overdue — review now to lock in memory`;
+    if(overdueRatio>0.7) return `🟢 Due soon — review to maintain retention`;
+    return `Maintenance review — ${daysSince}d since last study`;
   }
 
-  // ── WEEK STRIP ────────────────────────────────────────
-  let selDate=toLocalDate(new Date());
-  function renderStrip(){
-    const ts=toLocalDate(new Date());
-    const all=allSess();
-    const sel=new Date(selDate+'T00:00:00');
-    const ws=new Date(sel);
-    // Start week on Monday: getDay() gives 0=Sun,1=Mon...6=Sat; shift so Mon=0
-    const dow=sel.getDay();const mondayOff=dow===0?-6:1-dow;
-    ws.setDate(sel.getDate()+mondayOff);
-    const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'];
-    document.getElementById('wstrip').innerHTML=Array.from({length:7},(_,i)=>{
-      const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=toLocalDate(d);
-      const dsDate=new Date(ds+'T00:00:00');
-      const sessForDay=all.filter(s=>s.date===ds);
-      const dots=sessForDay.slice(0,4).map(s2=>{
-        const sub=S.subjects.find(s=>s.id===s2.subjectId);
-        if(!sub) return '';
-        // Highlight dot red if any topics in this subject are overdue on this day
-        const hasOverdue=sub.topics.some(t=>t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate&&t.lastStudied);
-        return `<div class="wdot" style="background:${hasOverdue?'var(--danger)':sub.color}"></div>`;
-      }).join('');
-      return `<div class="wd${ds===ts?' tod':''}${ds===selDate?' sel':''}" onclick="selDay('${ds}')"><div class="wdl">${lbl[d.getDay()]}</div><div class="wdn">${d.getDate()}</div><div class="wdd">${dots}</div></div>`;
-    }).join('');
+  // ── RENDERING ────────────────────────────────────────────
+  function buildValidDates(maxDays){
+    const today=new Date();today.setHours(0,0,0,0);
+    const dates=[];
+    const studyDays=(S.prefs&&S.prefs.studyDays)||[1,2,3,4,5];
+    for(let i=0;i<maxDays;i++){
+      const dt=new Date(today);dt.setDate(today.getDate()+i);
+      if(studyDays.includes(dt.getDay())) dates.push(toLocalDate(dt));
+    }
+    return dates;
   }
-  window.selDay=function(ds){selDate=ds;renderStrip();renderSessions();const d=new Date(ds+'T00:00:00');document.getElementById('dlabel').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});};
-  window.changeDay=function(delta){const d=new Date(selDate+'T00:00:00');d.setDate(d.getDate()+delta);selDay(toLocalDate(d));};
-  window.goToday=function(){selDay(toLocalDate(new Date()));};
+
+  let selDate=toLocalDate(new Date());
+
+  function renderStrip(){
+    const dates=buildValidDates(60);
+    const today=toLocalDate(new Date());
+    const strip=document.getElementById('dayStrip');
+    strip.innerHTML=dates.slice(0,30).map(d=>{
+      const dt=new Date(d+'T00:00:00');
+      const isToday=d===today;
+      return `<button class="day-btn${isToday?' today':''}" onclick="selDay('${d}')">${dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})}</button>`;
+    }).join('');
+    selDay(today);
+  }
+
+  window.selDay=function(d){
+    selDate=d;
+    document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('sel'));
+    document.querySelector(`.day-btn[onclick="selDay('${d}')"]`)?.classList.add('sel');
+    renderSessions();
+  };
 
   function renderSessions(){
     const list=document.getElementById('slist');
@@ -1781,266 +1095,238 @@ function bootApp(fbConfig) {
       }
     }
     save();renderSessions();
-    setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);
   };
-  window.saveNotes=function(k){const v=document.getElementById('nt-'+k).value;if(!S.sessions[k])S.sessions[k]={};S.sessions[k].notes=v;save();tk('Notes saved ✓',true);renderSessions();setTimeout(()=>{const e=document.getElementById('exp-'+k);if(e)e.style.display='block';},8);};
+
+  window.setTopicDiff=function(sid,tid,conf,k){
+    const sub=S.subjects.find(s=>s.id===sid);
+    if(!sub)return;
+    const t=sub.topics.find(t=>t.id===tid);
+    if(!t)return;
+    const oldConf=t.conf||0;
+    t.conf=conf;
+    // SM-2 algorithm update
+    if(oldConf===0){
+      t.easeFactor=2.5;
+      t.repetitions=1;
+      t.interval=1;
+    } else {
+      const quality=Math.min(5,Math.max(0,conf));
+      t.easeFactor=Math.max(1.3,t.easeFactor+(0.1-(5-quality)*(0.08+(5-quality)*0.02)));
+      t.repetitions=(t.repetitions||0)+1;
+      if(t.repetitions===1) t.interval=1;
+      else if(t.repetitions===2) t.interval=3;
+      else t.interval=Math.round(t.interval*t.easeFactor);
+    }
+    const today=new Date().toISOString().split('T')[0];
+    const nextDate=new Date();nextDate.setDate(nextDate.getDate()+t.interval);
+    t.nextReview=nextDate.toISOString().split('T')[0];
+    save();renderSessions();renderProgress();
+  };
+
+  window.saveNotes=function(k){
+    if(!S.sessions[k])S.sessions[k]={};
+    const textarea=document.getElementById('nt-'+k);
+    if(textarea) S.sessions[k].notes=textarea.value;
+    save();tk('Notes saved ✓',true);
+  };
 
   // ── POMODORO ──────────────────────────────────────────
-  let P={run:false,iv:null,left:0,total:0,phase:'focus',round:1,rounds:4,key:null};
+  const P={key:null,run:false,phase:'focus',round:1,rounds:4,left:25*60,total:25*60};
   window.openPomo=function(k,name){P.key=k;document.getElementById('pomoTitle').textContent='🍅 '+name;document.getElementById('mnt').value=(S.sessions[k]||{}).notes||'';resetPomo();document.getElementById('pomoOvl').classList.add('open');};
   window.closePomo=function(){if(P.run)togglePomo();document.getElementById('pomoOvl').classList.remove('open');P.key=null;};
   const gf=()=>Math.max(1,parseInt(document.getElementById('pfoc').value)||25)*60;
   const gb=()=>Math.max(1,parseInt(document.getElementById('pbrk').value)||5)*60;
-  const gr=()=>Math.max(1,parseInt(document.getElementById('prnd').value)||4);
-  window.resetPomo=function(){if(P.iv){clearInterval(P.iv);P.iv=null;}P.run=false;P.phase='focus';P.round=1;P.rounds=gr();P.total=gf();P.left=P.total;document.getElementById('pstbtn').textContent='Start';updPomo();};
-  window.togglePomo=function(){if(P.run){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Resume';}else{P.run=true;document.getElementById('pstbtn').textContent='Pause';P.iv=setInterval(tickPomo,1000);}};
-  function tickPomo(){P.left--;if(P.left<=0){if(P.phase==='focus'){tk(`Round ${P.round} done! 🎉`,true);if(P.round>=P.rounds){clearInterval(P.iv);P.iv=null;P.run=false;document.getElementById('pstbtn').textContent='Done! 🏆';return;}P.phase='break';P.total=gb();P.left=P.total;}else{P.round++;P.phase='focus';P.total=gf();P.left=P.total;tk(`Round ${P.round} starting!`);}}updPomo();}
+  function resetPomo(){P.phase='focus';P.round=1;P.left=gf();P.total=gf();updPomo();}
+  let pT;
   function updPomo(){const m=Math.floor(P.left/60),s=P.left%60;document.getElementById('ptm').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pph').textContent=P.phase==='focus'?`Round ${P.round}/${P.rounds}`:'Break';const circ=2*Math.PI*36,ring=document.getElementById('rfl');ring.style.strokeDasharray=circ;ring.style.strokeDashoffset=circ*(1-P.left/P.total);ring.className='rfl'+(P.phase==='break'?' brk':'');document.getElementById('pdots').innerHTML=Array.from({length:P.rounds},(_,i)=>{const cl=i<P.round-1?'dn':i===P.round-1&&P.phase==='focus'?'cu':'';return`<div class="pdot ${cl}"></div>`;}).join('');}
   window.saveModalNotes=function(){if(!P.key)return;if(!S.sessions[P.key])S.sessions[P.key]={};S.sessions[P.key].notes=document.getElementById('mnt').value;save();tk('Notes saved ✓',true);};
-  document.getElementById('pomoOvl').addEventListener('click',e=>{if(e.target===document.getElementById('pomoOvl'))closePomo();});
+  window.togglePomo=function(){
+    P.run=!P.run;
+    if(!P.run){clearTimeout(pT);updPomo();return;}
+    const tick=()=>{
+      P.left--;
+      if(P.left<=0){
+        P.phase=P.phase==='focus'?'break':'focus';
+        if(P.phase==='focus')P.round++;
+        if(P.round>P.rounds&&P.phase==='focus'){P.run=false;tk('Pomodoro complete! 🎉',true);updPomo();return;}
+        P.left=P.phase==='focus'?gf():gb();
+      }
+      updPomo();
+      pT=setTimeout(tick,1000);
+    };
+    tick();
+  };
 
   // ── EDIT SUBJECT ──────────────────────────────────────
-  let editSubjId = null;
-  window.openEditSubj = function(id) {
-    const sub = S.subjects.find(s => s.id === id);
-    if (!sub) return;
-    editSubjId = id;
-    document.getElementById('esName').value = sub.name;
-    document.getElementById('esDate').value = sub.examDate;
+  let editSubjId=null;
+  window.openEditSubj=function(sid){
+    editSubjId=sid;
+    const sub=S.subjects.find(s=>s.id===sid);
+    if(!sub)return;
+    document.getElementById('editSubjName').value=sub.name;
+    document.getElementById('editSubjExam').value=sub.examDate;
     document.getElementById('editSubjOvl').classList.add('open');
   };
-  window.closeEditSubj = function() {
+  window.closeEditSubj=function(){
     document.getElementById('editSubjOvl').classList.remove('open');
     editSubjId = null;
   };
-  window.saveEditSubj = function() {
-    if (!editSubjId) return;
-    const sub = S.subjects.find(s => s.id === editSubjId);
-    if (!sub) return;
-    const newName = document.getElementById('esName').value.trim();
-    const newDate = document.getElementById('esDate').value;
-    if (!newName) { tk('Name cannot be empty'); return; }
-    if (!newDate) { tk('Please pick an exam date'); return; }
-    sub.name = newName;
-    sub.examDate = newDate;
-    save();
-    closeEditSubj();
-    renderAll();
-    tk('Subject updated ✓', true);
+  window.saveEditSubj=function(){
+    if(!editSubjId)return;
+    const sub=S.subjects.find(s=>s.id===editSubjId);
+    if(!sub)return;
+    sub.name=document.getElementById('editSubjName').value||sub.name;
+    sub.examDate=document.getElementById('editSubjExam').value||sub.examDate;
+    save();renderAll();closeEditSubj();tk('Subject updated ✓',true);
   };
-  document.getElementById('editSubjOvl').addEventListener('click', e => {
-    if (e.target === document.getElementById('editSubjOvl')) closeEditSubj();
-  });
 
-  // ── PROGRESS ─────────────────────────────────────────
-  // Retention estimate: Ebbinghaus forgetting curve approximation
-  // R(t) = e^(-t / (stability × 1.5)) where stability = SM-2 interval
+  // ── SUBJECTS SIDEBAR ──────────────────────────────────
+  function renderSubjects(){
+    const grid=document.getElementById('progGrid')||document.createElement('div');
+    grid.innerHTML=S.subjects.map(sub=>{
+      const today=new Date();today.setHours(0,0,0,0);
+      const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
+      const daysLeft=Math.ceil((exam-today)/86400000);
+      const studiedTopics=sub.topics.filter(t=>t.lastStudied);
+      const retentions=studiedTopics.map(topicRetention);
+      const avgRetention=retentions.length?Math.round(retentions.reduce((a,b)=>a+b,0)/retentions.length):0;
+      return`<div class="subj-card" style="--c:${sub.color}"><div class="subj-card-header"><div><div class="subj-card-title">${sub.emoji} ${esc(sub.name)}</div><div class="subj-card-exam">${daysLeft===1?'📅 Exam tomorrow':daysLeft<=7?`📅 ${daysLeft}d to exam`:`📅 ${daysLeft}d left`}</div></div><button class="sib" onclick="openEditSubj('${sub.id}')">⚙️</button></div><div class="subj-stats"><div class="stat"><div class="stat-num">${sub.topics.length}</div><div class="stat-lbl">Topics</div></div><div class="stat"><div class="stat-num">${studiedTopics.length}</div><div class="stat-lbl">Studied</div></div><div class="stat"><div class="stat-num">${avgRetention}%</div><div class="stat-lbl">Retention</div></div></div><div class="topic-list">${sub.topics.slice(0,5).map(t=>{
+        const ret=topicRetention(t);
+        const retColor=ret>=80?'var(--accent)':ret>=50?'var(--accent3)':'var(--danger)';
+        const isOverdue=t.nextReview&&new Date(t.nextReview+'T00:00:00')<today;
+        const nxtStr=t.nextReview?`<span class="nxt-rev${isOverdue?' overdue':''}">${isOverdue?'⚠️ ':''} ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>`:'';
+        const efStr=t.easeFactor?`EF: ${t.easeFactor.toFixed(2)}`:' ';
+        const repStr=t.repetitions?`Rep: ${t.repetitions}`:'';
+        const cl=t.conf>0?CCLASS[t.conf]:'cb0';
+        const lbl=t.conf>0?CLABEL[t.conf]:'New';
+        return`<div class="topic-item">
+          <div>
+            <div class="sugg-name">${esc(t.name)}</div>
+            <div class="lstu">${t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied'}${t.lastStudied?` · ${nxtStr}`:''}${efStr?` · <span style="color:var(--muted);font-size:0.6rem">${efStr}</span>`:''}${repStr?` · <span style="color:var(--muted);font-size:0.6rem">${repStr}</span>`:''}</div>
+            <div class="conf-bar"><div class="conf-bar-fill" style="width:${t.conf>0?t.conf/5*100:0}%;background:${CCOLOR[t.conf]}"></div></div>
+            ${t.lastStudied?`<div class="ret-bar" title="Estimated retention: ${ret}%"><div class="ret-fill" style="width:${ret}%;background:${retColor}"></div></div>`:''}
+            <span class="cb5l ${cl}">${lbl}</span>
+          </div>`;
+      }).join('')}</div></div>`;
+    }).join('');
+  }
+
   function topicRetention(t){
     if(!t.lastStudied) return 0;
     const today=new Date();today.setHours(0,0,0,0);
     const daysSince=Math.max(0,Math.ceil((today-new Date(t.lastStudied+'T00:00:00'))/86400000));
     if(daysSince===0) return 100;
     const stability=Math.max(1,t.interval||getDefaultInterval(t.conf));
-    return Math.round(Math.max(0,Math.min(100,Math.exp(-daysSince/(stability*1.5))*100)));
+    const decay=Math.pow(0.95,daysSince/stability);
+    return Math.round(Math.max(0,Math.min(100,decay*100)));
   }
+
   function renderProgress(){
-    const grid=document.getElementById('pg');
-    if(!S.subjects.length){grid.innerHTML='<div class="es"><div class="be">📊</div><p>Complete sessions to track progress here.</p></div>';return;}
-    const today=new Date();today.setHours(0,0,0,0);
-    const sorted=[...S.subjects].sort((a,b)=>new Date(a.examDate)-new Date(b.examDate));
-
-    // ── 7-DAY REVIEW FORECAST ─────────────────────────────
-    const forecastDays=Array.from({length:7},(_,i)=>{
-      const d=new Date(today);d.setDate(today.getDate()+i);
-      const ds=toLocalDate(d);
-      const due=S.subjects.reduce((sum,sub)=>sum+sub.topics.filter(t=>t.nextReview===ds).length,0);
-      const lbl=['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
-      return{ds,lbl,day:d.getDate(),due};
-    });
-    const forecastHtml=`<div class="forecast-card">
-      <div class="stitle" style="margin-bottom:12px">7-day review forecast</div>
-      <div class="forecast-row">${forecastDays.map((f,i)=>`<div class="fc-day${f.due>0?' has-due':''}${f.due>=5?' overloaded':''}">
-        <div class="fc-day-lbl">${i===0?'Today':f.lbl}</div>
-        <div class="fc-day-num">${f.due||'–'}</div>
-        <div class="fc-day-sub" style="font-size:0.56rem;color:var(--muted)">${f.due?'reviews':''}</div>
-      </div>`).join('')}</div>
-      <div style="font-size:0.67rem;color:var(--muted);margin-top:9px">SM-2 schedules reviews based on how you rated each topic. Green = manageable load · Orange = busy day.</div>
-    </div>`;
-
-    grid.innerHTML=forecastHtml+sorted.map(sub=>{
-      const schd=genSched(sub);const total=schd.length;
-      const done=schd.filter(s=>S.sessions[sk(s)]?.completedAt).length;
-      const pct=total?Math.round((done/total)*100):0;
-      const exam=new Date(sub.examDate);const daysLeft=Math.max(0,Math.ceil((exam-today)/86400000));
-      const struggling=sub.topics.filter(t=>t.conf>0&&t.conf<=2);
-      const unrated=sub.topics.filter(t=>t.conf===0);
-      const dts=schd.filter(s=>S.sessions[sk(s)]?.completedAt).map(s=>s.date).sort();
-      let streak=0;if(dts.length){const u=[...new Set(dts)];streak=1;for(let i=u.length-1;i>0;i--){if((new Date(u[i])-new Date(u[i-1]))/86400000===1)streak++;else break;}}
-
-      // ── RETENTION & MASTERY ──────────────────────────────
+    const grid=document.getElementById('progGrid');
+    if(!grid)return;
+    grid.innerHTML=S.subjects.map(sub=>{
+      const today=new Date();today.setHours(0,0,0,0);
+      const exam=new Date(sub.examDate);exam.setHours(0,0,0,0);
+      const daysLeft=Math.ceil((exam-today)/86400000);
       const studiedTopics=sub.topics.filter(t=>t.lastStudied);
       const retentions=studiedTopics.map(topicRetention);
       const avgRetention=retentions.length?Math.round(retentions.reduce((a,b)=>a+b,0)/retentions.length):0;
-      const coverage=sub.topics.length?Math.round(studiedTopics.length/sub.topics.length*100):0;
-      // Mastery = weighted combination: retention of studied × coverage × confidence
-      const ratedTopics=sub.topics.filter(t=>t.conf>0);
-      const avgConf=ratedTopics.length?ratedTopics.reduce((a,t)=>a+t.conf,0)/ratedTopics.length:0;
-      const masteryScore=Math.round((avgRetention/100)*(coverage/100)*(avgConf/5)*100);
-
-      // ── SM-2 OVERDUE COUNT ──────────────────────────────
-      const overdueTopics=sub.topics.filter(t=>{
-        if(!t.lastStudied) return false;
-        if(!t.nextReview) return true;
-        return new Date(t.nextReview+'T00:00:00')<=today;
-      });
-
-      // ── SMART INSIGHT ──────────────────────────────────
-      let insight='';
-      if(!sub.topics.length) insight='Add topics to this subject to start tracking mastery.';
-      else if(daysLeft<=7&&struggling.length) insight=`🚨 <strong>${daysLeft} days to exam.</strong> Prioritise these weak topics: <strong>${struggling.map(t=>esc(t.name)).slice(0,3).join(', ')}</strong>. Use active recall — no passive re-reading.`;
-      else if(overdueTopics.length>0) insight=`⏰ <strong>${overdueTopics.length} topic${overdueTopics.length!==1?'s':''} overdue</strong> for spaced review. Review now before the forgetting curve steepens further.`;
-      else if(avgRetention<50&&studiedTopics.length) insight=`📉 Average retention is <strong>${avgRetention}%</strong> — you're forgetting faster than you're reviewing. Increase review frequency for weaker topics.`;
-      else if(avgRetention>=80&&masteryScore>=60) insight=`✅ Strong retention at <strong>${avgRetention}%</strong>. Maintain spacing intervals — reviewing too early wastes study time.`;
-      else if(unrated.length>0) insight=`📝 <strong>${unrated.length} topic${unrated.length!==1?'s':''} not yet rated</strong>. Study them on the Schedule page and rate difficulty to activate SM-2 tracking.`;
-
-      // ── NEXT REVIEW DATE ──────────────────────────────
-      const next=schd.find(s=>!S.sessions[sk(s)]?.completedAt&&new Date(s.date+'T00:00:00')>=today);
-      const nextStr=next?new Date(next.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—';
-
-      // ── TOPIC BREAKDOWN ────────────────────────────────
-      const tbHtml=sub.topics.length?`<div class="tbd">
-        <div class="tbd-t">Topic breakdown — SM-2 intervals &amp; retention</div>
-        ${sub.topics.map(t=>{
-          const cl=CCLASS[t.conf];const lbl=CLABEL[t.conf]||'Not rated';
-          const lastStr=t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied';
-          const isOverdue=t.nextReview&&new Date(t.nextReview+'T00:00:00')<today;
-          const nxtStr=t.nextReview?`<span class="nxt-rev${isOverdue?' overdue':''}">Next: ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${isOverdue?' ⚠️':''}</span>`:'';
-          const ret=topicRetention(t);
-          const retColor=ret>=75?'var(--accent)':ret>=45?'var(--accent3)':'var(--danger)';
-          const efStr=t.easeFactor?`EF ${t.easeFactor.toFixed(1)}`:'';
-          const repStr=(t.repetitions!=null)&&t.repetitions>0?`${t.repetitions} rep${t.repetitions!==1?'s':''}`:'';
-          return`<div class="tbr">
-            <div class="tbn">${esc(t.name)}</div>
-            <div class="lstu">${lastStr}${t.lastStudied?` · ${nxtStr}`:''}${efStr?` · <span style="color:var(--muted);font-size:0.6rem">${efStr}</span>`:''}${repStr?` · <span style="color:var(--muted);font-size:0.6rem">${repStr}</span>`:''}</div>
+      return`<div class="subj-card" style="--c:${sub.color}"><div class="subj-card-header"><div><div class="subj-card-title">${sub.emoji} ${esc(sub.name)}</div><div class="subj-card-exam">${daysLeft===1?'📅 Exam tomorrow':daysLeft<=7?`📅 ${daysLeft}d to exam`:`📅 ${daysLeft}d left`}</div></div><button class="sib" onclick="openEditSubj('${sub.id}')">⚙️</button></div><div class="subj-stats"><div class="stat"><div class="stat-num">${sub.topics.length}</div><div class="stat-lbl">Topics</div></div><div class="stat"><div class="stat-num">${studiedTopics.length}</div><div class="stat-lbl">Studied</div></div><div class="stat"><div class="stat-num">${avgRetention}%</div><div class="stat-lbl">Retention</div></div></div><div class="topic-list">${sub.topics.slice(0,5).map(t=>{
+        const ret=topicRetention(t);
+        const retColor=ret>=80?'var(--accent)':ret>=50?'var(--accent3)':'var(--danger)';
+        const isOverdue=t.nextReview&&new Date(t.nextReview+'T00:00:00')<today;
+        const nxtStr=t.nextReview?`<span class="nxt-rev${isOverdue?' overdue':''}">${isOverdue?'⚠️ ':''} ${new Date(t.nextReview+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>`:'';
+        const efStr=t.easeFactor?`EF: ${t.easeFactor.toFixed(2)}`:' ';
+        const repStr=t.repetitions?`Rep: ${t.repetitions}`:'';
+        const cl=t.conf>0?CCLASS[t.conf]:'cb0';
+        const lbl=t.conf>0?CLABEL[t.conf]:'New';
+        return`<div class="topic-item">
+          <div>
+            <div class="sugg-name">${esc(t.name)}</div>
+            <div class="lstu">${t.lastStudied?`Last: ${new Date(t.lastStudied+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Never studied'}${t.lastStudied?` · ${nxtStr}`:''}${efStr?` · <span style="color:var(--muted);font-size:0.6rem">${efStr}</span>`:''}${repStr?` · <span style="color:var(--muted);font-size:0.6rem">${repStr}</span>`:''}</div>
             <div class="conf-bar"><div class="conf-bar-fill" style="width:${t.conf>0?t.conf/5*100:0}%;background:${CCOLOR[t.conf]}"></div></div>
             ${t.lastStudied?`<div class="ret-bar" title="Estimated retention: ${ret}%"><div class="ret-fill" style="width:${ret}%;background:${retColor}"></div></div>`:''}
             <span class="cb5l ${cl}">${lbl}</span>
           </div>`;
-        }).join('')}
-        ${struggling.length?`<div class="struggle-box">⚠️ Needs work: <strong>${struggling.map(t=>esc(t.name)).join(', ')}</strong></div>`:''}
-        ${unrated.length?`<div style="margin-top:7px;font-size:0.77rem;color:var(--muted)">📝 Unrated: ${unrated.map(t=>esc(t.name)).join(', ')}</div>`:''}
-      </div>`:'';
-
-      return`<div class="pc" style="--c:${sub.color}">
-        <div class="pch">
-          <div>
-            <div class="pcn">${sub.emoji} ${esc(sub.name)}</div>
-            <div style="font-size:0.71rem;color:var(--muted);margin-top:3px">Exam: ${exam.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${daysLeft} day${daysLeft!==1?'s':''} to go</div>
-          </div>
-          <div class="pcs">
-            <div class="stat"><div class="sv" style="color:${sub.color}">${pct}%</div><div class="sl">Sessions</div></div>
-            <div class="stat"><div class="sv" style="color:${avgRetention>=70?'var(--accent)':avgRetention>=40?'var(--accent3)':'var(--danger)'}">${studiedTopics.length?avgRetention+'%':'—'}</div><div class="sl">Retention</div></div>
-            <div class="stat"><div class="sv" style="color:${struggling.length?'var(--danger)':'var(--muted)'}">${struggling.length}</div><div class="sl">Weak</div></div>
-            <div class="stat"><div class="sv">🔥${streak}</div><div class="sl">Streak</div></div>
-          </div>
-        </div>
-        <div class="mastery-row">
-          <div class="mastery-stat"><div class="mastery-val" style="color:${masteryScore>=60?'var(--accent)':masteryScore>=30?'var(--accent3)':'var(--danger)'}">${masteryScore}%</div><div class="mastery-lbl">Mastery</div></div>
-          <div class="mastery-stat"><div class="mastery-val">${coverage}%</div><div class="mastery-lbl">Coverage</div></div>
-          <div class="mastery-stat"><div class="mastery-val" style="color:${overdueTopics.length?'var(--danger)':'var(--accent)'}">${overdueTopics.length}</div><div class="mastery-lbl">Due now</div></div>
-          <div class="mastery-stat"><div class="mastery-val">${nextStr}</div><div class="mastery-lbl">Next session</div></div>
-        </div>
-        <div class="pbar-w"><div class="pbar" style="width:${pct}%;background:${sub.color}"></div></div>
-        ${insight?`<div class="insight-box">${insight}</div>`:''}
-        ${tbHtml}
-      </div>`;
+      }).join('')}</div></div>`;
     }).join('');
   }
 
-  // ── PREFERENCES ───────────────────────────────────────
-  const DEFAULT_PREFS={sessPerDay:6,topicsPerSess:3,focusLen:25,breakLen:5,studyDays:[1,2,3,4,5]};
-  function getPrefs(){return Object.assign({},DEFAULT_PREFS,S.prefs||{});}
   function renderPrefs(){
-    const p=getPrefs();
-    const set=(id,val)=>{document.getElementById(id).value=val;document.getElementById(id+'-val').textContent=val;};
-    set('pref-sessPerDay',p.sessPerDay);
-    set('pref-topicsPerSess',p.topicsPerSess);
-    set('pref-focusLen',p.focusLen);
-    set('pref-breakLen',p.breakLen);
-    document.getElementById('pfoc').value=p.focusLen;
-    document.getElementById('pbrk').value=p.breakLen;
-    document.querySelectorAll('.day-tog').forEach(btn=>{
-      const day=parseInt(btn.dataset.day);
-      btn.classList.toggle('on',p.studyDays.includes(day));
-    });
-    // ── Theme picker ──
-    const currentTheme=localStorage.getItem('rv_theme')||'dark';
-    const picker=document.getElementById('themePicker');
-    if(picker){
-      picker.innerHTML=Object.entries(THEMES).map(([id,t])=>`
-        <div class="theme-swatch${id===currentTheme?' sel':''}" data-theme="${id}" onclick="applyTheme('${id}')"
-          style="background:${t.bg};color:${t.text};border-color:${id===currentTheme?t.text:'transparent'}">
-          <div class="ts-dots">
-            <div class="ts-dot" style="background:${t.accent}"></div>
-            <div class="ts-dot" style="background:${t.accent2}"></div>
-            <div class="ts-dot" style="background:${t.surface2};border:1px solid ${t.border}"></div>
-          </div>
-          <div class="ts-name" style="color:${t.text}">${t.name}</div>
-        </div>`).join('');
-    }
+    const c=document.getElementById('prefsContent');
+    c.innerHTML=`<div class="pref-section">
+      <div class="pref-title">Study Preferences</div>
+      <div class="pref-row"><span class="pref-label">Topics per session</span><input class="pref-input" type="number" value="${(S.prefs&&S.prefs.topicsPerSess)||3}" onchange="S.prefs=S.prefs||{};S.prefs.topicsPerSess=parseInt(this.value);save();tk('Saved ✓',true)"></div>
+      <div class="pref-row"><span class="pref-label">Sessions per day</span><input class="pref-input" type="number" value="${(S.prefs&&S.prefs.sessPerDay)||6}" onchange="S.prefs=S.prefs||{};S.prefs.sessPerDay=parseInt(this.value);save();tk('Saved ✓',true)"></div>
+      <div class="pref-row"><span class="pref-label">Session length</span><select class="pref-select" onchange="S.prefs=S.prefs||{};S.prefs.sessionLength=this.value;save();tk('Saved ✓',true)"><option value="short"${(S.prefs&&S.prefs.sessionLength)==='short'?' selected':''}>Short (30 min)</option><option value="normal"${(S.prefs&&S.prefs.sessionLength)==='normal'||!(S.prefs&&S.prefs.sessionLength)?' selected':''}>Normal (60 min)</option><option value="long"${(S.prefs&&S.prefs.sessionLength)==='long'?' selected':''}>Long (90+ min)</option></select></div>
+    </div>`;
   }
-  window.toggleStudyDay=function(day){
-    const p=getPrefs();
-    const idx=p.studyDays.indexOf(day);
-    if(idx>-1){if(p.studyDays.length===1)return;p.studyDays.splice(idx,1);}
-    else p.studyDays.push(day);
-    if(!S.prefs)S.prefs={};
-    S.prefs.studyDays=p.studyDays;
-    document.querySelectorAll('.day-tog').forEach(btn=>{
-      btn.classList.toggle('on',p.studyDays.includes(parseInt(btn.dataset.day)));
-    });
-  };
-  window.prefsChanged=function(){
-    ['pref-sessPerDay','pref-topicsPerSess','pref-focusLen','pref-breakLen'].forEach(id=>{
-      document.getElementById(id+'-val').textContent=document.getElementById(id).value;
-    });
-  };
-  window.savePrefs=function(){
-    const currentDays=(S.prefs&&S.prefs.studyDays)||DEFAULT_PREFS.studyDays;
-    S.prefs={
-      sessPerDay:parseInt(document.getElementById('pref-sessPerDay').value),
-      topicsPerSess:parseInt(document.getElementById('pref-topicsPerSess').value),
-      focusLen:parseInt(document.getElementById('pref-focusLen').value),
-      breakLen:parseInt(document.getElementById('pref-breakLen').value),
-      studyDays:currentDays,
-    };
-    // sync pomo defaults
-    document.getElementById('pfoc').value=S.prefs.focusLen;
-    document.getElementById('pbrk').value=S.prefs.breakLen;
-    save();renderAll();tk('Preferences saved ✓',true);
-  };
 
-  window.showPage=function(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');el.classList.add('active');if(p==='schedule'){renderStrip();selDay(selDate);}if(p==='progress')renderProgress();if(p==='prefs')renderPrefs();};
   function renderAll(){renderSubjects();renderStrip();renderSessions();renderProgress();}
 
+  window.showPage=function(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');el.classList.add('active');if(p==='schedule'){renderStrip();selDay(selDate);}if(p==='progress')renderProgress();if(p==='prefs')renderPrefs();};
+
+  // Initial render
   renderAll();
-  renderPrefs();
-  selDay(toLocalDate(new Date()));
-  updPomo();
 }
 
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-window.esc=esc;
-let tT;
-window.tk=function(msg,ac=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(ac?' ac':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);};
+// Onboarding level selection
+const SUBJECTS_PRESET={
+  'GCSE':{
+    'English Language':{emoji:'📖',topics:['Paper 1: Reading','Paper 2: Writing','Speaking & Listening']},
+    'English Literature':{emoji:'📚',topics:['Poetry Anthology','Prose Texts','Drama Texts']},
+    'Mathematics':{emoji:'🔢',topics:['Number','Algebra','Geometry','Statistics','Probability']},
+    'Biology':{emoji:'🧬',topics:['Cell Biology','Organisation','Infection & Response','Bioenergetics','Homeostasis','Inheritance','Ecology']},
+    'Chemistry':{emoji:'⚗️',topics:['Atomic Structure','Bonding','Stoichiometry','Energetics','Kinetics','Equilibrium','Redox','Thermodynamics']},
+    'Physics':{emoji:'⚛️',topics:['Energy','Waves','Electricity','Magnetism','Forces','Motion','Thermodynamics']},
+    'History':{emoji:'🏛️',topics:['Medieval Period','Early Modern','Industrial Revolution','20th Century','Modern Era']},
+    'Geography':{emoji:'🌍',topics:['Physical Geography','Human Geography','Geographical Skills']},
+    'French':{emoji:'🇫🇷',topics:['Speaking','Listening','Reading','Writing']},
+    'Spanish':{emoji:'🇪🇸',topics:['Speaking','Listening','Reading','Writing']},
+    'German':{emoji:'🇩🇪',topics:['Speaking','Listening','Reading','Writing']},
+    'Religious Studies':{emoji:'✝️',topics:['Christianity','Islam','Judaism','Buddhism','Ethics']},
+    'Computer Science':{emoji:'💻',topics:['Programming','Data Representation','Networks','Cyber Security','Algorithms']},
+    'Art & Design':{emoji:'🎨',topics:['Drawing','Painting','Sculpture','Photography','Textiles']},
+    'Music':{emoji:'🎵',topics:['Performance','Composition','Listening','Music Technology']},
+    'PE':{emoji:'⚽',topics:['Anatomy','Physiology','Sports Psychology','Coaching']},
+    'Business':{emoji:'💼',topics:['Enterprise','Marketing','Operations','Finance','People Management']},
+  },
+  'A-Level':{
+    'English Language':{emoji:'📖',topics:['Phonology','Morphology','Syntax','Semantics','Pragmatics','Discourse']},
+    'English Literature':{emoji:'📚',topics:['Poetry','Prose','Drama','Critical Theory']},
+    'Mathematics':{emoji:'🔢',topics:['Pure Mathematics','Statistics','Mechanics']},
+    'Further Mathematics':{emoji:'🔢',topics:['Complex Numbers','Matrices','Vectors','Differential Equations']},
+    'Biology':{emoji:'🧬',topics:['Cells','Biochemistry','Genetics','Evolution','Ecology','Physiology']},
+    'Chemistry':{emoji:'⚗️',topics:['Physical Chemistry','Organic Chemistry','Inorganic Chemistry','Analytical Chemistry']},
+    'Physics':{emoji:'⚛️',topics:['Mechanics','Waves','Thermodynamics','Electricity','Magnetism','Nuclear Physics']},
+    'History':{emoji:'🏛️',topics:['British History','European History','World History','Historiography']},
+    'Geography':{emoji:'🌍',topics:['Physical Systems','Human Systems','Global Challenges','Geographical Methods']},
+    'French':{emoji:'🇫🇷',topics:['Grammar','Vocabulary','Culture','Literature']},
+    'Spanish':{emoji:'🇪🇸',topics:['Grammar','Vocabulary','Culture','Literature']},
+    'German':{emoji:'🇩🇪',topics:['Grammar','Vocabulary','Culture','Literature']},
+    'Religious Studies':{emoji:'✝️',topics:['Philosophy of Religion','Ethics','Comparative Religion']},
+    'Computer Science':{emoji:'💻',topics:['Algorithms','Programming','Data Structures','Networks','Security']},
+    'Psychology':{emoji:'🧠',topics:['Cognition','Development','Behaviour','Research Methods']},
+    'Sociology':{emoji:'👥',topics:['Culture','Socialisation','Institutions','Social Inequality']},
+    'Economics':{emoji:'💰',topics:['Microeconomics','Macroeconomics','International Economics','Development']},
+    'Business':{emoji:'💼',topics:['Strategy','Marketing','Finance','Operations','HR']},
+    'Law':{emoji:'⚖️',topics:['Criminal Law','Civil Law','Constitutional Law','Jurisprudence']},
+    'Art & Design':{emoji:'🎨',topics:['Fine Art','Graphic Design','Photography','3D Design']},
+    'Music':{emoji:'🎵',topics:['Performance','Composition','Music Technology','Analysis']},
+    'PE':{emoji:'⚽',topics:['Exercise Physiology','Biomechanics','Sports Psychology','Coaching']},
+  }
+};
 
-// ── PWA SERVICE WORKER ──
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg=>console.log('SW registered',reg.scope))
-      .catch(err=>console.warn('SW failed',err));
-  });
+function obSelectLevel(lv){
+  window.obLevel=lv;
+  document.querySelectorAll('.big-btn').forEach(b=>b.classList.toggle('sel',b.textContent.includes(lv)));
+  document.getElementById('nextBtn1').disabled=!lv;
+}
+
+// Render level choices on page load
+const levelChoice=document.getElementById('levelChoice');
+if(levelChoice){
+  levelChoice.innerHTML=Object.keys(SUBJECTS_PRESET).map(lv=>`<div class="big-btn" onclick="obSelectLevel('${lv}')">${lv}</div>`).join('');
 }
 </script>
 </body>
