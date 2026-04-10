@@ -1436,10 +1436,9 @@ function bootApp(fbConfig) {
   function sessForDate(ds){
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-    if(all.length<=limit)return all;
+    // ALWAYS apply scoring and filtering for diversity, even if under limit
+    // This ensures subjects rotate properly across days
 
-    const dayIndex=buildValidDates(365).indexOf(ds);
-    const numSubjects=S.subjects.length;
     const dsDate=new Date(ds+'T00:00:00');
 
     // Track which subjects have been selected recently to enforce diversity
@@ -1452,7 +1451,9 @@ function bootApp(fbConfig) {
         const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
         
         // Calculate days since last selected (for recency penalty)
-        const lastSel=sub._lastSelectedDate?Math.floor((dsDate-new Date(sub._lastSelectedDate+'T00:00:00'))/86400000):999;
+        // Use persisted lastSelectedDate if available, otherwise fall back to _lastSelectedDate
+        const lastSelectedDate=sub.lastSelectedDate||sub._lastSelectedDate;
+        const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
         sub._lastSelectedDays=lastSel;
         
         const urgency=subjectUrgencyScore(sub,S.subjects);
@@ -1748,7 +1749,9 @@ function bootApp(fbConfig) {
       const subjectId=parts[0];
       const sub=S.subjects.find(s=>s.id===subjectId);
       if(sub){
-        sub._lastSelectedDate=new Date().toISOString().split('T')[0];
+        // Persist to subject data so it survives page reloads
+        sub.lastSelectedDate=new Date().toISOString().split('T')[0];
+        sub._lastSelectedDate=sub.lastSelectedDate;
       }
       tk('Session complete ✓',true);
     }
