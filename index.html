@@ -1372,15 +1372,21 @@ function bootApp(fbConfig) {
         // Rotate rank: ensures every subject eventually surfaces, preventing starvation
         const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
         // Score: urgency dominates, rotation prevents lock-out, overdue adds burst priority
-        // ── RECENCY PENALTY: Prevent same subjects from appearing on consecutive days ──
+        // ── RECENCY PENALTY: Rotate subjects out after you tick them off ──
+        // Penalties must be strong enough to overcome urgency*10 (which can reach 6000+).
+        // Exception: exams ≤3 days away override the penalty — you really do need those daily.
         const lastSelectedDate=(S.lastSelectedDates||{})[sub.id];
         const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
+        const examDaysLeft=Math.ceil((new Date(sub.examDate)-dsDate)/86400000);
         let recencyPenalty=1.0;
-        if(lastSel===0) recencyPenalty=0.05;  // Selected today: 95% penalty
-        else if(lastSel===1) recencyPenalty=0.15;  // Selected yesterday: 85% penalty
-        else if(lastSel===2) recencyPenalty=0.4;  // Selected 2 days ago: 60% penalty
-        else if(lastSel===3) recencyPenalty=0.7;  // Selected 3 days ago: 30% penalty
-        const starvationBoost=lastSel>=3?150:lastSel>=2?100:0;
+        if(lastSel===0) recencyPenalty=0.01;   // Completed today — basically hide it
+        else if(lastSel===1) recencyPenalty=0.04; // Completed yesterday — 96% reduction
+        else if(lastSel===2) recencyPenalty=0.18; // 2 days ago — 82% reduction
+        else if(lastSel===3) recencyPenalty=0.50; // 3 days ago — 50% reduction
+        // Exam in ≤3 days: urgency overrides the penalty so critical subjects still surface
+        if(examDaysLeft<=3) recencyPenalty=Math.max(recencyPenalty,0.90);
+        else if(examDaysLeft<=7) recencyPenalty=Math.max(recencyPenalty,0.40);
+        const starvationBoost=lastSel>=4?400:lastSel>=3?250:lastSel>=2?80:0;
         const score=(urgency*10+(numSubjects-rotatedRank)+overdueNow*5)*recencyPenalty+starvationBoost;
         return{...s,_score:score};
       })
