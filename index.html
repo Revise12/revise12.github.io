@@ -1352,52 +1352,56 @@ function bootApp(fbConfig) {
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
     const dayIndex=buildValidDates(365).indexOf(ds);
-    const numSubjects=S.subjects.length;
     const dsDate=new Date(ds+'T00:00:00');
 
-    // Score every session by urgency + day-rotation
+    // Rank all subjects by urgency once — this drives frequency, not just daily order
+    const urgencyRanked=[...S.subjects]
+      .map(sub=>({id:sub.id,urgency:subjectUrgencyScore(sub),examDays:Math.ceil((new Date(sub.examDate)-dsDate)/86400000)}))
+      .sort((a,b)=>b.urgency-a.urgency);
+
     const scored=all.map(s=>{
-      const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
-      const urgency=subjectUrgencyScore(sub);
-      const overdueNow=(sub.topics||[]).filter(t=>
-        t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
-      ).length;
-      const subRank=S.subjects
-        .map(x=>({id:x.id,u:subjectUrgencyScore(x)}))
-        .sort((a,b)=>b.u-a.u)
-        .findIndex(x=>x.id===s.subjectId);
-      const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
-      // Rotation is the dominant factor — urgency just breaks ties within the same slot.
-      // Previously urgency*10 could reach 6000+ vs rotation's max of ~20, meaning the same
-      // high-urgency subjects won every day. Now rotation * 1000 ensures each day's lineup
-      // shifts, with urgency only deciding order among subjects at the same rotation position.
-      const score=(numSubjects-rotatedRank)*1000+urgency+overdueNow*5;
+      const ri=urgencyRanked.findIndex(x=>x.id===s.subjectId);
+      const{urgency,examDays}=urgencyRanked[ri]||{urgency:0,examDays:999};
       const lastDate=(S.lastSelectedDates||{})[s.subjectId];
       const lastSel=lastDate?Math.floor((dsDate-new Date(lastDate+'T00:00:00'))/86400000):999;
-      const examDays=Math.ceil((new Date(sub.examDate)-dsDate)/86400000);
-      return{...s,_score:score,_lastSel:lastSel,_examDays:examDays};
-    }).sort((a,b)=>b._score-a._score);
 
-    // ── THREE BUCKETS ─────────────────────────────────────
-    // Previously the recency logic was a score penalty, but urgency*10 could be
-    // so large that a penalised subject still beat fresh ones — especially when
-    // numSubjects <= limit (all subjects got a slot regardless). Now we bucket
-    // explicitly so ticking a subject actually removes it from the day's lineup.
-    //
-    // critical  — exam ≤3 days: always shown, no rest
-    // available — not ticked in the last study day: normal pool
-    // resting   — ticked yesterday/today: held back, only used as filler
-    const critical=[], available=[], resting=[];
+      // How frequently should this subject appear based on exam proximity?
+      // Closer exam = shorter interval = appears more days per cycle
+      const interval=examDays<=7?1:examDays<=14?2:examDays<=30?3:4;
+
+      // Each subject gets a unique phase within its cycle based on urgency rank.
+      // This spreads subjects across different days so you don't see the same ones daily.
+      // e.g. with interval=3: rank0→day0,3,6…  rank1→day1,4,7…  rank2→day2,5,8…
+      const phase=ri%interval;
+      const isDue=((dayIndex-phase)%interval+interval)%interval===0;
+
+      // Overdue SM-2 topics bump a subject into the due pool regardless of cycle
+      const overdueNow=(urgencyRanked[ri]&&S.subjects.find(x=>x.id===s.subjectId)?.topics||[])
+        .filter(t=>t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate).length;
+
+      return{...s,_rank:ri,_urgency:urgency,_examDays:examDays,_lastSel:lastSel,_isDue:isDue||overdueNow>0};
+    });
+
+    // ── FOUR BUCKETS ──────────────────────────────────────
+    // critical : exam ≤3 days — always show
+    // due      : on schedule for today per their frequency interval
+    // snoozed  : not due today — used only to fill remaining slots
+    // resting  : ticked off in last 1 day — last resort filler only
+    const critical=[],due=[],snoozed=[],resting=[];
     scored.forEach(s=>{
       if(s._examDays<=3)     critical.push(s);
       else if(s._lastSel<=1) resting.push(s);
-      else                   available.push(s);
+      else if(s._isDue)      due.push(s);
+      else                   snoozed.push(s);
     });
+    // Within each bucket, most urgent first
+    [critical,due,snoozed,resting].forEach(b=>b.sort((a,b)=>a._rank-b._rank));
 
     const result=[];
-    for(const s of critical)  { if(result.length<limit) result.push(s); }
-    for(const s of available) { if(result.length<limit) result.push(s); }
-    for(const s of resting)   { if(result.length<limit) result.push(s); }
+    for(const s of critical) { if(result.length<limit) result.push(s); }
+    for(const s of due)      { if(result.length<limit) result.push(s); }
+    for(const s of snoozed)  { if(result.length<limit) result.push(s); }
+    for(const s of resting)  { if(result.length<limit) result.push(s); }
     return result;
   }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
