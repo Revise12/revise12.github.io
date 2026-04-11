@@ -1468,12 +1468,21 @@ function bootApp(fbConfig) {
     },0);
 
     // ── 6. COGNITIVE CONSOLIDATION PENALTY ──────────────────────────
-    // Penalise revisiting too soon — exception: final 3 days before exam.
+    // Stickgold (2005): re-studying too soon can impair consolidation — but
+    // ONLY when it's early relative to the subject's own SubSR interval.
+    // If interval=1 (struggling subject needs daily review), next-day study
+    // is correct and must NOT be penalised.
+    // Penalty fires only when daysSince/interval < 0.5 (first half of gap).
     let consolidationFactor=1.0;
     if(sr.lastStudied&&daysLeft>3){
       const daysSince=Math.max(0,Math.ceil((today-new Date(sr.lastStudied+'T00:00:00'))/86400000));
-      if(daysSince===0)      consolidationFactor=0.10; // same-day: strongly suppress
-      else if(daysSince===1) consolidationFactor=0.55; // yesterday: mild suppression
+      const interval=Math.max(1,sr.interval);
+      const ratio=daysSince/interval;
+      if(ratio<0.5){
+        if(daysSince===0) consolidationFactor=0.12; // same-day: strong suppress
+        else              consolidationFactor=0.45+ratio*0.2; // 0.45–0.55 in early half of window
+      }
+      // ratio ≥ 0.5 → within intended review window → no suppression
     }
 
     // ── 7. COGNITIVE LOAD BOOST ─────────────────────────────────────
@@ -1563,6 +1572,7 @@ function bootApp(fbConfig) {
         _urgency:info.urgency,
         _examDays:info.examDays,
         _lastSel:lastSel,
+        _subSRDue:subSRDue,
         _isDue:(isDue||subSRDue||overdueTopics>0),
         _domain:info.domain,
         _loadWeight:info.loadWeight,
@@ -1574,13 +1584,15 @@ function bootApp(fbConfig) {
     // critical : exam ≤3 days — always show regardless of spacing
     // due      : SubSR or cycle says it's time to study today
     // snoozed  : not due yet — filler if slots remain
-    // resting  : studied yesterday — last resort only
+    // resting  : studied very recently AND SubSR doesn't demand it yet — last resort
+    // Key fix: _lastSel<=1 only sends to resting when SubSR agrees it's too soon.
+    // If SubSR interval=1 (struggling subject needs daily review), it must stay in `due`.
     const critical=[],due=[],snoozed=[],resting=[];
     scored.forEach(s=>{
-      if(s._examDays<=3)     critical.push(s);
-      else if(s._lastSel<=1) resting.push(s);
-      else if(s._isDue)      due.push(s);
-      else                   snoozed.push(s);
+      if(s._examDays<=3)                   critical.push(s);
+      else if(s._lastSel<=1&&!s._subSRDue) resting.push(s);  // recently studied AND not yet due per SubSR
+      else if(s._isDue)                    due.push(s);
+      else                                 snoozed.push(s);
     });
     [critical,due,snoozed,resting].forEach(b=>b.sort((a,b)=>a._rank-b._rank));
 
