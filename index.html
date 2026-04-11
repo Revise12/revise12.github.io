@@ -1357,12 +1357,14 @@ function bootApp(fbConfig) {
     const quality=subQualityFromTopics(sub);
     sr.lastQuality=quality;
     if(quality<3){
+      // Failed — reset, but keep a 1-day interval (study again tomorrow)
       sr.repetitions=0;
       sr.interval=1;
     } else {
+      // Standard SM-2 graduation: 1 → 3 → interval×EF
       if(sr.repetitions===0)      sr.interval=1;
       else if(sr.repetitions===1) sr.interval=3;
-      else sr.interval=Math.max(1,Math.round(sr.interval*sr.easeFactor));
+      else                        sr.interval=Math.max(1,Math.round(sr.interval*sr.easeFactor));
       sr.repetitions++;
     }
     sr.easeFactor=Math.max(1.3,sr.easeFactor+0.1-(5-quality)*(0.08+(5-quality)*0.02));
@@ -1508,136 +1510,89 @@ function bootApp(fbConfig) {
   function sessForDate(ds){
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-    const dayIndex=buildValidDates(365).indexOf(ds);
     const dsDate=new Date(ds+'T00:00:00');
 
-    // ── STEP 1: Rank all subjects by urgency on this date ──────────────
-    // subjectUrgencyScore now incorporates SubSR retention decay, optimal
-    // spacing window, exam deadline urgency, mastery deficit, consolidation
-    // penalty, cognitive load boost, and crisis multiplier.
-    const urgencyRanked=[...S.subjects]
-      .map(sub=>{
-        ensureSubSR(sub);
-        return{
-          id:sub.id,
-          urgency:subjectUrgencyScore(sub,dsDate),
-          examDays:Math.max(0,Math.ceil((new Date(sub.examDate)-dsDate)/86400000)),
-          domain:getSubjectDomain(sub),
-          loadWeight:DOMAIN_LOAD[getSubjectDomain(sub)]||1.0,
-        };
-      })
-      .sort((a,b)=>b.urgency-a.urgency);
-
-    // ── STEP 2: Compute adaptive per-subject interval from SubSR ────────
-    // Instead of a fixed exam-proximity interval, each subject's interval
-    // comes from its own SM-2 ease factor + repetition count.
-    // This means a subject with high mastery (high EF, many reps) naturally
-    // gets a longer interval, while struggling subjects appear more often.
-    const scored=all.map(s=>{
-      const ri=urgencyRanked.findIndex(x=>x.id===s.subjectId);
-      const info=urgencyRanked[ri]||{urgency:0,examDays:999,domain:'general',loadWeight:1.0};
+    // ── ANNOTATE each session with scheduling data ──────────────────────
+    const annotated=all.map(s=>{
       const sub=S.subjects.find(x=>x.id===s.subjectId);
+      if(!sub)return null;
       ensureSubSR(sub);
       const sr=sub.subSR;
 
-      // Adaptive interval = SubSR interval, clamped by exam proximity
-      // (exam proximity always shortens it — can never wait longer than exam)
+      const examDate=new Date(sub.examDate);examDate.setHours(0,0,0,0);
+      const examDays=Math.max(0,Math.ceil((examDate-dsDate)/86400000));
+
+      // ── Core SubSR due check ─────────────────────────────────────────
+      // A subject is DUE on day D when: daysSinceLastStudied >= subInterval.
+      // This is exactly how SM-2 works — nothing shows up early.
+      // Never-studied subjects are always due (daysSinceLast === null).
+      const daysSinceLast=sr.lastStudied
+        ?Math.max(0,Math.ceil((dsDate-new Date(sr.lastStudied+'T00:00:00'))/86400000))
+        :null;
       const subInterval=Math.max(1,sr.interval);
-      const examCapInterval=info.examDays<=7?1:info.examDays<=14?2:info.examDays<=30?3:subInterval;
-      const effectiveInterval=Math.min(subInterval,examCapInterval);
+      const subSRDue=daysSinceLast===null||daysSinceLast>=subInterval;
 
-      // Days since this subject was last shown on the schedule
-      const lastDate=(S.lastSelectedDates||{})[s.subjectId];
-      const lastSel=lastDate?Math.floor((dsDate-new Date(lastDate+'T00:00:00'))/86400000):999;
+      // Topic SM-2 overdue count — forces subject due regardless of subInterval
+      const overdueTopics=sub.topics.filter(t=>
+        t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
+      ).length;
 
-      // Phase offset: spread different subjects across different days in their cycle
-      // so you don't see the same bundle every day. Uses urgency rank as seed.
-      const phase=ri%Math.max(1,effectiveInterval);
-      const isDue=((dayIndex-phase)%Math.max(1,effectiveInterval)+Math.max(1,effectiveInterval))%Math.max(1,effectiveInterval)===0;
+      // Exam in ≤3 days — always show, no spacing rules apply
+      const isCritical=examDays<=3;
 
-      // SM-2 overdue topics always force this subject into the "due" pool
-      const overdueTopics=(sub?.topics||[]).filter(t=>t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate).length;
+      const isDue=isCritical||subSRDue||overdueTopics>0;
 
-      // SubSR: check if this subject's own review date has arrived
-      const subNextReview=sr.lastStudied?(()=>{
-        const d=new Date(sr.lastStudied+'T00:00:00');
-        d.setDate(d.getDate()+subInterval);
-        return d;
-      })():null;
-      const subSRDue=!subNextReview||(subNextReview<=dsDate);
+      // Days until this subject is next due (for filler pass)
+      const daysUntilDue=subSRDue?0:subInterval-(daysSinceLast||0);
 
-      return{
-        ...s,
-        _rank:ri,
-        _urgency:info.urgency,
-        _examDays:info.examDays,
-        _lastSel:lastSel,
-        _subSRDue:subSRDue,
-        _isDue:(isDue||subSRDue||overdueTopics>0),
-        _domain:info.domain,
-        _loadWeight:info.loadWeight,
-        _effectiveInterval:effectiveInterval,
-      };
+      const urgency=subjectUrgencyScore(sub,dsDate);
+      const domain=getSubjectDomain(sub);
+      const loadWeight=DOMAIN_LOAD[domain]||1.0;
+
+      return{...s,_isDue:isDue,_isCritical:isCritical,
+        _examDays:examDays,_urgency:urgency,_domain:domain,
+        _loadWeight:loadWeight,_daysUntilDue:daysUntilDue,
+        _overdueTopics:overdueTopics,_subSRDue:subSRDue};
+    }).filter(Boolean);
+
+    // Sort: critical → urgency descending
+    annotated.sort((a,b)=>{
+      if(a._isCritical!==b._isCritical)return(b._isCritical?1:0)-(a._isCritical?1:0);
+      return b._urgency-a._urgency;
     });
 
-    // ── STEP 3: Four priority buckets ───────────────────────────────────
-    // critical : exam ≤3 days — always show regardless of spacing
-    // due      : SubSR or cycle says it's time to study today
-    // snoozed  : not due yet — filler if slots remain
-    // resting  : studied very recently AND SubSR doesn't demand it yet — last resort
-    // Key fix: _lastSel<=1 only sends to resting when SubSR agrees it's too soon.
-    // If SubSR interval=1 (struggling subject needs daily review), it must stay in `due`.
-    const critical=[],due=[],snoozed=[],resting=[];
-    scored.forEach(s=>{
-      if(s._examDays<=3)                   critical.push(s);
-      else if(s._lastSel<=1&&!s._subSRDue) resting.push(s);  // recently studied AND not yet due per SubSR
-      else if(s._isDue)                    due.push(s);
-      else                                 snoozed.push(s);
-    });
-    [critical,due,snoozed,resting].forEach(b=>b.sort((a,b)=>a._rank-b._rank));
-
-    // ── STEP 4: Domain interleaving + cognitive load balancing ──────────
-    // Kornell & Bjork (2008): interleaving different subject domains in a
-    // study session outperforms blocked practice for long-term retention.
-    // Cap any single cognitive domain at 50% of selected slots.
-    // Also track total cognitive load (Sweller 1988): cap at 6× unit load
-    // to avoid overloading any single day.
+    // ── DOMAIN INTERLEAVING + LOAD BALANCING ───────────────────────────
+    // Cap any single cognitive domain at ⌈limit/2⌉ slots.
+    // Cap total daily cognitive load so high-load days don't burn you out.
+    // Ref: Kornell & Bjork (2008), Sweller (1988)
     const domainCap=Math.max(1,Math.ceil(limit*0.5));
     const domainCount={};
-    const MAX_DAILY_LOAD=limit*1.4; // generous cap
+    const MAX_DAILY_LOAD=limit*1.5;
     let totalLoad=0;
     const result=[];
 
     function tryAdd(s){
-      if(result.length>=limit) return false;
+      if(result.length>=limit)return false;
       const dom=s._domain||'general';
       const lw=s._loadWeight||1.0;
-      const dc=domainCount[dom]||0;
-      if(dc>=domainCap) return false;
-      if(totalLoad+lw>MAX_DAILY_LOAD) return false;
-      domainCount[dom]=(dc+1);
+      if((domainCount[dom]||0)>=domainCap)return false;
+      if(totalLoad+lw>MAX_DAILY_LOAD)return false;
+      domainCount[dom]=(domainCount[dom]||0)+1;
       totalLoad+=lw;
       result.push(s);
       return true;
     }
 
-    // Pass 1: fill with interleaving constraints respected
-    for(const s of critical) tryAdd(s);
-    for(const s of due)      tryAdd(s);
-    for(const s of snoozed)  tryAdd(s);
-    for(const s of resting)  tryAdd(s);
+    // Pass 1 — due subjects with domain cap enforced
+    for(const s of annotated.filter(s=>s._isDue))tryAdd(s);
 
-    // Pass 2: if slots remain, fill without domain cap (domain diversity already maximised)
-    if(result.length<limit){
-      const remaining=[...critical,...due,...snoozed,...resting].filter(s=>!result.includes(s));
-      for(const s of remaining){
-        if(result.length>=limit) break;
-        const lw=s._loadWeight||1.0;
-        if(totalLoad+lw<=MAX_DAILY_LOAD*1.3){
-          result.push(s);
-          totalLoad+=lw;
-        }
-      }
+    // Pass 2 — subjects due within next 2 days (filler when not enough are due today)
+    for(const s of annotated.filter(s=>!s._isDue&&s._daysUntilDue<=2))tryAdd(s);
+
+    // Pass 3 — any remaining subjects, drop domain cap (ensure schedule isn't empty)
+    for(const s of annotated){
+      if(result.length>=limit)break;
+      if(!result.includes(s))result.push(s);
     }
 
     return result;
