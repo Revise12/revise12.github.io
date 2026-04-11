@@ -1351,47 +1351,54 @@ function bootApp(fbConfig) {
   function sessForDate(ds){
     const all=allSess().filter(s=>s.date===ds);
     const limit=(S.prefs&&S.prefs.sessPerDay)||6;
-
     const dayIndex=buildValidDates(365).indexOf(ds);
     const numSubjects=S.subjects.length;
     const dsDate=new Date(ds+'T00:00:00');
 
-    return all
-      .map(s=>{
-        const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
-        const urgency=subjectUrgencyScore(sub);
-        // Count SM-2 topics overdue as of this session date — adds short-term priority
-        const overdueNow=(sub.topics||[]).filter(t=>
-          t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
-        ).length;
-        // Find rank in urgency-sorted list for rotation
-        const subRank=S.subjects
-          .map(x=>({id:x.id,u:subjectUrgencyScore(x)}))
-          .sort((a,b)=>b.u-a.u)
-          .findIndex(x=>x.id===s.subjectId);
-        // Rotate rank: ensures every subject eventually surfaces, preventing starvation
-        const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
-        // Score: urgency dominates, rotation prevents lock-out, overdue adds burst priority
-        // ── RECENCY PENALTY: Rotate subjects out after you tick them off ──
-        // Penalties must be strong enough to overcome urgency*10 (which can reach 6000+).
-        // Exception: exams ≤3 days away override the penalty — you really do need those daily.
-        const lastSelectedDate=(S.lastSelectedDates||{})[sub.id];
-        const lastSel=lastSelectedDate?Math.floor((dsDate-new Date(lastSelectedDate+'T00:00:00'))/86400000):999;
-        const examDaysLeft=Math.ceil((new Date(sub.examDate)-dsDate)/86400000);
-        let recencyPenalty=1.0;
-        if(lastSel===0) recencyPenalty=0.01;   // Completed today — basically hide it
-        else if(lastSel===1) recencyPenalty=0.04; // Completed yesterday — 96% reduction
-        else if(lastSel===2) recencyPenalty=0.18; // 2 days ago — 82% reduction
-        else if(lastSel===3) recencyPenalty=0.50; // 3 days ago — 50% reduction
-        // Exam in ≤3 days: urgency overrides the penalty so critical subjects still surface
-        if(examDaysLeft<=3) recencyPenalty=Math.max(recencyPenalty,0.90);
-        else if(examDaysLeft<=7) recencyPenalty=Math.max(recencyPenalty,0.40);
-        const starvationBoost=lastSel>=4?400:lastSel>=3?250:lastSel>=2?80:0;
-        const score=(urgency*10+(numSubjects-rotatedRank)+overdueNow*5)*recencyPenalty+starvationBoost;
-        return{...s,_score:score};
-      })
-      .sort((a,b)=>b._score-a._score)
-      .slice(0,limit);
+    // Score every session by urgency + day-rotation
+    const scored=all.map(s=>{
+      const sub=S.subjects.find(x=>x.id===s.subjectId)||{};
+      const urgency=subjectUrgencyScore(sub);
+      const overdueNow=(sub.topics||[]).filter(t=>
+        t.nextReview&&new Date(t.nextReview+'T00:00:00')<=dsDate
+      ).length;
+      const subRank=S.subjects
+        .map(x=>({id:x.id,u:subjectUrgencyScore(x)}))
+        .sort((a,b)=>b.u-a.u)
+        .findIndex(x=>x.id===s.subjectId);
+      const rotatedRank=(subRank+numSubjects-dayIndex%numSubjects)%numSubjects;
+      // Rotation is the dominant factor — urgency just breaks ties within the same slot.
+      // Previously urgency*10 could reach 6000+ vs rotation's max of ~20, meaning the same
+      // high-urgency subjects won every day. Now rotation * 1000 ensures each day's lineup
+      // shifts, with urgency only deciding order among subjects at the same rotation position.
+      const score=(numSubjects-rotatedRank)*1000+urgency+overdueNow*5;
+      const lastDate=(S.lastSelectedDates||{})[s.subjectId];
+      const lastSel=lastDate?Math.floor((dsDate-new Date(lastDate+'T00:00:00'))/86400000):999;
+      const examDays=Math.ceil((new Date(sub.examDate)-dsDate)/86400000);
+      return{...s,_score:score,_lastSel:lastSel,_examDays:examDays};
+    }).sort((a,b)=>b._score-a._score);
+
+    // ── THREE BUCKETS ─────────────────────────────────────
+    // Previously the recency logic was a score penalty, but urgency*10 could be
+    // so large that a penalised subject still beat fresh ones — especially when
+    // numSubjects <= limit (all subjects got a slot regardless). Now we bucket
+    // explicitly so ticking a subject actually removes it from the day's lineup.
+    //
+    // critical  — exam ≤3 days: always shown, no rest
+    // available — not ticked in the last study day: normal pool
+    // resting   — ticked yesterday/today: held back, only used as filler
+    const critical=[], available=[], resting=[];
+    scored.forEach(s=>{
+      if(s._examDays<=3)     critical.push(s);
+      else if(s._lastSel<=1) resting.push(s);
+      else                   available.push(s);
+    });
+
+    const result=[];
+    for(const s of critical)  { if(result.length<limit) result.push(s); }
+    for(const s of available) { if(result.length<limit) result.push(s); }
+    for(const s of resting)   { if(result.length<limit) result.push(s); }
+    return result;
   }
   function sk(s){return`${s.subjectId}_${s.date}_${s.idx}`;}
 
